@@ -20,11 +20,11 @@ terraform apply
 - Resource group `rg-diag-complete-dev-weu-001`
 - Log Analytics workspace `log-diag-complete-dev-weu-001`
 - Key Vault `kv-diagcm-dev-weu-001`
-- Storage account `stdiagcmdevweu001`
+- Key Vault `kv-diagcm-dev-weu-002`
 
 **Diagnostic Settings:**
-- Key Vault: selective categories (AuditEvent, AzurePolicyEvaluationDetails) with dedicated tables
-- Storage account: all categories with dedicated tables
+- Key Vault 1: selective categories (AuditEvent, AzurePolicyEvaluationDetails) with dedicated tables
+- Key Vault 2: all categories (default) with dedicated tables
 
 ## Clean Up
 

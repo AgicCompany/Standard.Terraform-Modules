@@ -1,6 +1,6 @@
 # diagnostic-settings
 
-**Complexity:** Simple
+**Complexity:** Low
 
 Creates an Azure Monitor diagnostic setting to send logs and metrics from any Azure resource to a Log Analytics workspace.
 

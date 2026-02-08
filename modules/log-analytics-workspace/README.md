@@ -1,6 +1,6 @@
 # log-analytics-workspace
 
-**Complexity:** Simple
+**Complexity:** Low
 
 Creates an Azure Log Analytics workspace with secure defaults for centralized logging and monitoring.
 

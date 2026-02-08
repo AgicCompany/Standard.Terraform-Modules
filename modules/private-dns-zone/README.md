@@ -1,6 +1,6 @@
 # private-dns-zone
 
-**Complexity:** Moderate
+**Complexity:** Medium
 
 Creates an Azure Private DNS Zone with virtual network linking for private endpoint DNS resolution.
 

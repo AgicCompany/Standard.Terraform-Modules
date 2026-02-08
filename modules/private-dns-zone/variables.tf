@@ -23,5 +23,5 @@ variable "virtual_network_links" {
 variable "tags" {
   type        = map(string)
   default     = {}
-  description = "Tags to apply to the resources"
+  description = "Tags to apply to the resource"
 }

@@ -1,6 +1,6 @@
 # network-security-group
 
-**Complexity:** Simple
+**Complexity:** Low
 
 Creates an Azure Network Security Group with configurable security rules managed as separate resources.
 

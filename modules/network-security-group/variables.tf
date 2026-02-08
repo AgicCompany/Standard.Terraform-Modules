@@ -21,7 +21,7 @@ variable "security_rules" {
     direction                                  = string
     access                                     = string
     protocol                                   = string
-    source_port_range                          = optional(string, null)
+    source_port_range                          = optional(string, "*")
     destination_port_range                     = optional(string, null)
     source_port_ranges                         = optional(list(string), null)
     destination_port_ranges                    = optional(list(string), null)
@@ -31,7 +31,7 @@ variable "security_rules" {
     destination_address_prefixes               = optional(list(string), null)
     source_application_security_group_ids      = optional(list(string), null)
     destination_application_security_group_ids = optional(list(string), null)
-    description                                = optional(string, null)
+    description                                = optional(string, "")
   }))
   default     = {}
   description = "Map of security rules. Key is used as the rule name."
@@ -41,5 +41,5 @@ variable "security_rules" {
 variable "tags" {
   type        = map(string)
   default     = {}
-  description = "Tags to apply to the resources"
+  description = "Tags to apply to the resource"
 }

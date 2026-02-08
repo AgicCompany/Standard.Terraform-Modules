@@ -1,6 +1,6 @@
 # user-assigned-identity
 
-**Complexity:** Very Simple
+**Complexity:** Low
 
 Creates an Azure User-Assigned Managed Identity for workload authentication.
 
