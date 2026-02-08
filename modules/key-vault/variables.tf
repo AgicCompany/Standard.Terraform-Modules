@@ -113,5 +113,5 @@ variable "private_dns_zone_id" {
 variable "tags" {
   type        = map(string)
   default     = {}
-  description = "Tags to apply to the resources"
+  description = "Tags to apply to the resource"
 }

@@ -91,6 +91,11 @@ These outputs are designed for cross-project state consumption:
 | `public_storage_account_name` | Storage account name |
 | `public_primary_blob_endpoint` | Primary blob endpoint URL |
 
+## Examples
+
+- [basic](./examples/basic)
+- [complete](./examples/complete)
+
 <!-- BEGIN_TF_DOCS -->
 <!-- END_TF_DOCS -->
 

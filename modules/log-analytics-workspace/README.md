@@ -36,6 +36,11 @@ This module applies secure defaults:
 | Retention | 30 days | `retention_in_days` |
 | Daily quota | Unlimited | `daily_quota_gb` |
 
+## Examples
+
+- [basic](./examples/basic)
+- [complete](./examples/complete)
+
 <!-- BEGIN_TF_DOCS -->
 <!-- END_TF_DOCS -->
 

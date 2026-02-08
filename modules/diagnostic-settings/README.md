@@ -38,6 +38,11 @@ This module sends all available logs and metrics by default:
 
 This module does **not** include `resource_group_name`, `location`, or `tags` variables. Diagnostic settings are child resources attached to a target resource and do not have their own resource group, location, or tags.
 
+## Examples
+
+- [basic](./examples/basic)
+- [complete](./examples/complete)
+
 <!-- BEGIN_TF_DOCS -->
 <!-- END_TF_DOCS -->
 

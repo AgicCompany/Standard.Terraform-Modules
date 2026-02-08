@@ -63,6 +63,11 @@ These outputs are designed for cross-project state consumption:
 | `public_vault_id` | Key Vault resource ID |
 | `public_vault_uri` | Key Vault URI |
 
+## Examples
+
+- [basic](./examples/basic)
+- [complete](./examples/complete)
+
 <!-- BEGIN_TF_DOCS -->
 <!-- END_TF_DOCS -->
 

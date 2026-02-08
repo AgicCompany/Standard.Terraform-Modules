@@ -28,6 +28,11 @@ module "identity" {
 
 This module creates a managed identity only. Role assignments are the consumer's responsibility and should follow the principle of least privilege.
 
+## Examples
+
+- [basic](./examples/basic)
+- [complete](./examples/complete)
+
 <!-- BEGIN_TF_DOCS -->
 <!-- END_TF_DOCS -->
 

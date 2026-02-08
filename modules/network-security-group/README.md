@@ -51,6 +51,11 @@ This module creates an empty NSG by default (no rules). Azure provides implicit 
 | AllowInternetOutBound | 65001 | Outbound | Allow |
 | DenyAllOutBound | 65500 | Outbound | Deny |
 
+## Examples
+
+- [basic](./examples/basic)
+- [complete](./examples/complete)
+
 <!-- BEGIN_TF_DOCS -->
 <!-- END_TF_DOCS -->
 

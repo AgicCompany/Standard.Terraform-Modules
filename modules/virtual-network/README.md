@@ -72,11 +72,16 @@ These outputs are designed for cross-project state consumption:
 | `public_vnet_name` | Virtual network name |
 | `public_subnet_ids` | Map of subnet name to subnet ID |
 
+## Examples
+
+- [basic](./examples/basic)
+- [complete](./examples/complete)
+
 <!-- BEGIN_TF_DOCS -->
 <!-- END_TF_DOCS -->
 
 ## Notes
 
-- **Subnets are inline:** Subnets are managed as part of the module, not as separate resources. Adding/removing subnets should work cleanly due to map-based addressing.
+- **Subnets as separate resources:** Subnets are managed as separate `azurerm_subnet` resources with `for_each` for clean lifecycle management. NSG and route table associations use separate association resources to avoid inline conflicts.
 - **No GatewaySubnet validation:** The module does not validate special subnet names. Use correct names for Azure-reserved subnets (GatewaySubnet, AzureFirewallSubnet, etc.).
 - **Private endpoints:** Set `private_endpoint_network_policies = "Disabled"` on subnets that will host private endpoints.

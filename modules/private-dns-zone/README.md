@@ -51,6 +51,11 @@ Private DNS zones are the foundation for private endpoint DNS resolution. No `lo
 | Web Apps | `privatelink.azurewebsites.net` |
 | Azure Monitor | `privatelink.monitor.azure.com` |
 
+## Examples
+
+- [basic](./examples/basic)
+- [complete](./examples/complete)
+
 <!-- BEGIN_TF_DOCS -->
 <!-- END_TF_DOCS -->
 
