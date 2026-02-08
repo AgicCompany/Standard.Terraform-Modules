@@ -4,7 +4,7 @@ All notable changes to this module will be documented in this file.
 
 ## [Unreleased]
 
-## [1.0.0] - YYYY-MM-DD
+## [1.0.0] - 2026-02-08
 
 ### Added
 

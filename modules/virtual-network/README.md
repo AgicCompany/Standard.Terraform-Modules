@@ -78,6 +78,55 @@ These outputs are designed for cross-project state consumption:
 - [complete](./examples/complete)
 
 <!-- BEGIN_TF_DOCS -->
+## Requirements
+
+| Name | Version |
+|------|---------|
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.9.0 |
+| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | >= 4.0.0 |
+
+## Providers
+
+| Name | Version |
+|------|---------|
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | >= 4.0.0 |
+
+## Modules
+
+No modules.
+
+## Resources
+
+| Name | Type |
+|------|------|
+| [azurerm_subnet.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet) | resource |
+| [azurerm_subnet_network_security_group_association.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet_network_security_group_association) | resource |
+| [azurerm_subnet_route_table_association.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet_route_table_association) | resource |
+| [azurerm_virtual_network.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_network) | resource |
+
+## Inputs
+
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| <a name="input_address_space"></a> [address\_space](#input\_address\_space) | Address space for the virtual network (e.g., ["10.0.0.0/16"]) | `list(string)` | n/a | yes |
+| <a name="input_location"></a> [location](#input\_location) | Azure region | `string` | n/a | yes |
+| <a name="input_name"></a> [name](#input\_name) | Virtual network name (full CAF-compliant name, provided by consumer) | `string` | n/a | yes |
+| <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name) | Name of the resource group | `string` | n/a | yes |
+| <a name="input_subnets"></a> [subnets](#input\_subnets) | Map of subnets. Key is used as the subnet name. | <pre>map(object({<br/>    address_prefixes                              = list(string)<br/>    network_security_group_id                     = optional(string, null)<br/>    route_table_id                                = optional(string, null)<br/>    service_endpoints                             = optional(list(string), [])<br/>    private_endpoint_network_policies             = optional(string, "Enabled")<br/>    private_link_service_network_policies_enabled = optional(bool, false)<br/>    delegation = optional(object({<br/>      name = string<br/>      service_delegation = object({<br/>        name    = string<br/>        actions = optional(list(string), [])<br/>      })<br/>    }), null)<br/>  }))</pre> | `{}` | no |
+| <a name="input_tags"></a> [tags](#input\_tags) | Tags to apply to the resource | `map(string)` | `{}` | no |
+
+## Outputs
+
+| Name | Description |
+|------|-------------|
+| <a name="output_address_space"></a> [address\_space](#output\_address\_space) | Virtual network address space |
+| <a name="output_id"></a> [id](#output\_id) | Virtual network resource ID |
+| <a name="output_name"></a> [name](#output\_name) | Virtual network name |
+| <a name="output_public_subnet_ids"></a> [public\_subnet\_ids](#output\_public\_subnet\_ids) | Map of subnet name to subnet ID (for cross-project consumption) |
+| <a name="output_public_vnet_id"></a> [public\_vnet\_id](#output\_public\_vnet\_id) | Virtual network resource ID (for cross-project consumption) |
+| <a name="output_public_vnet_name"></a> [public\_vnet\_name](#output\_public\_vnet\_name) | Virtual network name (for cross-project consumption) |
+| <a name="output_subnet_address_prefixes"></a> [subnet\_address\_prefixes](#output\_subnet\_address\_prefixes) | Map of subnet name to address prefixes |
+| <a name="output_subnet_ids"></a> [subnet\_ids](#output\_subnet\_ids) | Map of subnet name to subnet ID |
 <!-- END_TF_DOCS -->
 
 ## Notes

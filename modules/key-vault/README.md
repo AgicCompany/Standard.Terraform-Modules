@@ -69,6 +69,64 @@ These outputs are designed for cross-project state consumption:
 - [complete](./examples/complete)
 
 <!-- BEGIN_TF_DOCS -->
+## Requirements
+
+| Name | Version |
+|------|---------|
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.9.0 |
+| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | >= 4.0.0 |
+
+## Providers
+
+| Name | Version |
+|------|---------|
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | >= 4.0.0 |
+
+## Modules
+
+No modules.
+
+## Resources
+
+| Name | Type |
+|------|------|
+| [azurerm_key_vault.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/key_vault) | resource |
+| [azurerm_private_endpoint.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_endpoint) | resource |
+| [azurerm_client_config.current](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/client_config) | data source |
+
+## Inputs
+
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| <a name="input_enable_private_endpoint"></a> [enable\_private\_endpoint](#input\_enable\_private\_endpoint) | Create a private endpoint for the Key Vault | `bool` | `true` | no |
+| <a name="input_enable_public_access"></a> [enable\_public\_access](#input\_enable\_public\_access) | Allow public network access to the Key Vault | `bool` | `false` | no |
+| <a name="input_enable_purge_protection"></a> [enable\_purge\_protection](#input\_enable\_purge\_protection) | Enable purge protection. Cannot be disabled once enabled. | `bool` | `true` | no |
+| <a name="input_enabled_for_deployment"></a> [enabled\_for\_deployment](#input\_enabled\_for\_deployment) | Allow Azure VMs to retrieve certificates stored as secrets | `bool` | `false` | no |
+| <a name="input_enabled_for_disk_encryption"></a> [enabled\_for\_disk\_encryption](#input\_enabled\_for\_disk\_encryption) | Allow Azure Disk Encryption to retrieve secrets and unwrap keys | `bool` | `false` | no |
+| <a name="input_enabled_for_template_deployment"></a> [enabled\_for\_template\_deployment](#input\_enabled\_for\_template\_deployment) | Allow Azure Resource Manager to retrieve secrets | `bool` | `false` | no |
+| <a name="input_location"></a> [location](#input\_location) | Azure region | `string` | n/a | yes |
+| <a name="input_name"></a> [name](#input\_name) | Key Vault name (full CAF-compliant name, provided by consumer) | `string` | n/a | yes |
+| <a name="input_network_acls"></a> [network\_acls](#input\_network\_acls) | Network ACLs for the Key Vault. Only applies when enable\_public\_access = true. | <pre>object({<br/>    bypass                     = optional(string, "AzureServices")<br/>    default_action             = optional(string, "Deny")<br/>    ip_rules                   = optional(list(string), [])<br/>    virtual_network_subnet_ids = optional(list(string), [])<br/>  })</pre> | `null` | no |
+| <a name="input_private_dns_zone_id"></a> [private\_dns\_zone\_id](#input\_private\_dns\_zone\_id) | Private DNS zone ID for privatelink.vaultcore.azure.net. Required when enable\_private\_endpoint = true. | `string` | `null` | no |
+| <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name) | Name of the resource group | `string` | n/a | yes |
+| <a name="input_sku_name"></a> [sku\_name](#input\_sku\_name) | SKU name (standard or premium) | `string` | `"standard"` | no |
+| <a name="input_soft_delete_retention_days"></a> [soft\_delete\_retention\_days](#input\_soft\_delete\_retention\_days) | Soft delete retention period in days (7-90) | `number` | `90` | no |
+| <a name="input_subnet_id"></a> [subnet\_id](#input\_subnet\_id) | Subnet ID for the private endpoint. Required when enable\_private\_endpoint = true. | `string` | `null` | no |
+| <a name="input_tags"></a> [tags](#input\_tags) | Tags to apply to the resource | `map(string)` | `{}` | no |
+| <a name="input_tenant_id"></a> [tenant\_id](#input\_tenant\_id) | Azure AD tenant ID. Defaults to current subscription tenant. | `string` | `null` | no |
+
+## Outputs
+
+| Name | Description |
+|------|-------------|
+| <a name="output_id"></a> [id](#output\_id) | Key Vault resource ID |
+| <a name="output_name"></a> [name](#output\_name) | Key Vault name |
+| <a name="output_private_endpoint_id"></a> [private\_endpoint\_id](#output\_private\_endpoint\_id) | Private endpoint resource ID (when enabled) |
+| <a name="output_private_ip_address"></a> [private\_ip\_address](#output\_private\_ip\_address) | Private IP address of the private endpoint (when enabled) |
+| <a name="output_public_vault_id"></a> [public\_vault\_id](#output\_public\_vault\_id) | Key Vault resource ID (for cross-project consumption) |
+| <a name="output_public_vault_uri"></a> [public\_vault\_uri](#output\_public\_vault\_uri) | Key Vault URI (for cross-project consumption) |
+| <a name="output_tenant_id"></a> [tenant\_id](#output\_tenant\_id) | Azure AD tenant ID |
+| <a name="output_vault_uri"></a> [vault\_uri](#output\_vault\_uri) | Key Vault URI |
 <!-- END_TF_DOCS -->
 
 ## Notes

@@ -57,6 +57,47 @@ This module creates an empty NSG by default (no rules). Azure provides implicit 
 - [complete](./examples/complete)
 
 <!-- BEGIN_TF_DOCS -->
+## Requirements
+
+| Name | Version |
+|------|---------|
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.9.0 |
+| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | >= 4.0.0 |
+
+## Providers
+
+| Name | Version |
+|------|---------|
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | >= 4.0.0 |
+
+## Modules
+
+No modules.
+
+## Resources
+
+| Name | Type |
+|------|------|
+| [azurerm_network_security_group.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/network_security_group) | resource |
+| [azurerm_network_security_rule.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/network_security_rule) | resource |
+
+## Inputs
+
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| <a name="input_location"></a> [location](#input\_location) | Azure region | `string` | n/a | yes |
+| <a name="input_name"></a> [name](#input\_name) | Network security group name (full CAF-compliant name, provided by consumer) | `string` | n/a | yes |
+| <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name) | Name of the resource group | `string` | n/a | yes |
+| <a name="input_security_rules"></a> [security\_rules](#input\_security\_rules) | Map of security rules. Key is used as the rule name. | <pre>map(object({<br/>    priority                                   = number<br/>    direction                                  = string<br/>    access                                     = string<br/>    protocol                                   = string<br/>    source_port_range                          = optional(string, "*")<br/>    destination_port_range                     = optional(string, null)<br/>    source_port_ranges                         = optional(list(string), null)<br/>    destination_port_ranges                    = optional(list(string), null)<br/>    source_address_prefix                      = optional(string, null)<br/>    destination_address_prefix                 = optional(string, null)<br/>    source_address_prefixes                    = optional(list(string), null)<br/>    destination_address_prefixes               = optional(list(string), null)<br/>    source_application_security_group_ids      = optional(list(string), null)<br/>    destination_application_security_group_ids = optional(list(string), null)<br/>    description                                = optional(string, "")<br/>  }))</pre> | `{}` | no |
+| <a name="input_tags"></a> [tags](#input\_tags) | Tags to apply to the resource | `map(string)` | `{}` | no |
+
+## Outputs
+
+| Name | Description |
+|------|-------------|
+| <a name="output_id"></a> [id](#output\_id) | Network security group resource ID |
+| <a name="output_name"></a> [name](#output\_name) | Network security group name |
+| <a name="output_public_nsg_id"></a> [public\_nsg\_id](#output\_public\_nsg\_id) | Network security group resource ID (for cross-project consumption) |
 <!-- END_TF_DOCS -->
 
 ## Notes

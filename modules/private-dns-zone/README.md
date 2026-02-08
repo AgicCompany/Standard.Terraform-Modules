@@ -57,6 +57,47 @@ Private DNS zones are the foundation for private endpoint DNS resolution. No `lo
 - [complete](./examples/complete)
 
 <!-- BEGIN_TF_DOCS -->
+## Requirements
+
+| Name | Version |
+|------|---------|
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.9.0 |
+| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | >= 4.0.0 |
+
+## Providers
+
+| Name | Version |
+|------|---------|
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | >= 4.0.0 |
+
+## Modules
+
+No modules.
+
+## Resources
+
+| Name | Type |
+|------|------|
+| [azurerm_private_dns_zone.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_dns_zone) | resource |
+| [azurerm_private_dns_zone_virtual_network_link.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_dns_zone_virtual_network_link) | resource |
+
+## Inputs
+
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| <a name="input_name"></a> [name](#input\_name) | Private DNS zone name (e.g., privatelink.blob.core.windows.net) | `string` | n/a | yes |
+| <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name) | Name of the resource group | `string` | n/a | yes |
+| <a name="input_tags"></a> [tags](#input\_tags) | Tags to apply to the resource | `map(string)` | `{}` | no |
+| <a name="input_virtual_network_links"></a> [virtual\_network\_links](#input\_virtual\_network\_links) | Map of virtual network links. Key is used as the link name. | <pre>map(object({<br/>    virtual_network_id   = string<br/>    registration_enabled = optional(bool, false)<br/>  }))</pre> | `{}` | no |
+
+## Outputs
+
+| Name | Description |
+|------|-------------|
+| <a name="output_id"></a> [id](#output\_id) | Private DNS zone resource ID |
+| <a name="output_name"></a> [name](#output\_name) | Private DNS zone name |
+| <a name="output_public_dns_zone_id"></a> [public\_dns\_zone\_id](#output\_public\_dns\_zone\_id) | Private DNS zone resource ID (for cross-project consumption) |
+| <a name="output_virtual_network_link_ids"></a> [virtual\_network\_link\_ids](#output\_virtual\_network\_link\_ids) | Map of link name to virtual network link resource ID |
 <!-- END_TF_DOCS -->
 
 ## Notes

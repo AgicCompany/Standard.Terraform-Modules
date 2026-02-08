@@ -44,6 +44,46 @@ This module does **not** include `resource_group_name`, `location`, or `tags` va
 - [complete](./examples/complete)
 
 <!-- BEGIN_TF_DOCS -->
+## Requirements
+
+| Name | Version |
+|------|---------|
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.9.0 |
+| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | >= 4.0.0 |
+
+## Providers
+
+| Name | Version |
+|------|---------|
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | >= 4.0.0 |
+
+## Modules
+
+No modules.
+
+## Resources
+
+| Name | Type |
+|------|------|
+| [azurerm_monitor_diagnostic_setting.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_diagnostic_setting) | resource |
+
+## Inputs
+
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| <a name="input_enabled_log_categories"></a> [enabled\_log\_categories](#input\_enabled\_log\_categories) | List of log categories to enable. Null sends all logs via the allLogs category group. | `list(string)` | `null` | no |
+| <a name="input_log_analytics_destination_type"></a> [log\_analytics\_destination\_type](#input\_log\_analytics\_destination\_type) | Log Analytics destination type. Use "Dedicated" for resource-specific tables or "AzureDiagnostics" for legacy single table. | `string` | `null` | no |
+| <a name="input_log_analytics_workspace_id"></a> [log\_analytics\_workspace\_id](#input\_log\_analytics\_workspace\_id) | Log Analytics workspace resource ID for log destination | `string` | n/a | yes |
+| <a name="input_metric_categories"></a> [metric\_categories](#input\_metric\_categories) | List of metric categories to enable. Null sends all metrics via the AllMetrics category group. | `list(string)` | `null` | no |
+| <a name="input_name"></a> [name](#input\_name) | Diagnostic setting name | `string` | n/a | yes |
+| <a name="input_target_resource_id"></a> [target\_resource\_id](#input\_target\_resource\_id) | Resource ID of the target resource to monitor | `string` | n/a | yes |
+
+## Outputs
+
+| Name | Description |
+|------|-------------|
+| <a name="output_id"></a> [id](#output\_id) | Diagnostic setting resource ID |
+| <a name="output_name"></a> [name](#output\_name) | Diagnostic setting name |
 <!-- END_TF_DOCS -->
 
 ## Notes
