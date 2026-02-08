@@ -18,6 +18,11 @@ variable "name" {
 variable "address_space" {
   type        = list(string)
   description = "Address space for the virtual network (e.g., [\"10.0.0.0/16\"])"
+
+  validation {
+    condition     = length(var.address_space) > 0
+    error_message = "At least one address space CIDR must be provided."
+  }
 }
 
 # === Optional: Configuration ===
@@ -39,6 +44,14 @@ variable "subnets" {
   }))
   default     = {}
   description = "Map of subnets. Key is used as the subnet name."
+
+  validation {
+    condition = alltrue([
+      for k, v in var.subnets :
+      contains(["Disabled", "Enabled", "NetworkSecurityGroupEnabled", "RouteTableEnabled"], v.private_endpoint_network_policies)
+    ])
+    error_message = "private_endpoint_network_policies must be one of: Disabled, Enabled, NetworkSecurityGroupEnabled, RouteTableEnabled."
+  }
 }
 
 # === Tags ===

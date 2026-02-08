@@ -37,6 +37,10 @@ Private DNS zones are the foundation for private endpoint DNS resolution. No `lo
 |---------|---------|-------------------|
 | Auto-registration | Disabled | `virtual_network_links[*].registration_enabled` |
 
+## Non-Standard Interface
+
+This module does **not** include a `location` variable. Private DNS zones are global Azure resources and do not have an associated region.
+
 ## Common Zone Names
 
 | Service | DNS Zone Name |

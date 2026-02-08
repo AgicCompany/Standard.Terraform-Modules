@@ -19,6 +19,11 @@ variable "sku" {
   type        = string
   default     = "PerGB2018"
   description = "SKU of the Log Analytics workspace"
+
+  validation {
+    condition     = contains(["Free", "PerGB2018", "PerNode", "Premium", "Standard", "Standalone", "Unlimited", "CapacityReservation"], var.sku)
+    error_message = "SKU must be one of: Free, PerGB2018, PerNode, Premium, Standard, Standalone, Unlimited, CapacityReservation."
+  }
 }
 
 variable "retention_in_days" {

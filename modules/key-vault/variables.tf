@@ -19,6 +19,11 @@ variable "sku_name" {
   type        = string
   default     = "standard"
   description = "SKU name (standard or premium)"
+
+  validation {
+    condition     = contains(["standard", "premium"], var.sku_name)
+    error_message = "SKU name must be \"standard\" or \"premium\"."
+  }
 }
 
 variable "tenant_id" {

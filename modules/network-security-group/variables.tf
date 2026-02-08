@@ -35,6 +35,38 @@ variable "security_rules" {
   }))
   default     = {}
   description = "Map of security rules. Key is used as the rule name."
+
+  validation {
+    condition = alltrue([
+      for k, v in var.security_rules :
+      !(v.source_port_range != null && v.source_port_ranges != null)
+    ])
+    error_message = "Each rule must specify either source_port_range or source_port_ranges, not both."
+  }
+
+  validation {
+    condition = alltrue([
+      for k, v in var.security_rules :
+      !(v.destination_port_range != null && v.destination_port_ranges != null)
+    ])
+    error_message = "Each rule must specify either destination_port_range or destination_port_ranges, not both."
+  }
+
+  validation {
+    condition = alltrue([
+      for k, v in var.security_rules :
+      !(v.source_address_prefix != null && v.source_address_prefixes != null)
+    ])
+    error_message = "Each rule must specify either source_address_prefix or source_address_prefixes, not both."
+  }
+
+  validation {
+    condition = alltrue([
+      for k, v in var.security_rules :
+      !(v.destination_address_prefix != null && v.destination_address_prefixes != null)
+    ])
+    error_message = "Each rule must specify either destination_address_prefix or destination_address_prefixes, not both."
+  }
 }
 
 # === Tags ===
