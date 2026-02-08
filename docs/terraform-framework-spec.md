@@ -28,8 +28,8 @@ This document defines the standards and conventions for using Terraform within t
 
 The framework defines two repository types:
 
-1. **Terraform Modules Repo** â€” Central source of truth for reusable modules, maintained by infra team
-2. **Project Repo** â€” Contains app code, infrastructure, and pipelines
+1. **Terraform Modules Repo** — Central source of truth for reusable modules, maintained by infra team
+2. **Project Repo** — Contains app code, infrastructure, and pipelines
 
 ---
 
@@ -41,13 +41,13 @@ Project repositories contain application source code, Terraform infrastructure, 
 
 ```
 project-repo/
-â”œâ”€â”€ src/                          # App source code
-â”œâ”€â”€ infrastructures/
-â”‚   â””â”€â”€ iac/                      # Terraform code
-â”œâ”€â”€ ops/                          # CI/CD definitions
-â”‚   â”œâ”€â”€ infrastructure.yml
-â”‚   â””â”€â”€ app.yml
-â””â”€â”€ README.md
+├── src/                          # App source code
+├── infrastructures/
+│   └── iac/                      # Terraform code
+├── ops/                          # CI/CD definitions
+│   ├── infrastructure.yml
+│   └── app.yml
+└── README.md
 ```
 
 ### 3.2 Terraform Directory Layout (infrastructures/iac/)
@@ -56,33 +56,33 @@ All Terraform code follows a flat structure with environment-specific variable f
 
 ```
 infrastructures/iac/
-â”œâ”€â”€ main.tf
-â”œâ”€â”€ variables.tf
-â”œâ”€â”€ outputs.tf
-â”œâ”€â”€ providers.tf
-â”œâ”€â”€ locals.tf
-â”œâ”€â”€ data.tf
-â”œâ”€â”€ versions.tf
-â”œâ”€â”€ terraform.tfvars
-â”œâ”€â”€ environments/
-â”‚   â”œâ”€â”€ dev.tfvars
-â”‚   â”œâ”€â”€ dev.backend.tfvars
-â”‚   â”œâ”€â”€ test.tfvars
-â”‚   â”œâ”€â”€ test.backend.tfvars
-â”‚   â”œâ”€â”€ stg.tfvars
-â”‚   â”œâ”€â”€ stg.backend.tfvars
-â”‚   â”œâ”€â”€ prod.tfvars
-â”‚   â””â”€â”€ prod.backend.tfvars
-â”œâ”€â”€ modules/                      # Only if remote modules not possible
-â”‚   â””â”€â”€ MODULES.md
-â”œâ”€â”€ bootstrap/
-â”‚   â”œâ”€â”€ bootstrap.sh
-â”‚   â”œâ”€â”€ bootstrap.ps1
-â”‚   â””â”€â”€ README.md
-â”œâ”€â”€ .gitignore
-â”œâ”€â”€ .terraform-version
-â”œâ”€â”€ .terraform.lock.hcl
-â””â”€â”€ README.md
+├── main.tf
+├── variables.tf
+├── outputs.tf
+├── providers.tf
+├── locals.tf
+├── data.tf
+├── versions.tf
+├── terraform.tfvars
+├── environments/
+│   ├── dev.tfvars
+│   ├── dev.backend.tfvars
+│   ├── test.tfvars
+│   ├── test.backend.tfvars
+│   ├── stg.tfvars
+│   ├── stg.backend.tfvars
+│   ├── prod.tfvars
+│   └── prod.backend.tfvars
+├── modules/                      # Only if remote modules not possible
+│   └── MODULES.md
+├── bootstrap/
+│   ├── bootstrap.sh
+│   ├── bootstrap.ps1
+│   └── README.md
+├── .gitignore
+├── .terraform-version
+├── .terraform.lock.hcl
+└── README.md
 ```
 
 ### 3.3 Terraform Files
@@ -156,16 +156,16 @@ When remote modules are not accessible (e.g., project on client's Azure DevOps),
 
 ```
 infrastructures/iac/
-â”œâ”€â”€ modules/
-â”‚   â”œâ”€â”€ storage-account/
-â”‚   â”œâ”€â”€ key-vault/
-â”‚   â””â”€â”€ MODULES.md
+├── modules/
+│   ├── storage-account/
+│   ├── key-vault/
+│   └── MODULES.md
 ```
 
 ### 4.2 Module Sourcing Priority
 
-1. **Remote first** â€” Use modules from central `terraform-modules` repo
-2. **Local fallback** â€” Copy to `modules/` only if remote not accessible
+1. **Remote first** — Use modules from central `terraform-modules` repo
+2. **Local fallback** — Copy to `modules/` only if remote not accessible
 
 ### 4.3 Remote vs Local Sourcing
 
@@ -192,8 +192,8 @@ Modules copied from central terraform-modules repository.
 
 | Module | Source Version | Copy Date | Notes |
 |--------|----------------|-----------|-------|
-| storage-account | v1.2.0 | 2024-02-15 | â€” |
-| key-vault | v2.0.1 | 2024-02-15 | â€” |
+| storage-account | v1.2.0 | 2024-02-15 | — |
+| key-vault | v2.0.1 | 2024-02-15 | — |
 
 ## Updating
 
@@ -293,9 +293,9 @@ Each project requires a dedicated Azure Storage Account for Terraform state and 
 
 Bootstrap scripts reside in the project repository under the `bootstrap/` directory:
 
-- `bootstrap.sh` â€” Bash (Linux/macOS/WSL)
-- `bootstrap.ps1` â€” PowerShell (Windows)
-- `README.md` â€” Usage instructions
+- `bootstrap.sh` — Bash (Linux/macOS/WSL)
+- `bootstrap.ps1` — PowerShell (Windows)
+- `README.md` — Usage instructions
 
 ### 7.2 Script Parameters
 
@@ -311,7 +311,7 @@ Bootstrap scripts reside in the project repository under the `bootstrap/` direct
 |----------|--------|---------------|
 | Resource Group | `rg-<project>-tfstate-<region_short>-001` | Container for state + secrets |
 | Storage Account | `st<project>tfstate<region_short>001` | LRS redundancy |
-| Blob Container | `tfstate` | â€” |
+| Blob Container | `tfstate` | — |
 | Key Vault | `kv-<project>-secrets-<region_short>-001` | Project secrets |
 
 ### 7.4 State File Organization
@@ -428,27 +428,27 @@ All reusable modules are hosted in a single monorepo. This provides a central lo
 
 ```
 terraform-modules/
-â”œâ”€â”€ storage-account/
-â”‚   â”œâ”€â”€ main.tf
-â”‚   â”œâ”€â”€ variables.tf
-â”‚   â”œâ”€â”€ outputs.tf
-â”‚   â”œâ”€â”€ locals.tf
-â”‚   â”œâ”€â”€ data.tf
-â”‚   â”œâ”€â”€ versions.tf
-â”‚   â”œâ”€â”€ examples/
-â”‚   â”‚   â”œâ”€â”€ basic/
-â”‚   â”‚   â”‚   â”œâ”€â”€ main.tf
-â”‚   â”‚   â”‚   â””â”€â”€ README.md
-â”‚   â”‚   â””â”€â”€ complete/
-â”‚   â”‚       â”œâ”€â”€ main.tf
-â”‚   â”‚       â””â”€â”€ README.md
-â”‚   â”œâ”€â”€ CHANGELOG.md
-â”‚   â””â”€â”€ README.md
-â”œâ”€â”€ virtual-network/
-â”‚   â””â”€â”€ ...
-â”œâ”€â”€ key-vault/
-â”‚   â””â”€â”€ ...
-â””â”€â”€ README.md
+├── storage-account/
+│   ├── main.tf
+│   ├── variables.tf
+│   ├── outputs.tf
+│   ├── locals.tf
+│   ├── data.tf
+│   ├── versions.tf
+│   ├── examples/
+│   │   ├── basic/
+│   │   │   ├── main.tf
+│   │   │   └── README.md
+│   │   └── complete/
+│   │       ├── main.tf
+│   │       └── README.md
+│   ├── CHANGELOG.md
+│   └── README.md
+├── virtual-network/
+│   └── ...
+├── key-vault/
+│   └── ...
+└── README.md
 ```
 
 ### 11.2 Module Folder Structure
@@ -493,7 +493,7 @@ Strict adherence to semantic versioning:
 
 | Bump | When | Example |
 |------|------|---------|
-| MAJOR | Breaking change â€” consumers must modify their code | Renaming a variable, removing an output, changing default behavior |
+| MAJOR | Breaking change — consumers must modify their code | Renaming a variable, removing an output, changing default behavior |
 | MINOR | New feature, backward compatible | Adding a new optional variable, new output |
 | PATCH | Bug fix, backward compatible | Fixing a typo, correcting logic without interface change |
 
@@ -543,7 +543,7 @@ All modules must output:
 | `id` | Resource ID |
 | `name` | Resource name |
 
-Plus resource-specific outputs (e.g., `primary_blob_endpoint` for storage, `vault_uri` for Key Vault). Note: secrets such as access keys must never be exposed as outputs â€” see Module Standards document.
+Plus resource-specific outputs (e.g., `primary_blob_endpoint` for storage, `vault_uri` for Key Vault). Note: secrets such as access keys must never be exposed as outputs — see Module Standards document.
 
 ### 13.4 Naming Responsibility
 
@@ -564,7 +564,7 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = ">= 3.75.0"
+      version = ">= 4.0.0"
     }
   }
 }
@@ -786,7 +786,7 @@ Developers use local state for experimentation. Remote state is reserved for rea
 ### 20.1 Local Development
 
 ```bash
-# Initialize without backend config â€” uses local state
+# Initialize without backend config — uses local state
 terraform init
 
 # Work locally
@@ -801,7 +801,7 @@ Local state file (`terraform.tfstate`) is created in the project directory. This
 All deployments to real environments (dev, test, stg, prod) use remote state via CI/CD pipelines:
 
 ```bash
-# Initialize with backend config â€” uses remote state
+# Initialize with backend config — uses remote state
 terraform init -backend-config=environments/dev.backend.tfvars
 
 # Plan and apply
@@ -897,8 +897,8 @@ All projects must be under the same Microsoft Entra ID tenant.
 Deployments are fully manual. Each environment is deployed independently with explicit approval.
 
 ```
-dev â†’ test â†’ stg â†’ prod
-       â†‘       â†‘      â†‘
+dev → test → stg → prod
+       ↑       ↑      ↑
     manual  manual  manual
 ```
 
@@ -1072,7 +1072,7 @@ Azure DevOps Pipelines (YAML-based)
 
 ### 26.3 Trust Model
 
-The operator triggering the pipeline is trusted. No approval gates â€” safeguards are:
+The operator triggering the pipeline is trusted. No approval gates — safeguards are:
 
 - Manual trigger requires deliberate action
 - Plan output visible before apply
@@ -1094,25 +1094,25 @@ The operator triggering the pipeline is trusted. No approval gates â€” safe
 ```
 Manual Trigger (with environment parameter):
 
-  â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
-  â”‚ Stage: Validate                         â”‚
-  â”‚  - terraform fmt -check                 â”‚
-  â”‚  - terraform validate                   â”‚
-  â”‚  - tflint                               â”‚
-  â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
-                    â†“
-  â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
-  â”‚ Stage: Plan                             â”‚
-  â”‚  - terraform init (with backend config) â”‚
-  â”‚  - terraform plan -out=tfplan           â”‚
-  â”‚  - Publish plan artifact                â”‚
-  â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
-                    â†“
-  â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
-  â”‚ Stage: Apply                            â”‚
-  â”‚  - Download plan artifact               â”‚
-  â”‚  - terraform apply tfplan               â”‚
-  â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+  ┌─────────────────────────────────────────┐
+  │ Stage: Validate                         │
+  │  - terraform fmt -check                 │
+  │  - terraform validate                   │
+  │  - tflint                               │
+  └─────────────────────────────────────────┘
+                    ↓
+  ┌─────────────────────────────────────────┐
+  │ Stage: Plan                             │
+  │  - terraform init (with backend config) │
+  │  - terraform plan -out=tfplan           │
+  │  - Publish plan artifact                │
+  └─────────────────────────────────────────┘
+                    ↓
+  ┌─────────────────────────────────────────┐
+  │ Stage: Apply                            │
+  │  - Download plan artifact               │
+  │  - terraform apply tfplan               │
+  └─────────────────────────────────────────┘
 ```
 
 ---
@@ -1177,7 +1177,7 @@ If any validation step fails, pipeline stops. No plan or apply runs.
 
 ### 30.2 Plan Artifact Guarantee
 
-Apply uses the exact plan file generated in Plan stage. No re-planning occurs â€” what was reviewed is what gets applied.
+Apply uses the exact plan file generated in Plan stage. No re-planning occurs — what was reviewed is what gets applied.
 
 ---
 
@@ -1208,13 +1208,13 @@ Pipeline definitions live in the project repository under the `ops/` directory:
 
 ```
 project-repo/
-â”œâ”€â”€ src/
-â”œâ”€â”€ infrastructures/
-â”‚   â””â”€â”€ iac/
-â”œâ”€â”€ ops/
-â”‚   â”œâ”€â”€ infrastructure.yml
-â”‚   â””â”€â”€ app.yml
-â””â”€â”€ README.md
+├── src/
+├── infrastructures/
+│   └── iac/
+├── ops/
+│   ├── infrastructure.yml
+│   └── app.yml
+└── README.md
 ```
 
 ---
@@ -1271,40 +1271,40 @@ A template repository provides the starting point for new projects:
 
 ```
 terraform-project-template/
-â”œâ”€â”€ src/                          # App source code placeholder
-â”‚   â””â”€â”€ .gitkeep
-â”œâ”€â”€ infrastructures/
-â”‚   â””â”€â”€ iac/
-â”‚       â”œâ”€â”€ main.tf
-â”‚       â”œâ”€â”€ variables.tf
-â”‚       â”œâ”€â”€ outputs.tf
-â”‚       â”œâ”€â”€ providers.tf
-â”‚       â”œâ”€â”€ locals.tf
-â”‚       â”œâ”€â”€ data.tf
-â”‚       â”œâ”€â”€ versions.tf
-â”‚       â”œâ”€â”€ terraform.tfvars
-â”‚       â”œâ”€â”€ environments/
-â”‚       â”‚   â”œâ”€â”€ dev.tfvars
-â”‚       â”‚   â”œâ”€â”€ dev.backend.tfvars
-â”‚       â”‚   â”œâ”€â”€ test.tfvars
-â”‚       â”‚   â”œâ”€â”€ test.backend.tfvars
-â”‚       â”‚   â”œâ”€â”€ stg.tfvars
-â”‚       â”‚   â”œâ”€â”€ stg.backend.tfvars
-â”‚       â”‚   â”œâ”€â”€ prod.tfvars
-â”‚       â”‚   â””â”€â”€ prod.backend.tfvars
-â”‚       â”œâ”€â”€ modules/
-â”‚       â”‚   â””â”€â”€ MODULES.md
-â”‚       â”œâ”€â”€ bootstrap/
-â”‚       â”‚   â”œâ”€â”€ bootstrap.sh
-â”‚       â”‚   â”œâ”€â”€ bootstrap.ps1
-â”‚       â”‚   â””â”€â”€ README.md
-â”‚       â”œâ”€â”€ .gitignore
-â”‚       â”œâ”€â”€ .terraform-version
-â”‚       â””â”€â”€ README.md
-â”œâ”€â”€ ops/
-â”‚   â”œâ”€â”€ infrastructure.yml
-â”‚   â””â”€â”€ app.yml
-â””â”€â”€ README.md
+├── src/                          # App source code placeholder
+│   └── .gitkeep
+├── infrastructures/
+│   └── iac/
+│       ├── main.tf
+│       ├── variables.tf
+│       ├── outputs.tf
+│       ├── providers.tf
+│       ├── locals.tf
+│       ├── data.tf
+│       ├── versions.tf
+│       ├── terraform.tfvars
+│       ├── environments/
+│       │   ├── dev.tfvars
+│       │   ├── dev.backend.tfvars
+│       │   ├── test.tfvars
+│       │   ├── test.backend.tfvars
+│       │   ├── stg.tfvars
+│       │   ├── stg.backend.tfvars
+│       │   ├── prod.tfvars
+│       │   └── prod.backend.tfvars
+│       ├── modules/
+│       │   └── MODULES.md
+│       ├── bootstrap/
+│       │   ├── bootstrap.sh
+│       │   ├── bootstrap.ps1
+│       │   └── README.md
+│       ├── .gitignore
+│       ├── .terraform-version
+│       └── README.md
+├── ops/
+│   ├── infrastructure.yml
+│   └── app.yml
+└── README.md
 ```
 
 ### 35.3 New Project Workflow
