@@ -78,19 +78,16 @@ module "virtual_network" {
   address_space       = ["10.0.0.0/16"]
 
   subnets = {
-    # Application subnet with NSG and service endpoints
+    # Application subnet with service endpoints
     snet-app = {
       address_prefixes                  = ["10.0.1.0/24"]
-      network_security_group_id         = azurerm_network_security_group.app.id
       service_endpoints                 = ["Microsoft.Storage", "Microsoft.KeyVault"]
       private_endpoint_network_policies = "Disabled"
     }
 
-    # Data subnet with NSG and route table
+    # Data subnet
     snet-data = {
-      address_prefixes          = ["10.0.2.0/24"]
-      network_security_group_id = azurerm_network_security_group.data.id
-      route_table_id            = azurerm_route_table.data.id
+      address_prefixes = ["10.0.2.0/24"]
     }
 
     # Private endpoint subnet
@@ -113,7 +110,7 @@ module "virtual_network" {
 
     # Container Apps delegation subnet
     snet-container-apps = {
-      address_prefixes = ["10.0.5.0/23"]
+      address_prefixes = ["10.0.6.0/23"]
       delegation = {
         name = "containerapps"
         service_delegation = {
@@ -122,6 +119,17 @@ module "virtual_network" {
         }
       }
     }
+  }
+
+  # NSG associations (separate from subnet definition to avoid for_each unknown-value issues)
+  subnet_nsg_associations = {
+    snet-app  = azurerm_network_security_group.app.id
+    snet-data = azurerm_network_security_group.data.id
+  }
+
+  # Route table associations
+  subnet_route_table_associations = {
+    snet-data = azurerm_route_table.data.id
   }
 
   tags = {

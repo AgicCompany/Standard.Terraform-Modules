@@ -17,14 +17,17 @@ module "virtual_network" {
 
   subnets = {
     snet-app = {
-      address_prefixes              = ["10.0.1.0/24"]
-      network_security_group_id     = azurerm_network_security_group.app.id
-      service_endpoints             = ["Microsoft.Storage", "Microsoft.KeyVault"]
+      address_prefixes                  = ["10.0.1.0/24"]
+      service_endpoints                 = ["Microsoft.Storage", "Microsoft.KeyVault"]
       private_endpoint_network_policies = "Disabled"
     }
     snet-data = {
       address_prefixes = ["10.0.2.0/24"]
     }
+  }
+
+  subnet_nsg_associations = {
+    snet-app = azurerm_network_security_group.app.id
   }
 
   tags = local.common_tags
@@ -35,8 +38,8 @@ module "virtual_network" {
 
 - Virtual network with configurable address space
 - Subnets via map variable (no list ordering issues)
-- NSG association per subnet (`network_security_group_id`)
-- Route table association per subnet (`route_table_id`)
+- NSG association per subnet (`subnet_nsg_associations`)
+- Route table association per subnet (`subnet_route_table_associations`)
 - Service endpoints per subnet
 - Subnet delegation support
 - Private endpoint network policies configuration
@@ -45,8 +48,8 @@ module "virtual_network" {
 
 This module does not apply security defaults at the network level. Security is implemented through:
 
-- Network Security Groups (created separately, associated via `network_security_group_id`)
-- Route tables (created separately, associated via `route_table_id`)
+- Network Security Groups (created separately, associated via `subnet_nsg_associations`)
+- Route tables (created separately, associated via `subnet_route_table_associations`)
 
 ## Subnet Configuration
 
@@ -55,12 +58,27 @@ Each subnet in the `subnets` map supports:
 | Property | Type | Default | Description |
 |----------|------|---------|-------------|
 | `address_prefixes` | list(string) | Required | Subnet address prefixes |
-| `network_security_group_id` | string | `null` | NSG to associate |
-| `route_table_id` | string | `null` | Route table to associate |
 | `service_endpoints` | list(string) | `[]` | Service endpoints to enable |
 | `private_endpoint_network_policies` | string | `"Enabled"` | Set to `"Disabled"` for PE subnets |
 | `private_link_service_network_policies_enabled` | bool | `false` | Enable for private link services |
 | `delegation` | object | `null` | Service delegation configuration |
+
+## NSG and Route Table Associations
+
+NSG and route table associations are managed via separate variables to avoid Terraform `for_each` unknown-value issues when creating resources in the same configuration:
+
+```hcl
+subnet_nsg_associations = {
+  snet-app  = azurerm_network_security_group.app.id
+  snet-data = azurerm_network_security_group.data.id
+}
+
+subnet_route_table_associations = {
+  snet-data = azurerm_route_table.data.id
+}
+```
+
+Keys must match subnet names defined in the `subnets` variable.
 
 ## Public Outputs
 

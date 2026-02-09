@@ -29,8 +29,6 @@ variable "address_space" {
 variable "subnets" {
   type = map(object({
     address_prefixes                              = list(string)
-    network_security_group_id                     = optional(string, null)
-    route_table_id                                = optional(string, null)
     service_endpoints                             = optional(list(string), [])
     private_endpoint_network_policies             = optional(string, "Enabled")
     private_link_service_network_policies_enabled = optional(bool, false)
@@ -52,6 +50,18 @@ variable "subnets" {
     ])
     error_message = "private_endpoint_network_policies must be one of: Disabled, Enabled, NetworkSecurityGroupEnabled, RouteTableEnabled."
   }
+}
+
+variable "subnet_nsg_associations" {
+  type        = map(string)
+  default     = {}
+  description = "Map of subnet name to NSG resource ID. Keys must match keys in the subnets variable."
+}
+
+variable "subnet_route_table_associations" {
+  type        = map(string)
+  default     = {}
+  description = "Map of subnet name to route table resource ID. Keys must match keys in the subnets variable."
 }
 
 # === Tags ===

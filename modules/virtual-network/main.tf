@@ -32,21 +32,15 @@ resource "azurerm_subnet" "this" {
 }
 
 resource "azurerm_subnet_network_security_group_association" "this" {
-  for_each = {
-    for k, v in var.subnets : k => v
-    if v.network_security_group_id != null
-  }
+  for_each = var.subnet_nsg_associations
 
   subnet_id                 = azurerm_subnet.this[each.key].id
-  network_security_group_id = each.value.network_security_group_id
+  network_security_group_id = each.value
 }
 
 resource "azurerm_subnet_route_table_association" "this" {
-  for_each = {
-    for k, v in var.subnets : k => v
-    if v.route_table_id != null
-  }
+  for_each = var.subnet_route_table_associations
 
   subnet_id      = azurerm_subnet.this[each.key].id
-  route_table_id = each.value.route_table_id
+  route_table_id = each.value
 }
