@@ -290,4 +290,4 @@ No issues found.
 |--------|-------------|
 | `d356f98` | Fix virtual-network for_each unknown-value error and invalid CIDR |
 | `dbad5b0` | Fix module bugs found during live testing (linux-web-app, function-app, app-service-plan, mssql-database) |
-| `pending` | Fix AKS examples (missing terraform blocks, inline RGs, placeholder IDs, stale K8s version) |
+| `b99114a` | Fix AKS examples and update test results with Phase 3 |
