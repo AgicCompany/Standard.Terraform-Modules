@@ -1,17 +1,35 @@
+terraform {
+  required_version = ">= 1.9.0"
+
+  required_providers {
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = ">= 4.0.0"
+    }
+  }
+}
+
 provider "azurerm" {
   features {}
 }
 
+data "azurerm_client_config" "current" {}
+
+resource "azurerm_resource_group" "example" {
+  name     = "rg-sqldb-complete-dev-weu-001"
+  location = "westeurope"
+}
+
 resource "azurerm_mssql_server" "example" {
   name                = "sql-payments-prod-weu-001"
-  resource_group_name = "rg-data-prod-weu-001"
-  location            = "westeurope"
+  resource_group_name = azurerm_resource_group.example.name
+  location            = azurerm_resource_group.example.location
   version             = "12.0"
   minimum_tls_version = "1.2"
 
   azuread_administrator {
-    login_username              = "sqladmin@example.com"
-    object_id                   = "00000000-0000-0000-0000-000000000000"
+    login_username              = "sqladmin@contoso.com"
+    object_id                   = data.azurerm_client_config.current.object_id
     azuread_authentication_only = true
   }
 
@@ -43,4 +61,12 @@ module "database" {
     project     = "payments"
     cost_center = "finance"
   }
+}
+
+output "database_id" {
+  value = module.database.id
+}
+
+output "database_name" {
+  value = module.database.name
 }

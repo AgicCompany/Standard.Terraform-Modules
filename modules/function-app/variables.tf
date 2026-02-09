@@ -35,12 +35,12 @@ variable "storage_account_access_key" {
 variable "application_stack" {
   type = object({
     dotnet_version              = optional(string)
-    use_dotnet_isolated_runtime = optional(bool, true)
+    use_dotnet_isolated_runtime = optional(bool)
     java_version                = optional(string)
     node_version                = optional(string)
     python_version              = optional(string)
     powershell_core_version     = optional(string)
-    use_custom_runtime          = optional(bool, false)
+    use_custom_runtime          = optional(bool)
     docker = optional(object({
       image_name        = string
       image_tag         = string

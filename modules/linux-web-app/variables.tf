@@ -71,6 +71,12 @@ variable "health_check_path" {
   description = "Health check path (e.g., /health)"
 }
 
+variable "health_check_eviction_time_in_min" {
+  type        = number
+  default     = 2
+  description = "Time in minutes after which unhealthy instances are removed. Required when health_check_path is set."
+}
+
 variable "always_on" {
   type        = bool
   default     = true

@@ -15,10 +15,11 @@ resource "azurerm_linux_web_app" "this" {
   app_settings = var.app_settings
 
   site_config {
-    always_on           = var.always_on
-    health_check_path   = var.health_check_path
-    minimum_tls_version = "1.2"
-    ftps_state          = "Disabled"
+    always_on                         = var.always_on
+    health_check_path                 = var.health_check_path
+    health_check_eviction_time_in_min = var.health_check_path != null ? var.health_check_eviction_time_in_min : null
+    minimum_tls_version               = "1.2"
+    ftps_state                        = "Disabled"
 
     dynamic "application_stack" {
       for_each = var.application_stack != null ? [var.application_stack] : []
