@@ -162,16 +162,18 @@ Integration tests deploy multiple modules together to validate cross-module wiri
 #### Integration Test 2: Database Stack
 
 **Estimated cost:** 3-5 EUR per session.
+**Region:** northeurope (SQL blocked in westeurope for MPN).
 
 | Step | Module | Notes |
 |------|--------|-------|
 | 1 | virtual-network | Shared VNet with PE subnet |
 | 2 | private-dns-zone | `privatelink.database.windows.net` linked to VNet |
-| 3 | key-vault | For SQL admin password |
-| 4 | mssql-server | With private endpoint, AAD-only auth |
-| 5 | mssql-database | Basic DTU tier |
+| 3 | mssql-server | With private endpoint, AAD-only auth |
+| 4 | mssql-database | S0 (Standard) tier |
 
-**Validates:** Key Vault secret integration, private endpoint for SQL, AAD authentication.
+**Validates:** Private endpoint for SQL, DNS zone group wiring, AAD-only authentication.
+
+**Note:** Key Vault is not needed for AAD-only auth (no SQL password). The stack was simplified from the original plan.
 
 #### Integration Test 3: Container Stack
 
@@ -179,13 +181,20 @@ Integration tests deploy multiple modules together to validate cross-module wiri
 
 | Step | Module | Notes |
 |------|--------|-------|
-| 1 | virtual-network | With subnet for Container App Environment |
+| 1 | virtual-network | `snet-pe` (/24) for ACR PE, `snet-cae` (/23) for CAE |
 | 2 | log-analytics-workspace | Required by Container App Environment |
-| 3 | container-registry | Standard SKU (no PE for this test) |
-| 4 | container-app-environment | With VNet integration |
-| 5 | container-app | Simple container from ACR |
+| 3 | private-dns-zone | `privatelink.azurecr.io` linked to VNet |
+| 4 | container-registry | Premium SKU with private endpoint |
+| 5 | container-app-environment | Internal LB, VNet-integrated |
+| 6 | container-app | `mcr.microsoft.com/k8se/quickstart:latest`, internal ingress |
 
-**Validates:** Container App Environment VNet integration, ACR pull, container deployment.
+**Validates:** ACR private endpoint + DNS, CAE internal load balancer, container deployment, VNet wiring.
+
+**Important notes:**
+- The CAE subnet **must have delegation** to `Microsoft.App/environments` with action `Microsoft.Network/virtualNetworks/subnets/join/action`. Without this, apply fails with `ManagedEnvironmentSubnetDelegationError`.
+- CAE subnet requires minimum `/23` CIDR.
+- ACR PE creates **two** DNS A records: one for the registry and one for the `.data` endpoint.
+- CAE destroy takes ~18 minutes. This is normal Azure behavior.
 
 #### Integration Test 4: AKS Stack
 
@@ -193,12 +202,18 @@ Integration tests deploy multiple modules together to validate cross-module wiri
 
 | Step | Module | Notes |
 |------|--------|-------|
-| 1 | virtual-network | With dedicated AKS subnet (minimum /24) |
+| 1 | virtual-network | `snet-pe` (/24) for ACR PE |
 | 2 | log-analytics-workspace | For Container Insights |
-| 3 | container-registry | Standard SKU |
-| 4 | aks | Private cluster, CNI Overlay, single node (Standard_B2s) |
+| 3 | private-dns-zone | `privatelink.azurecr.io` linked to VNet |
+| 4 | container-registry | Premium SKU with private endpoint |
+| 5 | aks | Standard_B2s, 1 node, `zones = []`, no autoscaling, Container Insights enabled |
 
-**Validates:** Private AKS cluster, CNI Overlay networking, Container Insights, ACR integration.
+**Validates:** ACR private endpoint + DNS, private AKS cluster, Container Insights → LAW, Azure RBAC, local accounts disabled.
+
+**Important notes:**
+- AKS provision takes ~10 minutes, destroy takes ~5 minutes.
+- ContainerInsights orphan blocks RG deletion — use `az group delete` for cleanup (see section 5.4).
+- AKS creates a `MC_` node resource group that is auto-deleted when the cluster is destroyed.
 
 ---
 
