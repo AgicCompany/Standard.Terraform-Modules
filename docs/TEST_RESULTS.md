@@ -15,7 +15,8 @@
 | Phase 1 (Free/Low) | 8 | 8 | 0 | 2 |
 | Phase 2 (Medium) | 8 | 8 | 0 | 4 |
 | Phase 3 (High) | 1 | 1 | 0 | 1 |
-| **Total** | **17** | **17** | **0** | **7** |
+| Phase 4 (Integration) | 4 stacks | 4 | 0 | 0 |
+| **Total** | **17 + 4 stacks** | **All pass** | **0** | **7** |
 
 ---
 
@@ -270,6 +271,100 @@ No issues found.
 | Identity | SystemAssigned | SystemAssigned |
 | Node pool OS | AzureLinux | AzureLinux |
 | Tags | applied | applied |
+
+---
+
+## Phase 4: Integration Tests
+
+Integration tests validate cross-module wiring by deploying multi-module stacks that mirror real-world architectures.
+
+### Integration Test 1: Web App Stack
+
+| Property | Value |
+|----------|-------|
+| Modules | virtual-network, private-dns-zone, log-analytics-workspace, app-service-plan, linux-web-app, diagnostic-settings |
+| Resources created | 11 |
+| Region | westeurope |
+| Result | **PASS** |
+
+**Cross-module wiring verified:**
+
+| Check | Result |
+|-------|--------|
+| PE auto-approved | Yes |
+| DNS A record (`privatelink.azurewebsites.net`) | `10.0.1.4` |
+| VNet integration connected | Yes (`snet-integration`) |
+| HTTPS only / public access disabled | Yes |
+| Diagnostics flowing to LAW | Yes |
+| Clean destroy | Yes (11/11) |
+
+### Integration Test 2: Database Stack
+
+| Property | Value |
+|----------|-------|
+| Modules | virtual-network, private-dns-zone, mssql-server, mssql-database |
+| Resources created | 8 |
+| Region | northeurope (SQL blocked in westeurope for MPN) |
+| Result | **PASS** |
+
+**Cross-module wiring verified:**
+
+| Check | Result |
+|-------|--------|
+| PE auto-approved | Yes |
+| DNS A record (`privatelink.database.windows.net`) | `10.0.1.4` |
+| Public access disabled | Yes |
+| TLS 1.2 enforced | Yes |
+| AAD-only auth | Yes |
+| Database SKU (S0) | Standard |
+| Clean destroy | Yes (8/8) |
+
+### Integration Test 3: Container Stack
+
+| Property | Value |
+|----------|-------|
+| Modules | virtual-network, log-analytics-workspace, private-dns-zone, container-registry, container-app-environment, container-app |
+| Resources created | 11 |
+| Region | westeurope |
+| Result | **PASS** (after test config fix) |
+
+**Test config fix:** The CAE infrastructure subnet requires delegation to `Microsoft.App/environments`. This is an Azure requirement, not a module bug — the consumer must configure the subnet delegation.
+
+**Cross-module wiring verified:**
+
+| Check | Result |
+|-------|--------|
+| ACR PE auto-approved | Yes |
+| ACR DNS records (`privatelink.azurecr.io`) | `10.0.1.5` / `10.0.1.4` (data) |
+| CAE internal LB | Yes |
+| CAE static IP in VNet | `10.0.2.190` (in `snet-cae`) |
+| Container App running | Yes (quickstart image) |
+| Ingress internal only | Yes |
+| Clean destroy | Yes (11/11, ~18 min for CAE) |
+
+### Integration Test 4: AKS Stack
+
+| Property | Value |
+|----------|-------|
+| Modules | virtual-network, log-analytics-workspace, private-dns-zone, container-registry, aks |
+| Resources created | 9 |
+| Region | westeurope |
+| Provision time | ~10 minutes (AKS) |
+| Destroy time | ~5 min (AKS) + ~10 min (RG cleanup via `az group delete`) |
+| Result | **PASS** |
+
+**Cross-module wiring verified:**
+
+| Check | Result |
+|-------|--------|
+| ACR PE auto-approved | Yes |
+| ACR DNS records (`privatelink.azurecr.io`) | `10.0.1.5` / `10.0.1.4` (data) |
+| AKS private cluster | Yes |
+| AKS K8s version | 1.33 |
+| Local accounts disabled | Yes |
+| Azure RBAC | Yes |
+| Container Insights → LAW | Yes |
+| ContainerInsights orphan on destroy | Yes (expected, manual `az group delete` needed) |
 
 ---
 
