@@ -28,13 +28,23 @@ az account set --subscription "<subscription-id>"
 
 Claude Code assumes an active Azure CLI session. It does not manage authentication.
 
+**Important (WSL):** The AzureRM Terraform provider cannot auto-detect the subscription in WSL environments. You must pass the subscription ID as an environment variable on every terraform command:
+
+```bash
+ARM_SUBSCRIPTION_ID=ac0ea687-800c-467f-a67a-c070396bda88 terraform plan
+ARM_SUBSCRIPTION_ID=ac0ea687-800c-467f-a67a-c070396bda88 terraform apply -auto-approve
+ARM_SUBSCRIPTION_ID=ac0ea687-800c-467f-a67a-c070396bda88 terraform destroy -auto-approve
+```
+
+Alternatively, export it once per session: `export ARM_SUBSCRIPTION_ID=ac0ea687-800c-467f-a67a-c070396bda88`
+
 ### 1.3 State Management
 
 All test deployments use **local state**. No remote backend configuration is needed for testing. Local state files are excluded via `.gitignore`.
 
 ### 1.4 Working Directory
 
-Claude Code runs from inside the `terraform-modules` repo. Tests execute from each module's `examples/complete/` directory (isolation tests) or from a dedicated `tests/` directory (integration tests).
+Claude Code runs from inside the `framework-terraform` repo. Tests execute from each module's `examples/complete/` or `examples/basic/` directory (isolation tests) or from a dedicated `tests/` directory (integration tests).
 
 ---
 
@@ -76,7 +86,7 @@ Monthly budget: 130 EUR. Remaining budget varies -- check before testing expensi
 ### 3.2 Budget Rules
 
 1. **Always destroy after testing.** No resources should survive longer than a single test session.
-2. **Check remaining budget** before testing Medium or High tier modules: `az consumption usage list --query "[].{Cost:pretaxCost}" --output table` (or check the Azure portal Cost Management blade).
+2. **Check remaining budget** before testing Medium or High tier modules. Use the Azure portal **Cost Management + Billing** blade — the `az consumption usage list` CLI command has a 24-48 hour delay and is unreliable for same-day cost checking.
 3. **High tier modules** (AKS, Redis, Front Door): only test when at least 30 EUR of budget remains. Deploy, verify, destroy in the same session.
 4. **Use the cheapest viable SKUs** for testing. The goal is to validate module logic, not performance. Examples: Basic App Service Plan, Basic SQL DTU, Standard_B2s nodes for AKS.
 5. **If a destroy fails**, fix and retry immediately. Orphaned resources are budget llamas eating your credits.
@@ -117,9 +127,9 @@ Each module is tested independently with its prerequisites deployed inline. The 
 | container-app-environment | Resource group, virtual-network (with subnet), log-analytics-workspace | Consumption | Medium |
 | container-app | Resource group, container-app-environment | Consumption (single replica) | Medium |
 | container-registry | Resource group | Standard | Low |
-| mssql-server | Resource group, key-vault (for admin password) | N/A (server is free, DB costs) | Low |
-| mssql-database | Resource group, mssql-server | Basic DTU (5 DTU) | Medium |
-| aks | Resource group, virtual-network (with subnet), log-analytics-workspace | Standard_B2s, 1 node, no autoscaling for test | High |
+| mssql-server | Resource group | N/A (server is free, DB costs). **Region: use northeurope** (westeurope blocked for MPN) | Low |
+| mssql-database | Resource group, mssql-server | Basic DTU (5 DTU). **Region: use northeurope** (westeurope blocked for MPN) | Medium |
+| aks | Resource group, log-analytics-workspace | Standard_B2s, 1 node, no autoscaling, `zones = []` (MPN zone restrictions). See AKS notes in section 8 | High |
 
 #### P3 - Situational
 
@@ -280,6 +290,8 @@ If `terraform destroy` fails:
 3. Delete the resource group as a last resort: `az group delete --name <rg-name> --yes --no-wait`
 4. Log the failure -- it may indicate a module bug (missing dependency ordering, lifecycle issues)
 
+**Known destroy issue — AKS with Container Insights:** When an AKS cluster with OMS agent (Container Insights) is destroyed, Azure leaves an orphaned `ContainerInsights(<workspace-name>)` solution resource in the resource group. This causes `terraform destroy` to fail on the RG deletion with `prevent_deletion_if_contains_resources`. This is a guaranteed failure, not an edge case. Use `az group delete --name <rg-name> --yes` to clean up.
+
 ---
 
 ## 6. Test Execution Order
@@ -329,6 +341,9 @@ Run after every test session:
 # List all tftest resource groups
 az group list --query "[?starts_with(name, 'rg-tftest')].{Name:name, State:properties.provisioningState}" --output table
 
+# Also check for AKS node resource groups (MC_* prefix)
+az group list --query "[?starts_with(name, 'MC_')].{Name:name, State:properties.provisioningState}" --output table
+
 # Delete any survivors
 az group delete --name <rg-name> --yes --no-wait
 
@@ -346,6 +361,9 @@ az group list --query "[?starts_with(name, 'rg-tftest')].name" --output tsv | xa
 - **Private endpoints in isolation tests:** For modules that default to `enable_private_endpoint = true`, isolation tests need a VNet and subnet as prerequisites. For cheaper/faster testing, you can set `enable_private_endpoint = false` and `enable_public_access = true` to skip the networking prerequisites. Test private endpoint wiring separately or in integration tests.
 - **Key Vault soft delete:** Key Vault has a soft-delete retention period (default 90 days). Reusing the same name after destroy will fail. Either purge explicitly (`az keyvault purge --name <name>`) or use a unique suffix per test run.
 - **SQL Server soft delete:** Similar to Key Vault. Server names are globally unique and may be retained briefly after deletion.
-- **AKS cluster creation time:** AKS clusters take 5-10 minutes to provision and 3-5 minutes to destroy. Plan accordingly.
-- **Container App Environment:** Can take 5-10 minutes to provision when VNet-integrated.
+- **AKS cluster creation time:** AKS clusters take ~10 minutes to provision. Destroy takes ~5 minutes for the cluster itself, but the resource group cleanup (which must delete the orphaned ContainerInsights resource and the MC_ node resource group) takes an additional ~10 minutes. Total destroy cycle: ~15 minutes.
+- **AKS availability zones on MPN:** MPN subscriptions may only support a subset of availability zones for certain VM SKUs in westeurope. The module default `zones = ["1", "2", "3"]` may fail. For testing, override with `zones = []` (no zone pinning). This is a subscription limitation, not a module bug.
+- **AKS Container Insights cleanup:** See section 5.4 for the known destroy failure. Always use `az group delete` after AKS destroy to clean up the orphaned ContainerInsights solution resource.
+- **Container App Environment:** Can take 4-6 minutes to provision when VNet-integrated.
+- **SQL Server region restriction:** MPN subscriptions cannot provision SQL Server in westeurope (`ProvisioningDisabled`). Use northeurope for mssql-server and mssql-database tests. The modules are region-agnostic; this is purely a subscription limitation.
 - **Log Analytics free tier:** The free tier allows 5 GB/day ingestion. Sufficient for testing.
