@@ -1,25 +1,43 @@
+terraform {
+  required_version = ">= 1.9.0"
+
+  required_providers {
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = ">= 4.0.0"
+    }
+  }
+}
+
 provider "azurerm" {
   features {}
 }
 
+data "azurerm_client_config" "current" {}
+
+resource "azurerm_resource_group" "example" {
+  name     = "rg-aks-prod-weu-001"
+  location = "westeurope"
+}
+
 resource "azurerm_virtual_network" "example" {
   name                = "vnet-aks-prod-weu-001"
-  resource_group_name = "rg-aks-prod-weu-001"
-  location            = "westeurope"
+  resource_group_name = azurerm_resource_group.example.name
+  location            = azurerm_resource_group.example.location
   address_space       = ["10.1.0.0/16"]
 }
 
 resource "azurerm_subnet" "nodes" {
   name                 = "snet-aks-nodes-prod-weu-001"
-  resource_group_name  = "rg-aks-prod-weu-001"
+  resource_group_name  = azurerm_resource_group.example.name
   virtual_network_name = azurerm_virtual_network.example.name
   address_prefixes     = ["10.1.0.0/22"]
 }
 
 resource "azurerm_log_analytics_workspace" "example" {
   name                = "law-aks-prod-weu-001"
-  resource_group_name = "rg-aks-prod-weu-001"
-  location            = "westeurope"
+  resource_group_name = azurerm_resource_group.example.name
+  location            = azurerm_resource_group.example.location
   sku                 = "PerGB2018"
   retention_in_days   = 90
 }
@@ -27,15 +45,14 @@ resource "azurerm_log_analytics_workspace" "example" {
 module "aks" {
   source = "../../"
 
-  resource_group_name = "rg-aks-prod-weu-001"
-  location            = "westeurope"
+  resource_group_name = azurerm_resource_group.example.name
+  location            = azurerm_resource_group.example.location
   name                = "aks-payments-prod-weu-001"
   dns_prefix          = "aks-payments-prod"
 
-  kubernetes_version       = "1.29"
   sku_tier                 = "Standard"
   node_resource_group_name = "rg-aks-payments-prod-weu-001-nodes"
-  admin_group_object_ids   = ["00000000-0000-0000-0000-000000000000"]
+  admin_group_object_ids   = [data.azurerm_client_config.current.object_id]
 
   default_node_pool = {
     vm_size         = "Standard_D4s_v3"
@@ -78,4 +95,16 @@ module "aks" {
     project     = "payments"
     cost_center = "finance"
   }
+}
+
+output "cluster_id" {
+  value = module.aks.id
+}
+
+output "cluster_name" {
+  value = module.aks.name
+}
+
+output "private_fqdn" {
+  value = module.aks.private_fqdn
 }

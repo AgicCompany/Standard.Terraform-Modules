@@ -14,7 +14,8 @@
 |-------|---------------|--------|--------|------------|
 | Phase 1 (Free/Low) | 8 | 8 | 0 | 2 |
 | Phase 2 (Medium) | 8 | 8 | 0 | 4 |
-| **Total** | **16** | **16** | **0** | **6** |
+| Phase 3 (High) | 1 | 1 | 0 | 1 |
+| **Total** | **17** | **17** | **0** | **7** |
 
 ---
 
@@ -226,11 +227,49 @@ No issues found.
 
 ---
 
-## Phase 3: High Cost Modules (Not Tested)
+## Phase 3: High Cost Modules
 
-| Module | Reason |
-|--------|--------|
-| aks | Requires 30+ EUR budget remaining; deferred to a dedicated session |
+### 17. aks
+
+| Property | Value |
+|----------|-------|
+| Example | `examples/basic` (with cost-optimized overrides) |
+| Resources created | 3 (1 RG, 1 LAW, 1 AKS cluster) |
+| Provision time | ~10 minutes |
+| Destroy time | ~5 minutes (AKS) + ~10 minutes (RG cleanup) |
+| Result | **PASS** (after fix) |
+
+**Test configuration:** Standard_B2s, 1 node, no autoscaling, no availability zones, Free tier SKU. Used basic example with node pool overrides to minimize cost.
+
+**Bugs found:**
+
+1. **Incomplete examples (MEDIUM):** Both `examples/basic/main.tf` and `examples/complete/main.tf` were missing the `terraform {}` block with version constraints, inline `azurerm_resource_group` resources (referenced non-existent RGs by name string), and output blocks. The complete example also used a placeholder `admin_group_object_ids = ["00000000-0000-0000-0000-000000000000"]` and a stale `kubernetes_version = "1.29"` (current default is 1.33).
+
+   **Fix:** Added `terraform {}` blocks, inline resource groups, outputs. Complete example: replaced placeholder with `data.azurerm_client_config.current.object_id`, removed hardcoded `kubernetes_version` (let Azure select latest).
+
+   **Files changed:** `examples/basic/main.tf`, `examples/complete/main.tf`
+
+**Subscription limitations encountered:**
+
+1. **AvailabilityZoneNotSupported:** MPN subscription only supports zone `3` for Standard_D2s_v3 in westeurope. The module default `zones = ["1", "2", "3"]` fails. This is a subscription limitation, not a module bug. Tested with `zones = []`.
+
+2. **ContainerInsights orphaned resource:** When AKS with OMS agent is destroyed, Azure leaves a `ContainerInsights` solution resource in the RG that Terraform doesn't manage. This causes `terraform destroy` to fail on the RG deletion with `prevent_deletion_if_contains_resources`. Cleanup required `az group delete`.
+
+**Verified configuration:**
+
+| Setting | Expected | Verified |
+|---------|----------|----------|
+| Private cluster | true | true |
+| Local accounts disabled | true | true |
+| Azure RBAC | true | true |
+| OIDC issuer | true | true |
+| Kubernetes version | latest (1.33) | 1.33 |
+| Network plugin | azure (overlay) | azure (overlay) |
+| Network policy | azure | azure |
+| Container Insights | enabled | enabled |
+| Identity | SystemAssigned | SystemAssigned |
+| Node pool OS | AzureLinux | AzureLinux |
+| Tags | applied | applied |
 
 ---
 
@@ -240,7 +279,8 @@ No issues found.
 |-----------|--------|------------|
 | SQL Server blocked in westeurope | mssql-server, mssql-database examples fail | Test in northeurope |
 | Zone redundant SQL not available | mssql-database complete example fails with Premium SKU | Test with Standard SKU (S0) |
-| Monthly budget: 130 EUR | AKS testing deferred | Test when sufficient budget remains |
+| AKS zones limited in westeurope | Default `zones = ["1","2","3"]` fails for some VM SKUs | Test with `zones = []` |
+| ContainerInsights orphan on destroy | RG deletion fails after AKS destroy with OMS agent | Use `az group delete` for cleanup |
 
 ---
 
@@ -250,3 +290,4 @@ No issues found.
 |--------|-------------|
 | `d356f98` | Fix virtual-network for_each unknown-value error and invalid CIDR |
 | `dbad5b0` | Fix module bugs found during live testing (linux-web-app, function-app, app-service-plan, mssql-database) |
+| `pending` | Fix AKS examples (missing terraform blocks, inline RGs, placeholder IDs, stale K8s version) |
