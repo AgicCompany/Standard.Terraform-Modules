@@ -1,0 +1,17 @@
+# Changelog
+
+All notable changes to this module will be documented in this file.
+
+## [Unreleased]
+
+## [1.0.0] - 2026-02-09
+
+### Added
+
+- Initial release
+- Linux virtual machine with SSH key authentication
+- Network interface with optional public IP
+- Data disk management with for_each
+- System and user-assigned managed identity support
+- Boot diagnostics support
+- Secure defaults (password auth disabled, no public IP)
