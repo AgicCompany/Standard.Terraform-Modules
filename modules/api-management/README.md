@@ -74,6 +74,73 @@ These outputs are designed for cross-project state consumption:
 - [complete](./examples/complete)
 
 <!-- BEGIN_TF_DOCS -->
+## Requirements
+
+| Name | Version |
+|------|---------|
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.9.0 |
+| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | >= 4.0.0 |
+
+## Providers
+
+| Name | Version |
+|------|---------|
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | >= 4.0.0 |
+
+## Modules
+
+No modules.
+
+## Resources
+
+| Name | Type |
+|------|------|
+| [azurerm_api_management.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/api_management) | resource |
+| [azurerm_private_endpoint.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_endpoint) | resource |
+
+## Inputs
+
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| <a name="input_additional_locations"></a> [additional\_locations](#input\_additional\_locations) | Additional deployment locations for multi-region (Premium SKU only) | <pre>list(object({<br/>    location                  = string<br/>    sku_name                  = optional(string)<br/>    zones                     = optional(list(string))<br/>    virtual_network_subnet_id = optional(string)<br/>  }))</pre> | `[]` | no |
+| <a name="input_client_certificate_enabled"></a> [client\_certificate\_enabled](#input\_client\_certificate\_enabled) | Enable client certificate authentication | `bool` | `false` | no |
+| <a name="input_enable_private_endpoint"></a> [enable\_private\_endpoint](#input\_enable\_private\_endpoint) | Create a private endpoint for this API Management service | `bool` | `true` | no |
+| <a name="input_enable_public_access"></a> [enable\_public\_access](#input\_enable\_public\_access) | Allow public network access | `bool` | `false` | no |
+| <a name="input_gateway_disabled"></a> [gateway\_disabled](#input\_gateway\_disabled) | Disable gateway in the main region (for multi-region with External/Internal VNet) | `bool` | `false` | no |
+| <a name="input_identity_ids"></a> [identity\_ids](#input\_identity\_ids) | User-assigned identity IDs | `list(string)` | `[]` | no |
+| <a name="input_identity_type"></a> [identity\_type](#input\_identity\_type) | Type of managed identity | `string` | `"SystemAssigned"` | no |
+| <a name="input_location"></a> [location](#input\_location) | Azure region | `string` | n/a | yes |
+| <a name="input_min_api_version"></a> [min\_api\_version](#input\_min\_api\_version) | Minimum API version to enforce | `string` | `null` | no |
+| <a name="input_name"></a> [name](#input\_name) | API Management service name | `string` | n/a | yes |
+| <a name="input_notification_sender_email"></a> [notification\_sender\_email](#input\_notification\_sender\_email) | Email address for sending notifications | `string` | `null` | no |
+| <a name="input_private_dns_zone_id"></a> [private\_dns\_zone\_id](#input\_private\_dns\_zone\_id) | Private DNS zone ID for privatelink.azure-api.net. Required when enable\_private\_endpoint = true. | `string` | `null` | no |
+| <a name="input_publisher_email"></a> [publisher\_email](#input\_publisher\_email) | Publisher email (for notifications) | `string` | n/a | yes |
+| <a name="input_publisher_name"></a> [publisher\_name](#input\_publisher\_name) | Publisher name (shown in developer portal) | `string` | n/a | yes |
+| <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name) | Name of the resource group | `string` | n/a | yes |
+| <a name="input_sku_name"></a> [sku\_name](#input\_sku\_name) | SKU in format {tier}\_{capacity} | `string` | `"Developer_1"` | no |
+| <a name="input_subnet_id"></a> [subnet\_id](#input\_subnet\_id) | Subnet ID for the private endpoint. Required when enable\_private\_endpoint = true. | `string` | `null` | no |
+| <a name="input_tags"></a> [tags](#input\_tags) | Tags to apply to the resource | `map(string)` | `{}` | no |
+| <a name="input_virtual_network_subnet_id"></a> [virtual\_network\_subnet\_id](#input\_virtual\_network\_subnet\_id) | Subnet ID for VNet integration (required when virtual\_network\_type is External or Internal) | `string` | `null` | no |
+| <a name="input_virtual_network_type"></a> [virtual\_network\_type](#input\_virtual\_network\_type) | Type of VNet integration | `string` | `"None"` | no |
+| <a name="input_zones"></a> [zones](#input\_zones) | Availability zones (Premium SKU only) | `list(string)` | `[]` | no |
+
+## Outputs
+
+| Name | Description |
+|------|-------------|
+| <a name="output_developer_portal_url"></a> [developer\_portal\_url](#output\_developer\_portal\_url) | Developer portal URL of the API Management service |
+| <a name="output_gateway_url"></a> [gateway\_url](#output\_gateway\_url) | Gateway URL of the API Management service |
+| <a name="output_id"></a> [id](#output\_id) | API Management service resource ID |
+| <a name="output_management_api_url"></a> [management\_api\_url](#output\_management\_api\_url) | Management API URL of the API Management service |
+| <a name="output_name"></a> [name](#output\_name) | API Management service name |
+| <a name="output_principal_id"></a> [principal\_id](#output\_principal\_id) | System-assigned managed identity principal ID (when enabled) |
+| <a name="output_private_endpoint_id"></a> [private\_endpoint\_id](#output\_private\_endpoint\_id) | Private endpoint resource ID (when enabled) |
+| <a name="output_private_ip_address"></a> [private\_ip\_address](#output\_private\_ip\_address) | Private IP address of the private endpoint (when enabled) |
+| <a name="output_public_apim_gateway_url"></a> [public\_apim\_gateway\_url](#output\_public\_apim\_gateway\_url) | Gateway URL (for cross-project consumption) |
+| <a name="output_public_apim_id"></a> [public\_apim\_id](#output\_public\_apim\_id) | API Management service ID (for cross-project consumption) |
+| <a name="output_public_apim_name"></a> [public\_apim\_name](#output\_public\_apim\_name) | API Management service name (for cross-project consumption) |
+| <a name="output_public_ip_addresses"></a> [public\_ip\_addresses](#output\_public\_ip\_addresses) | Public IP addresses of the API Management service |
+| <a name="output_tenant_id"></a> [tenant\_id](#output\_tenant\_id) | System-assigned managed identity tenant ID (when enabled) |
 <!-- END_TF_DOCS -->
 
 ## Notes
