@@ -19,6 +19,11 @@ variable "sku_name" {
   type        = string
   default     = "B_Standard_B1ms"
   description = "SKU name for the PostgreSQL Flexible Server (e.g., B_Standard_B1ms, GP_Standard_D2s_v3, MO_Standard_E4s_v3)"
+
+  validation {
+    condition     = can(regex("^(B|GP|MO)_Standard_", var.sku_name))
+    error_message = "sku_name must start with B_Standard_, GP_Standard_, or MO_Standard_ (e.g., B_Standard_B1ms, GP_Standard_D2s_v3)."
+  }
 }
 
 variable "version_number" {
@@ -132,8 +137,8 @@ variable "enable_public_access" {
 
 variable "enable_password_auth" {
   type        = bool
-  default     = true
-  description = "Enable password authentication"
+  default     = false
+  description = "Enable password authentication. Disabled by default; use Entra ID where possible."
 }
 
 variable "enable_entra_auth" {

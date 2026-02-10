@@ -78,6 +78,7 @@ module "postgresql" {
   name                   = "psql-complete-dev-weu-001"
   administrator_login    = "psqladmin"
   administrator_password = random_password.admin.result
+  enable_password_auth   = true
 
   sku_name              = "GP_Standard_D2s_v3"
   version_number        = "16"

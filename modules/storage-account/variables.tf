@@ -24,24 +24,44 @@ variable "account_tier" {
   type        = string
   default     = "Standard"
   description = "Account tier (Standard or Premium)"
+
+  validation {
+    condition     = contains(["Standard", "Premium"], var.account_tier)
+    error_message = "account_tier must be one of: Standard, Premium."
+  }
 }
 
 variable "account_replication_type" {
   type        = string
   default     = "LRS"
   description = "Replication type (LRS, ZRS, GRS, RAGRS, GZRS, RAGZRS)"
+
+  validation {
+    condition     = contains(["LRS", "ZRS", "GRS", "RAGRS", "GZRS", "RAGZRS"], var.account_replication_type)
+    error_message = "account_replication_type must be one of: LRS, ZRS, GRS, RAGRS, GZRS, RAGZRS."
+  }
 }
 
 variable "account_kind" {
   type        = string
   default     = "StorageV2"
   description = "Account kind (StorageV2, BlobStorage, BlockBlobStorage, FileStorage)"
+
+  validation {
+    condition     = contains(["StorageV2", "BlobStorage", "BlockBlobStorage", "FileStorage", "Storage"], var.account_kind)
+    error_message = "account_kind must be one of: StorageV2, BlobStorage, BlockBlobStorage, FileStorage, Storage."
+  }
 }
 
 variable "access_tier" {
   type        = string
   default     = "Hot"
-  description = "Access tier for BlobStorage/StorageV2 (Hot or Cool)"
+  description = "Access tier for BlobStorage/StorageV2 (Hot, Cool, or Cold)"
+
+  validation {
+    condition     = contains(["Hot", "Cool", "Cold"], var.access_tier)
+    error_message = "access_tier must be one of: Hot, Cool, Cold."
+  }
 }
 
 variable "min_tls_version" {
@@ -58,8 +78,8 @@ variable "allow_nested_items_to_be_public" {
 
 variable "shared_access_key_enabled" {
   type        = bool
-  default     = true
-  description = "Enable shared key authorization"
+  default     = false
+  description = "Enable shared key authorization. Disabled by default; use managed identity where possible."
 }
 
 variable "blob_soft_delete_retention_days" {

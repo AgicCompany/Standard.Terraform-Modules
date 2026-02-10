@@ -17,6 +17,11 @@ variable "name" {
 variable "sku_name" {
   type        = string
   description = "The SKU for the plan (e.g., B1, S1, P1v3, Y1)"
+
+  validation {
+    condition     = can(regex("^(F1|D1|B[1-3]|S[1-3]|P[0-3]v[2-3]|P[1-3]|I[1-3]v?2?|Y1|EP[1-3]|WS[1-3])$", var.sku_name))
+    error_message = "sku_name must be a valid App Service Plan SKU (e.g., F1, B1, S1, P1v3, Y1, EP1)."
+  }
 }
 
 # === Optional: Configuration ===

@@ -164,6 +164,7 @@ module "postgresql" {
   sku_name               = "B_Standard_B1ms"
   administrator_login    = "pgadmin"
   administrator_password = random_password.postgres.result
+  enable_password_auth   = true
 
   delegated_subnet_id = module.virtual_network.subnet_ids["snet-postgres"]
   private_dns_zone_id = module.dns_postgres.id

@@ -37,6 +37,7 @@ module "postgresql" {
   administrator_login    = "psqladmin"
   administrator_password = random_password.admin.result
 
+  enable_password_auth = true
   enable_public_access = true
 
   databases = {

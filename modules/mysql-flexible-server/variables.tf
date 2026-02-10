@@ -19,6 +19,11 @@ variable "sku_name" {
   type        = string
   default     = "B_Standard_B1ms"
   description = "SKU name for the MySQL Flexible Server (e.g., B_Standard_B1ms, GP_Standard_D2ds_v4, MO_Standard_E4s_v3)"
+
+  validation {
+    condition     = can(regex("^(B|GP|MO)_Standard_", var.sku_name))
+    error_message = "sku_name must start with B_Standard_, GP_Standard_, or MO_Standard_ (e.g., B_Standard_B1ms, GP_Standard_D2ds_v4)."
+  }
 }
 
 variable "version_number" {
@@ -27,8 +32,8 @@ variable "version_number" {
   description = "MySQL version"
 
   validation {
-    condition     = contains(["5.7", "8.0.21"], var.version_number)
-    error_message = "MySQL version must be one of: 5.7, 8.0.21."
+    condition     = contains(["5.7", "8.0.21", "8.4"], var.version_number)
+    error_message = "MySQL version must be one of: 5.7, 8.0.21, 8.4."
   }
 }
 

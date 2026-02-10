@@ -16,12 +16,12 @@ output "fully_qualified_domain_name" {
 }
 
 output "principal_id" {
-  value       = azurerm_mssql_server.this.identity[0].principal_id
+  value       = try(azurerm_mssql_server.this.identity[0].principal_id, null)
   description = "System-assigned managed identity principal ID"
 }
 
 output "tenant_id" {
-  value       = azurerm_mssql_server.this.identity[0].tenant_id
+  value       = try(azurerm_mssql_server.this.identity[0].tenant_id, null)
   description = "System-assigned managed identity tenant ID"
 }
 

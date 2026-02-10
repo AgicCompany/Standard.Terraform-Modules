@@ -22,6 +22,13 @@ resource "azurerm_mssql_server" "this" {
     azuread_authentication_only = var.enable_aad_only_auth
   }
 
+  lifecycle {
+    precondition {
+      condition     = var.enable_aad_only_auth || (var.administrator_login != null && var.administrator_login_password != null)
+      error_message = "administrator_login and administrator_login_password are required when enable_aad_only_auth is false."
+    }
+  }
+
   tags = var.tags
 }
 

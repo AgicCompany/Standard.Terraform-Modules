@@ -231,7 +231,7 @@ output "vnet_id" {
 }
 
 output "event_hub_namespace_id" {
-  value = module.event_hub.namespace_id
+  value = module.event_hub.id
 }
 
 output "event_hub_private_ip" {

@@ -16,12 +16,12 @@ output "login_server" {
 }
 
 output "principal_id" {
-  value       = azurerm_container_registry.this.identity[0].principal_id
+  value       = try(azurerm_container_registry.this.identity[0].principal_id, null)
   description = "System-assigned managed identity principal ID"
 }
 
 output "tenant_id" {
-  value       = azurerm_container_registry.this.identity[0].tenant_id
+  value       = try(azurerm_container_registry.this.identity[0].tenant_id, null)
   description = "System-assigned managed identity tenant ID"
 }
 

@@ -161,6 +161,7 @@ module "storage_account" {
   location            = azurerm_resource_group.this.location
   name                = "sttftestslsweu001"
 
+  shared_access_key_enabled    = true # Required for function app access key pattern
   enable_private_endpoints     = true
   enable_blob_private_endpoint = true
   subnet_id                    = module.virtual_network.subnet_ids["snet-pe"]

@@ -138,8 +138,8 @@ variable "enable_multiple_write_locations" {
 
 variable "enable_local_auth" {
   type        = bool
-  default     = true
-  description = "Enable local (key-based) authentication"
+  default     = false
+  description = "Enable local (key-based) authentication. Disabled by default; use Entra ID where possible."
 }
 
 # === Private Endpoint ===

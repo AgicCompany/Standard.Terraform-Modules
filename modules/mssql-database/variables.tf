@@ -13,7 +13,12 @@ variable "server_id" {
 variable "sku_name" {
   type        = string
   default     = "S0"
-  description = "Database SKU (e.g., S0, P1, GP_Gen5_2)"
+  description = "Database SKU (e.g., S0, P1, GP_Gen5_2, HS_Gen5_2, BC_Gen5_2)"
+
+  validation {
+    condition     = can(regex("^(Basic|S[0-9]+|P[1-9][0-9]*|GP_Gen[45]_[0-9]+|GP_S_Gen[45]_[0-9]+|BC_Gen[45]_[0-9]+|HS_Gen[45]_[0-9]+|DW[0-9]+c|DS[0-9]+|ElasticPool)$", var.sku_name))
+    error_message = "sku_name must be a valid Azure SQL Database SKU (e.g., Basic, S0, P1, GP_Gen5_2, BC_Gen5_2, HS_Gen5_2)."
+  }
 }
 
 variable "max_size_gb" {

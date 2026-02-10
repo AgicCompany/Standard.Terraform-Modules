@@ -83,20 +83,20 @@ variable "disable_ip_masking" {
 
 variable "local_authentication_disabled" {
   type        = bool
-  default     = false
-  description = "Disable local (non-AAD) authentication"
+  default     = true
+  description = "Disable local (non-AAD) authentication. Disabled by default for security; set to false to allow API key auth."
 }
 
 variable "internet_ingestion_enabled" {
   type        = bool
-  default     = true
-  description = "Enable ingestion over public internet"
+  default     = false
+  description = "Enable ingestion over public internet. Disabled by default for security."
 }
 
 variable "internet_query_enabled" {
   type        = bool
-  default     = true
-  description = "Enable querying over public internet"
+  default     = false
+  description = "Enable querying over public internet. Disabled by default for security."
 }
 
 variable "force_customer_storage_for_profiler" {

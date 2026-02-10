@@ -10,11 +10,6 @@ output "name" {
 }
 
 # === Resource-Specific Outputs ===
-output "namespace_id" {
-  value       = azurerm_eventhub_namespace.this.id
-  description = "Event Hub namespace resource ID"
-}
-
 output "eventhub_ids" {
   value       = { for k, v in azurerm_eventhub.this : k => v.id }
   description = "Map of Event Hub names to their resource IDs"
