@@ -66,7 +66,7 @@ module "cosmosdb" {
 
 | Name | Version |
 |------|---------|
-| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | >= 4.0.0 |
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 4.59.0 |
 
 ## Modules
 
@@ -88,7 +88,7 @@ No modules.
 | <a name="input_backup"></a> [backup](#input\_backup) | Backup policy configuration | <pre>object({<br/>    type                = optional(string, "Periodic")<br/>    interval_in_minutes = optional(number, 240)<br/>    retention_in_hours  = optional(number, 8)<br/>    storage_redundancy  = optional(string, "Geo")<br/>    tier                = optional(string, null)<br/>  })</pre> | `{}` | no |
 | <a name="input_capacity"></a> [capacity](#input\_capacity) | Account capacity configuration (total throughput limit in RU/s, -1 for unlimited) | <pre>object({<br/>    total_throughput_limit = number<br/>  })</pre> | `null` | no |
 | <a name="input_consistency_policy"></a> [consistency\_policy](#input\_consistency\_policy) | Consistency policy configuration | <pre>object({<br/>    consistency_level       = string<br/>    max_interval_in_seconds = optional(number, 5)<br/>    max_staleness_prefix    = optional(number, 100)<br/>  })</pre> | <pre>{<br/>  "consistency_level": "Session"<br/>}</pre> | no |
-| <a name="input_enable_local_auth"></a> [enable\_local\_auth](#input\_enable\_local\_auth) | Enable local (key-based) authentication | `bool` | `true` | no |
+| <a name="input_enable_local_auth"></a> [enable\_local\_auth](#input\_enable\_local\_auth) | Enable local (key-based) authentication. Disabled by default; use Entra ID where possible. | `bool` | `false` | no |
 | <a name="input_enable_multiple_write_locations"></a> [enable\_multiple\_write\_locations](#input\_enable\_multiple\_write\_locations) | Enable multi-region writes | `bool` | `false` | no |
 | <a name="input_enable_private_endpoint"></a> [enable\_private\_endpoint](#input\_enable\_private\_endpoint) | Create a private endpoint for this Cosmos DB account | `bool` | `true` | no |
 | <a name="input_enable_public_access"></a> [enable\_public\_access](#input\_enable\_public\_access) | Allow public network access (default: disabled for security) | `bool` | `false` | no |

@@ -80,7 +80,7 @@ No modules.
 | <a name="input_name"></a> [name](#input\_name) | Database name | `string` | n/a | yes |
 | <a name="input_server_id"></a> [server\_id](#input\_server\_id) | ID of the SQL server to create the database on | `string` | n/a | yes |
 | <a name="input_short_term_retention_days"></a> [short\_term\_retention\_days](#input\_short\_term\_retention\_days) | Point-in-time restore retention in days (1-35) | `number` | `7` | no |
-| <a name="input_sku_name"></a> [sku\_name](#input\_sku\_name) | Database SKU (e.g., S0, P1, GP\_Gen5\_2) | `string` | `"S0"` | no |
+| <a name="input_sku_name"></a> [sku\_name](#input\_sku\_name) | Database SKU (e.g., S0, P1, GP\_Gen5\_2, HS\_Gen5\_2, BC\_Gen5\_2) | `string` | `"S0"` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | Tags to apply to the resource | `map(string)` | `{}` | no |
 
 ## Outputs

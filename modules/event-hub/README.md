@@ -90,7 +90,7 @@ These outputs are designed for cross-project state consumption:
 
 | Name | Version |
 |------|---------|
-| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | >= 4.0.0 |
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 4.59.0 |
 
 ## Modules
 
@@ -136,7 +136,6 @@ No modules.
 | <a name="output_eventhub_ids"></a> [eventhub\_ids](#output\_eventhub\_ids) | Map of Event Hub names to their resource IDs |
 | <a name="output_id"></a> [id](#output\_id) | Event Hub namespace resource ID |
 | <a name="output_name"></a> [name](#output\_name) | Event Hub namespace name |
-| <a name="output_namespace_id"></a> [namespace\_id](#output\_namespace\_id) | Event Hub namespace resource ID |
 | <a name="output_private_endpoint_id"></a> [private\_endpoint\_id](#output\_private\_endpoint\_id) | Private endpoint resource ID (when enabled) |
 | <a name="output_private_ip_address"></a> [private\_ip\_address](#output\_private\_ip\_address) | Private IP address of the private endpoint (when enabled) |
 | <a name="output_public_namespace_id"></a> [public\_namespace\_id](#output\_public\_namespace\_id) | Event Hub namespace resource ID (for cross-project consumption) |

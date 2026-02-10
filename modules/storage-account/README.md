@@ -108,7 +108,7 @@ These outputs are designed for cross-project state consumption:
 
 | Name | Version |
 |------|---------|
-| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | >= 4.0.0 |
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 4.59.0 |
 
 ## Modules
 
@@ -125,7 +125,7 @@ No modules.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_access_tier"></a> [access\_tier](#input\_access\_tier) | Access tier for BlobStorage/StorageV2 (Hot or Cool) | `string` | `"Hot"` | no |
+| <a name="input_access_tier"></a> [access\_tier](#input\_access\_tier) | Access tier for BlobStorage/StorageV2 (Hot, Cool, or Cold) | `string` | `"Hot"` | no |
 | <a name="input_account_kind"></a> [account\_kind](#input\_account\_kind) | Account kind (StorageV2, BlobStorage, BlockBlobStorage, FileStorage) | `string` | `"StorageV2"` | no |
 | <a name="input_account_replication_type"></a> [account\_replication\_type](#input\_account\_replication\_type) | Replication type (LRS, ZRS, GRS, RAGRS, GZRS, RAGZRS) | `string` | `"LRS"` | no |
 | <a name="input_account_tier"></a> [account\_tier](#input\_account\_tier) | Account tier (Standard or Premium) | `string` | `"Standard"` | no |
@@ -147,7 +147,7 @@ No modules.
 | <a name="input_network_rules"></a> [network\_rules](#input\_network\_rules) | Network rules for the storage account. Only applies when enable\_public\_access = true. | <pre>object({<br/>    bypass                     = optional(list(string), ["AzureServices"])<br/>    default_action             = optional(string, "Deny")<br/>    ip_rules                   = optional(list(string), [])<br/>    virtual_network_subnet_ids = optional(list(string), [])<br/>  })</pre> | `null` | no |
 | <a name="input_private_dns_zone_ids"></a> [private\_dns\_zone\_ids](#input\_private\_dns\_zone\_ids) | Map of subresource name (blob, file, table, queue) to private DNS zone ID. | `map(string)` | `{}` | no |
 | <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name) | Name of the resource group | `string` | n/a | yes |
-| <a name="input_shared_access_key_enabled"></a> [shared\_access\_key\_enabled](#input\_shared\_access\_key\_enabled) | Enable shared key authorization | `bool` | `true` | no |
+| <a name="input_shared_access_key_enabled"></a> [shared\_access\_key\_enabled](#input\_shared\_access\_key\_enabled) | Enable shared key authorization. Disabled by default; use managed identity where possible. | `bool` | `false` | no |
 | <a name="input_subnet_id"></a> [subnet\_id](#input\_subnet\_id) | Subnet ID for private endpoints. Required when any private endpoint is enabled. | `string` | `null` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | Tags to apply to the resource | `map(string)` | `{}` | no |
 
