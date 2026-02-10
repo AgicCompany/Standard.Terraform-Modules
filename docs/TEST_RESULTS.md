@@ -17,9 +17,10 @@
 | Phase 3 (High) | 3 | 3 | 0 | 1 |
 | Phase 4 (Integration) | 4 stacks | 4 | 0 | 0 |
 | Phase 5 (New modules) | 12 | 12 | 0 | 0 |
-| **Live-tested** | **31 + 4 stacks** | **All pass** | **0** | **7** |
-| **Validate-only** | **4** | **4** | **0** | **0** |
-| **Total** | **35 modules** | **All pass** | **0** | **7** |
+| Phase 6 (Integration P2) | 5 stacks (19 modules) | 5 | 0 | 2 |
+| **Live-tested** | **31 + 9 stacks** | **All pass** | **0** | **9** |
+| **Validate-only** | **2** | **2** | **0** | **0** |
+| **Total** | **35 modules** | **All pass** | **0** | **9** |
 
 ---
 
@@ -585,6 +586,171 @@ No issues found. Standard_v2 SKU with autoscaling (0-2 capacity units). Applicat
 
 ---
 
+## Phase 6: Integration Tests — Part 2
+
+Five new integration test stacks covering 19 previously uncovered modules. All stacks deployed, verified, and destroyed cleanly.
+
+### Integration Test 5: Networking Stack
+
+| Property | Value |
+|----------|-------|
+| Modules | virtual-network (x2), network-security-group, route-table, nat-gateway, vnet-peering, bastion |
+| Resources created | 21 |
+| Region | westeurope |
+| Result | **PASS** |
+
+**Architecture:** Hub VNet (`10.1.0.0/16`) with AzureBastionSubnet + Spoke VNet (`10.2.0.0/16`) with workload subnet. Bidirectional peering, NSG + route table + NAT gateway on the spoke subnet, bastion in the hub.
+
+**Cross-module wiring verified:**
+
+| Check | Result |
+|-------|--------|
+| VNet peering (bidirectional) | Yes (local-to-remote + remote-to-local) |
+| NSG associated to spoke subnet | Yes |
+| Route table associated to spoke subnet | Yes |
+| NAT gateway associated to spoke subnet | Yes (via `azurerm_subnet_nat_gateway_association`) |
+| Bastion in hub AzureBastionSubnet | Yes |
+| NAT gateway public IP allocated | `20.160.28.224` |
+| Clean destroy | Yes (21/21) |
+
+### Integration Test 6: VM Stack
+
+| Property | Value |
+|----------|-------|
+| Modules | virtual-network, network-security-group, linux-virtual-machine, windows-virtual-machine |
+| Resources created | 14 |
+| Region | westeurope |
+| Result | **PASS** |
+
+**Architecture:** VNet with VM subnet, NSG with SSH/RDP allow from VNet + deny internet. Linux VM (Standard_B1s, SSH key) and Windows VM (Standard_B2s, password) side by side, both with system-assigned managed identity.
+
+**Cross-module wiring verified:**
+
+| Check | Result |
+|-------|--------|
+| NSG associated to VM subnet | Yes |
+| Linux VM SSH key auth | Yes (via `tls_private_key`) |
+| Windows VM password auth | Yes (via `random_password`) |
+| Linux VM system identity | Yes (`principal_id` populated) |
+| Windows VM system identity | Yes (`principal_id` populated) |
+| Both VMs in same subnet | Yes (`10.0.1.5`, `10.0.1.4`) |
+| Clean destroy | Yes (14/14) |
+
+### Integration Test 7: OSS Database Stack
+
+| Property | Value |
+|----------|-------|
+| Modules | virtual-network, private-dns-zone (x2), mysql-flexible-server, postgresql-flexible-server |
+| Resources created | 14 |
+| Region | **swedencentral** (MySQL/PostgreSQL blocked in westeurope) |
+| Result | **PASS** (after fix) |
+
+**Architecture:** VNet with two delegated subnets — one for MySQL (`Microsoft.DBforMySQL/flexibleServers`), one for PostgreSQL (`Microsoft.DBforPostgreSQL/flexibleServers`). Each server VNet-integrated via delegated subnet + private DNS zone.
+
+**Bug found and fixed:**
+
+1. **DNS zone VNet link race condition (HIGH):** MySQL provisioning failed with `VnetNotLinkedToPrivateDnsZone` because Terraform started creating the flexible server before the DNS zone VNet link was fully provisioned. The module references `private_dns_zone_id` (the zone itself), but Azure requires the VNet link within that zone to exist first.
+
+   **Fix:** Added `depends_on = [module.dns_mysql]` and `depends_on = [module.dns_postgres]` to the respective flexible server module calls.
+
+   **Files changed:** `tests/integration/oss-database-stack/main.tf`
+
+**Cross-module wiring verified:**
+
+| Check | Result |
+|-------|--------|
+| MySQL VNet-integrated (delegated subnet) | Yes |
+| PostgreSQL VNet-integrated (delegated subnet) | Yes |
+| MySQL DNS zone VNet link | Yes |
+| PostgreSQL DNS zone VNet link | Yes |
+| MySQL FQDN | `mysql-tftest-ossdb-sec-001.mysql.database.azure.com` |
+| PostgreSQL FQDN | `psql-tftest-ossdb-sec-001.postgres.database.azure.com` |
+| Clean destroy | Yes (14/14) |
+
+### Integration Test 8: Messaging Stack
+
+| Property | Value |
+|----------|-------|
+| Modules | virtual-network, private-dns-zone (x3), event-hub, service-bus, cosmosdb, redis-cache |
+| Resources created | 23 |
+| Region | westeurope (CosmosDB geo_location: northeurope) |
+| Result | **PASS** (after fixes) |
+
+**Architecture:** VNet with PE subnet. Four PE-enabled data services: Event Hub (Standard, 1 hub + consumer group), Service Bus (Premium, 1 queue + 1 topic with subscription), CosmosDB (Session consistency, 1 SQL database), Redis Cache (Basic C0). Event Hub and Service Bus share `privatelink.servicebus.windows.net` DNS zone.
+
+**Bugs found and fixed:**
+
+1. **Service Bus PE requires Premium SKU (HIGH):** Standard SKU does not support private endpoints. Azure returns `PrivateEndpointInvalidSku`.
+
+   **Fix:** Changed Service Bus from `sku = "Standard"` to `sku = "Premium"` with `capacity = 1`.
+
+   **Note:** Event Hub Standard DOES support PE — this limitation is specific to Service Bus.
+
+2. **CosmosDB westeurope capacity (MEDIUM):** CosmosDB account creation fails with `ServiceUnavailable` in westeurope due to regional capacity constraints.
+
+   **Fix:** Added `geo_locations` override to place the database in `northeurope` while keeping the account in the westeurope resource group.
+
+   **Files changed:** `tests/integration/messaging-stack/main.tf`
+
+**Cross-module wiring verified:**
+
+| Check | Result |
+|-------|--------|
+| Event Hub PE (shared DNS zone) | Yes (`10.0.1.4`) |
+| Service Bus PE (shared DNS zone) | Yes (`10.0.1.5`) |
+| CosmosDB PE | Yes (`10.0.1.6`) |
+| Redis Cache PE | Yes (`10.0.1.8`) |
+| Shared DNS zone for EH + SB | Yes (`privatelink.servicebus.windows.net`) |
+| Event Hub consumer group | Yes (`cg-processor`) |
+| Service Bus queue + topic + subscription | Yes |
+| CosmosDB SQL database | Yes |
+| Clean destroy | Yes (23/23) |
+
+### Integration Test 9: Serverless Stack
+
+| Property | Value |
+|----------|-------|
+| Modules | virtual-network, private-dns-zone (x3), log-analytics-workspace, application-insights, app-service-plan, storage-account, function-app, key-vault, user-assigned-identity, action-group |
+| Resources created | 21 |
+| Region | westeurope |
+| Result | **PASS** |
+
+**Architecture:** VNet with PE subnet and integration subnet (delegated to `Microsoft.Web/serverFarms`). Storage account with blob PE provides runtime storage for function app. Function app with PE, VNet integration, AppInsights, system + user-assigned identity. Key vault with PE. Action group with email receiver.
+
+**Implementation note:** The storage-account module intentionally does not output `primary_access_key`. A `data "azurerm_storage_account"` block retrieves the key after module deployment for the function-app's `storage_account_access_key` input.
+
+**Cross-module wiring verified:**
+
+| Check | Result |
+|-------|--------|
+| Storage account blob PE | Yes |
+| Function app PE | Yes (`10.0.1.6`) |
+| Function app VNet integration | Yes (`snet-integration`) |
+| Function app → AppInsights connection | Yes |
+| Function app system identity | Yes (`principal_id` populated) |
+| Function app user-assigned identity | Yes |
+| Key vault PE | Yes (`10.0.1.4`) |
+| Key vault URI | `https://kv-tftest-sls-weu-001.vault.azure.net/` |
+| Storage access key → function app | Yes (via data source) |
+| Application Insights → LAW | Yes (workspace-based) |
+| Action group | Yes (email receiver) |
+| Clean destroy | Yes (21/21) |
+
+### Phase 6 Coverage Summary
+
+| Stack | New Modules Covered | Count |
+|-------|-------------------|-------|
+| networking-stack | network-security-group, route-table, nat-gateway, vnet-peering, bastion | 5 |
+| vm-stack | linux-virtual-machine, windows-virtual-machine | 2 |
+| oss-database-stack | mysql-flexible-server, postgresql-flexible-server | 2 |
+| messaging-stack | event-hub, service-bus, cosmosdb, redis-cache | 4 |
+| serverless-stack | function-app, storage-account, key-vault, application-insights, user-assigned-identity, action-group | 6 |
+| **Total** | **19 new modules** | **19** |
+
+**Integration test totals:** 12 (Phase 4) + 19 (Phase 6) = **31 of 35 modules** with integration test coverage.
+
+---
+
 ## Subscription Limitations
 
 | Limitation | Impact | Workaround |
@@ -596,6 +762,9 @@ No issues found. Standard_v2 SKU with autoscaling (0-2 capacity units). Applicat
 | AKS zones limited in westeurope | Default `zones = ["1","2","3"]` fails for some VM SKUs | Test with `zones = []` |
 | ContainerInsights orphan on destroy | RG deletion fails after AKS destroy with OMS agent | Use `az group delete` for cleanup |
 | CosmosDB very slow destroy | Account deletion takes ~8m, RG cleanup adds more | Budget extra time; northeurope more reliable than westeurope |
+| CosmosDB westeurope capacity | Account creation fails with `ServiceUnavailable` | Use northeurope `geo_locations` override |
+| Service Bus PE requires Premium | Standard SKU returns `PrivateEndpointInvalidSku` | Use `sku = "Premium"` with `capacity = 1` |
+| MySQL/PostgreSQL DNS race condition | Flexible server fails with `VnetNotLinkedToPrivateDnsZone` | Add `depends_on` for DNS zone module |
 
 ---
 
@@ -610,16 +779,15 @@ No issues found. Standard_v2 SKU with autoscaling (0-2 capacity units). Applicat
 | `be8bee2` | Add P2 modules: postgresql-flexible-server, cosmosdb |
 | `94f909d` | Add P3 modules: event-hub, static-web-app, bastion, mysql-flexible-server |
 | `9e04b38` | Add P3 modules: application-gateway, api-management |
+| `3928b10` | Add 5 integration test stacks covering 19 new modules |
 
 ---
 
 ## Validate-Only Modules (Not Yet Live-Tested)
 
-The following 4 modules have passed `terraform fmt` and `terraform validate` on both basic and complete examples but have not been live-tested against Azure.
+The following 2 modules have passed `terraform fmt` and `terraform validate` on both basic and complete examples but have not been live-tested against Azure.
 
 | # | Module | Examples Validated | Notes |
 |---|--------|-------------------|-------|
 | 32 | api-management | basic, complete | Developer-Premium SKUs, VNet integration, PE. Skipped live test due to ~45 min provision time. |
-| 33 | service-bus | basic, complete | Standard/Premium, queues, topics, subscriptions, PE |
-| 34 | redis-cache | basic, complete | Basic-Premium, firewall rules, patch schedule, PE |
-| 35 | front-door | basic, complete | Standard AzureFrontDoor, endpoints, origins, routes |
+| 33 | front-door | basic, complete | Standard AzureFrontDoor, endpoints, origins, routes. Global CDN service, minimal cross-module wiring. |
