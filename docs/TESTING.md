@@ -78,9 +78,9 @@ Monthly budget: 130 EUR. Remaining budget varies -- check before testing expensi
 
 | Tier | Est. Daily Cost | Modules |
 |------|----------------|---------|
-| Free / negligible | ~0 EUR | virtual-network, network-security-group, private-dns-zone, user-assigned-identity |
-| Low (<1 EUR/day) | <1 EUR | storage-account, key-vault, log-analytics-workspace (free tier), container-registry (Standard) |
-| Medium (1-5 EUR/day) | 2-5 EUR | app-service-plan + linux-web-app, function-app, mssql-server + mssql-database, diagnostic-settings |
+| Free / negligible | ~0 EUR | virtual-network, network-security-group, private-dns-zone, user-assigned-identity, route-table, vnet-peering, action-group, static-web-app |
+| Low (<1 EUR/day) | <1 EUR | storage-account, key-vault, log-analytics-workspace (free tier), container-registry (Standard), nat-gateway, application-insights, event-hub (Standard) |
+| Medium (1-5 EUR/day) | 2-5 EUR | app-service-plan + linux-web-app, function-app, mssql-server + mssql-database, diagnostic-settings, linux/windows-virtual-machine, bastion, postgresql-flexible-server, mysql-flexible-server, cosmosdb, application-gateway, api-management (Developer) |
 | High (5-20+ EUR/day) | 10-20 EUR | aks, redis-cache, front-door |
 
 ### 3.2 Budget Rules
@@ -116,6 +116,11 @@ Each module is tested independently with its prerequisites deployed inline. The 
 | diagnostic-settings | Resource group, log-analytics-workspace, target resource (e.g., key-vault) | N/A | Low |
 | user-assigned-identity | Resource group | N/A | Free |
 | private-dns-zone | Resource group, virtual-network | N/A | Free |
+| nat-gateway | Resource group | Standard SKU | Low |
+| route-table | Resource group | N/A | Free |
+| vnet-peering | Resource group, two virtual-networks | N/A | Free |
+| application-insights | Resource group, log-analytics-workspace | N/A | Low |
+| action-group | Resource group | N/A | Free |
 
 #### P2 - Application Layer
 
@@ -130,6 +135,8 @@ Each module is tested independently with its prerequisites deployed inline. The 
 | mssql-server | Resource group | N/A (server is free, DB costs). **Region: use northeurope** (westeurope blocked for MPN) | Low |
 | mssql-database | Resource group, mssql-server | Basic DTU (5 DTU). **Region: use northeurope** (westeurope blocked for MPN) | Medium |
 | aks | Resource group, log-analytics-workspace | Standard_B2s, 1 node, no autoscaling, `zones = []` (MPN zone restrictions). See AKS notes in section 8 | High |
+| postgresql-flexible-server | Resource group (basic); Resource group, virtual-network with delegated subnet, private-dns-zone (complete) | B_Standard_B1ms, version 16 | Medium |
+| cosmosdb | Resource group (basic); Resource group, virtual-network, private-dns-zone (complete) | Session consistency, free tier | Medium |
 
 #### P3 - Situational
 
@@ -140,6 +147,12 @@ Each module is tested independently with its prerequisites deployed inline. The 
 | service-bus | Resource group | Basic | Low |
 | redis-cache | Resource group | Basic C0 | High |
 | front-door | Resource group | Standard | High |
+| event-hub | Resource group (basic); Resource group, virtual-network, private-dns-zone (complete) | Standard, 1 TU | Low |
+| static-web-app | Resource group | Free tier | Free |
+| bastion | Resource group, virtual-network (with AzureBastionSubnet /26) | Basic | Medium |
+| mysql-flexible-server | Resource group (basic); Resource group, virtual-network with delegated subnet, private-dns-zone (complete) | B_Standard_B1ms, version 8.0.21 | Medium |
+| application-gateway | Resource group, virtual-network (with dedicated /24 subnet) | Standard_v2, autoscale 1-2 | Medium |
+| api-management | Resource group (basic); Resource group, virtual-network, private-dns-zone (complete) | Developer_1 | Medium |
 
 ### 4.2 Integration Tests
 

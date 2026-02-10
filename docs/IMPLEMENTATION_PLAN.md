@@ -1,7 +1,7 @@
 # Terraform Modules Implementation Plan
 
-**Version:** 1.0
-**Status:** Implementation Complete — Live Testing P3
+**Version:** 1.1
+**Status:** 35 modules complete — P0-P2 live-tested, P3 awaiting live tests
 **Maintainer:** Infrastructure Team
 
 This document is the implementation plan for the `terraform-modules` repository. It defines the order, scope, and workflow for building reusable Terraform modules following the organization's standards.
@@ -75,12 +75,24 @@ The module library will be hosted in a single monorepo (`terraform-modules`) wit
 | P2 | mssql-server | key-vault | v1.0.0 | Released | SQL blocked in westeurope for MPN — tested in northeurope |
 | P2 | mssql-database | mssql-server | v1.0.0 | Released | |
 | P2 | aks | virtual-network, container-registry | v1.0.0 | Released | ContainerInsights orphan on destroy — needs `az group delete` |
+| P1 | nat-gateway | — | v1.0.0 | Complete | `terraform validate` passing. NAT GW + Standard public IP. |
+| P1 | route-table | — | v1.0.0 | Complete | `terraform validate` passing. Routes as separate resources. |
+| P1 | vnet-peering | — | v1.0.0 | Complete | `terraform validate` passing. Bidirectional peering. |
+| P1 | application-insights | log-analytics-workspace | v1.0.0 | Complete | `terraform validate` passing. Workspace-based only. |
+| P1 | action-group | — | v1.0.0 | Complete | `terraform validate` passing. Email/SMS/webhook/push receivers. |
+| P2 | postgresql-flexible-server | — | v1.0.0 | Complete | `terraform validate` passing. VNet integration (not PE). |
+| P2 | cosmosdb | — | v1.0.0 | Complete | `terraform validate` passing. SQL API + PE. |
 | P3 | linux-virtual-machine | virtual-network | v1.0.0 | Released | Live-tested: apply + destroy clean. |
 | P3 | windows-virtual-machine | virtual-network | v1.0.0 | Released | Live-tested: apply + destroy clean. |
 | P3 | service-bus | — | v1.0.0 | Complete | `terraform validate` passing. Removed `zone_redundant` (AzureRM 4.x). |
 | P3 | redis-cache | — | v1.0.0 | Complete | `terraform validate` passing. Awaiting live test. |
 | P3 | front-door | — | v1.0.0 | Complete | `terraform validate` passing. Awaiting live test. |
-| — | cosmosdb | — | — | Backlog | |
+| P3 | event-hub | — | v1.0.0 | Complete | `terraform validate` passing. Namespace + hubs + consumer groups + PE. |
+| P3 | static-web-app | — | v1.0.0 | Complete | `terraform validate` passing. Free/Standard SKU. |
+| P3 | bastion | virtual-network | v1.0.0 | Complete | `terraform validate` passing. Basic/Standard SKU. |
+| P3 | mysql-flexible-server | — | v1.0.0 | Complete | `terraform validate` passing. VNet integration (not PE). |
+| P3 | application-gateway | virtual-network | v1.0.0 | Complete | `terraform validate` passing. Standard_v2/WAF_v2, L7 routing. |
+| P3 | api-management | — | v1.0.0 | Complete | `terraform validate` passing. VNet integration + PE. |
 
 ### 3.2 Priority Definitions
 
@@ -160,6 +172,19 @@ Files are prefixed with the module's current priority level. When a module's pri
 | service-bus | [p3-spec-service-bus.md](modules/p3-spec-service-bus.md) |
 | redis-cache | [p3-spec-redis-cache.md](modules/p3-spec-redis-cache.md) |
 | front-door | [p3-spec-front-door.md](modules/p3-spec-front-door.md) |
+| nat-gateway | — (simple, no spec needed) |
+| route-table | — (simple, no spec needed) |
+| vnet-peering | — (simple, no spec needed) |
+| application-insights | — (simple, no spec needed) |
+| action-group | — (simple, no spec needed) |
+| postgresql-flexible-server | — |
+| cosmosdb | — |
+| event-hub | — |
+| static-web-app | — |
+| bastion | — |
+| mysql-flexible-server | — |
+| application-gateway | — |
+| api-management | — |
 
 ### 4.1 Module Spec Template
 
@@ -327,6 +352,9 @@ Each module's spec file documents the Azure `subresource_names` value for its re
 | function-app | `sites` |
 | service-bus | `namespace` |
 | redis-cache | `redisCache` |
+| event-hub | `namespace` |
+| cosmosdb | `Sql` |
+| api-management | `Gateway` |
 
 #### Outputs
 
@@ -420,3 +448,4 @@ module "diagnostics" {
 | 0.6 | — | Completed P2 module specs (app-service-plan, linux-web-app, function-app, container-app-environment, container-app, container-registry, mssql-server, mssql-database, aks). |
 | 0.7 | — | All P0–P2 modules (17) implemented, live-tested, and passing. 4 integration stacks passing. 7 bugs fixed during live testing. |
 | 1.0 | 2026-02-09 | All P3 modules (service-bus, redis-cache, linux-virtual-machine, front-door) implemented. All 21 modules code-complete. P0–P2 live-tested and released. P3 `terraform validate` passing, live testing starting with linux-virtual-machine. Resolved all open questions. |
+| 1.1 | 2026-02-10 | Expanded framework to 35 modules. Added P1: nat-gateway, route-table, vnet-peering, application-insights, action-group. Added P2: postgresql-flexible-server, cosmosdb. Added P3: event-hub, static-web-app, bastion, mysql-flexible-server, application-gateway, api-management. windows-virtual-machine added in prior session. All new modules `terraform validate` passing. |

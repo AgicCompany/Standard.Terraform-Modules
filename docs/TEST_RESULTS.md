@@ -1,6 +1,6 @@
 # Module Test Results
 
-**Date:** 2026-02-09
+**Date:** 2026-02-10
 **Terraform:** 1.13.0
 **AzureRM Provider:** 4.59.0
 **Subscription:** MPN (AGIC – MPN Mihai)
@@ -16,7 +16,9 @@
 | Phase 2 (Medium) | 8 | 8 | 0 | 4 |
 | Phase 3 (High) | 3 | 3 | 0 | 1 |
 | Phase 4 (Integration) | 4 stacks | 4 | 0 | 0 |
-| **Total** | **19 + 4 stacks** | **All pass** | **0** | **7** |
+| **Live-tested** | **19 + 4 stacks** | **All pass** | **0** | **7** |
+| **Validate-only** | **16** | **16** | **0** | **0** |
+| **Total** | **35 modules** | **All pass** | **0** | **7** |
 
 ---
 
@@ -432,3 +434,49 @@ Integration tests validate cross-module wiring by deploying multi-module stacks 
 | `d356f98` | Fix virtual-network for_each unknown-value error and invalid CIDR |
 | `dbad5b0` | Fix module bugs found during live testing (linux-web-app, function-app, app-service-plan, mssql-database) |
 | `b99114a` | Fix AKS examples and update test results with Phase 3 |
+| `9a2f1a7` | Add P1 modules: nat-gateway, route-table, vnet-peering, application-insights, action-group |
+| `be8bee2` | Add P2 modules: postgresql-flexible-server, cosmosdb |
+| `94f909d` | Add P3 modules: event-hub, static-web-app, bastion, mysql-flexible-server |
+| `9e04b38` | Add P3 modules: application-gateway, api-management |
+
+---
+
+## Validate-Only Modules (Not Yet Live-Tested)
+
+The following 16 modules have passed `terraform fmt` and `terraform validate` on both basic and complete examples but have not been live-tested against Azure.
+
+### P1 Modules
+
+| # | Module | Examples Validated | Notes |
+|---|--------|-------------------|-------|
+| 20 | nat-gateway | basic, complete | NAT GW + Standard public IP + association |
+| 21 | route-table | basic, complete | Routes as separate resources, BGP propagation control |
+| 22 | vnet-peering | basic, complete | Bidirectional peering (local-to-remote + remote-to-local) |
+| 23 | application-insights | basic, complete | Workspace-based only, sensitive outputs |
+| 24 | action-group | basic, complete | Email/SMS/webhook/push receivers, no location |
+
+### P2 Modules
+
+| # | Module | Examples Validated | Notes |
+|---|--------|-------------------|-------|
+| 25 | postgresql-flexible-server | basic, complete | VNet integration via delegated subnet (not PE) |
+| 26 | cosmosdb | basic, complete | SQL API, PE enabled, AzureRM 4.x connection string fix |
+
+### P3 Modules
+
+| # | Module | Examples Validated | Notes |
+|---|--------|-------------------|-------|
+| 27 | event-hub | basic, complete | Namespace + hubs + consumer groups + auth rules + PE |
+| 28 | static-web-app | basic, complete | Free/Standard SKU, no PE in v1.0 |
+| 29 | bastion | basic, complete | Basic/Standard SKU, Standard features gated |
+| 30 | mysql-flexible-server | basic, complete | VNet integration via delegated subnet (not PE) |
+| 31 | application-gateway | basic, complete | Standard_v2/WAF_v2, L7 routing, health probes, SSL |
+| 32 | api-management | basic, complete | Developer-Premium SKUs, VNet integration, PE |
+
+Previously validate-only (from earlier sessions):
+
+| # | Module | Examples Validated | Notes |
+|---|--------|-------------------|-------|
+| 33 | service-bus | basic, complete | Standard/Premium, queues, topics, subscriptions, PE |
+| 34 | redis-cache | basic, complete | Basic-Premium, firewall rules, patch schedule, PE |
+| 35 | front-door | basic, complete | Standard AzureFrontDoor, endpoints, origins, routes |
