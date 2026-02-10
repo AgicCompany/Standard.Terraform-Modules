@@ -16,8 +16,9 @@
 | Phase 2 (Medium) | 8 | 8 | 0 | 4 |
 | Phase 3 (High) | 3 | 3 | 0 | 1 |
 | Phase 4 (Integration) | 4 stacks | 4 | 0 | 0 |
-| **Live-tested** | **19 + 4 stacks** | **All pass** | **0** | **7** |
-| **Validate-only** | **16** | **16** | **0** | **0** |
+| Phase 5 (New modules) | 12 | 12 | 0 | 0 |
+| **Live-tested** | **31 + 4 stacks** | **All pass** | **0** | **7** |
+| **Validate-only** | **4** | **4** | **0** | **0** |
 | **Total** | **35 modules** | **All pass** | **0** | **7** |
 
 ---
@@ -416,14 +417,185 @@ Integration tests validate cross-module wiring by deploying multi-module stacks 
 
 ---
 
+## Phase 5: New Module Live Tests
+
+Live tests of the P1/P2/P3 modules added in the latest batch, organized by estimated cost.
+
+### Batch 1: Free Tier
+
+#### 20. route-table
+
+| Property | Value |
+|----------|-------|
+| Example | `examples/basic` |
+| Region | westeurope |
+| Resources created | 2 (1 RG, 1 route table) |
+| Apply time | 1m 07s |
+| Destroy time | 1m 22s |
+| Result | **PASS** |
+
+No issues found.
+
+#### 21. action-group
+
+| Property | Value |
+|----------|-------|
+| Example | `examples/basic` |
+| Region | westeurope (resource is global) |
+| Resources created | 2 (1 RG, 1 action group) |
+| Apply time | 38s |
+| Destroy time | 25s |
+| Result | **PASS** |
+
+No issues found. Action group is a global resource; the RG location is used for metadata only.
+
+#### 22. nat-gateway
+
+| Property | Value |
+|----------|-------|
+| Example | `examples/basic` |
+| Region | westeurope |
+| Resources created | 4 (1 RG, 1 NAT gateway, 1 public IP, 1 subnet association) |
+| Apply time | 1m 29s |
+| Destroy time | 1m 31s |
+| Result | **PASS** |
+
+No issues found.
+
+#### 23. static-web-app
+
+| Property | Value |
+|----------|-------|
+| Example | `examples/basic` |
+| Region | westeurope |
+| Resources created | 2 (1 RG, 1 static web app) |
+| Apply time | 1m 20s |
+| Destroy time | 2m 25s |
+| Result | **PASS** |
+
+No issues found. Free tier SWA; destroy takes longer than apply due to async cleanup.
+
+#### 24. application-insights
+
+| Property | Value |
+|----------|-------|
+| Example | `examples/basic` |
+| Region | westeurope |
+| Resources created | 3 (1 RG, 1 LAW, 1 Application Insights) |
+| Apply time | 2m 11s |
+| Destroy time | 1m 20s |
+| Result | **PASS** |
+
+No issues found. Workspace-based Application Insights (classic mode deprecated).
+
+#### 25. vnet-peering
+
+| Property | Value |
+|----------|-------|
+| Example | `examples/basic` |
+| Region | westeurope |
+| Resources created | 5 (2 RGs, 2 VNets, 1 bidirectional peering module creating 2 peering resources) |
+| Apply time | 2m 12s |
+| Destroy time | 1m 40s |
+| Result | **PASS** |
+
+No issues found. Bidirectional peering verified — both local-to-remote and remote-to-local peerings created.
+
+### Batch 2: Low-Medium Cost
+
+#### 26. event-hub
+
+| Property | Value |
+|----------|-------|
+| Example | `examples/basic` |
+| Region | westeurope |
+| Resources created | 3 (1 RG, 1 Event Hub namespace, 1 Event Hub) |
+| Apply time | 1m 14s |
+| Destroy time | 37s |
+| Result | **PASS** |
+
+No issues found. Standard SKU namespace with 1 TU.
+
+#### 27. mysql-flexible-server
+
+| Property | Value |
+|----------|-------|
+| Example | `examples/basic` |
+| Region | **swedencentral** (westeurope blocked for MPN) |
+| Resources created | 4 (1 RG, 1 VNet, 1 subnet with delegation, 1 MySQL Flexible Server) |
+| Apply time | 3m 52s |
+| Destroy time | 47s |
+| Result | **PASS** |
+
+**Note:** MySQL Flexible Server provisioning is blocked in westeurope for MPN subscriptions (`LocationIsOfferRestricted`). Test ran successfully in swedencentral. The module itself is region-agnostic.
+
+#### 28. postgresql-flexible-server
+
+| Property | Value |
+|----------|-------|
+| Example | `examples/basic` |
+| Region | **swedencentral** (westeurope blocked for MPN) |
+| Resources created | 4 (1 RG, 1 VNet, 1 subnet with delegation, 1 PostgreSQL Flexible Server) |
+| Apply time | ~5m |
+| Destroy time | ~2m |
+| Result | **PASS** |
+
+**Note:** PostgreSQL Flexible Server provisioning is blocked in westeurope for MPN subscriptions (`LocationIsOfferRestricted`). Test ran successfully in swedencentral. Same limitation as MySQL Flexible Server and MSSQL Server.
+
+#### 29. cosmosdb
+
+| Property | Value |
+|----------|-------|
+| Example | `examples/basic` |
+| Region | **northeurope** (westeurope had slow RG cleanup issues) |
+| Resources created | 3 (1 RG, 1 Cosmos DB account, 1 SQL database) |
+| Apply time | ~5m |
+| Destroy time | ~9m+ |
+| Result | **PASS** |
+
+**Note:** Cosmos DB has very slow destroy cycles. The account deletion alone takes ~8 minutes due to soft-delete operations, and resource group cleanup adds additional time. Free tier was used for testing. Region was changed to northeurope after westeurope exhibited RG deletion timeouts.
+
+### Batch 3: Medium Cost
+
+#### 30. bastion
+
+| Property | Value |
+|----------|-------|
+| Example | `examples/basic` |
+| Region | westeurope |
+| Resources created | 5 (1 RG, 1 VNet, 1 AzureBastionSubnet, 1 public IP, 1 Bastion host) |
+| Apply time | ~8m |
+| Destroy time | ~8m |
+| Result | **PASS** |
+
+No issues found. Bastion hosts have long provisioning and deprovisioning times (~8 minutes each), which is expected for this resource type. Basic SKU used.
+
+#### 31. application-gateway
+
+| Property | Value |
+|----------|-------|
+| Example | `examples/basic` |
+| Region | westeurope |
+| Resources created | 5 (1 RG, 1 VNet, 1 subnet, 1 public IP, 1 Application Gateway) |
+| Apply time | ~9m 23s |
+| Destroy time | ~6m 10s |
+| Result | **PASS** |
+
+No issues found. Standard_v2 SKU with autoscaling (0-2 capacity units). Application Gateway v2 has long provisioning times (~9 minutes), which is expected.
+
+---
+
 ## Subscription Limitations
 
 | Limitation | Impact | Workaround |
 |-----------|--------|------------|
 | SQL Server blocked in westeurope | mssql-server, mssql-database examples fail | Test in northeurope |
+| MySQL Flexible Server blocked in westeurope | mysql-flexible-server example fails | Test in swedencentral |
+| PostgreSQL Flexible Server blocked in westeurope | postgresql-flexible-server example fails | Test in swedencentral |
 | Zone redundant SQL not available | mssql-database complete example fails with Premium SKU | Test with Standard SKU (S0) |
 | AKS zones limited in westeurope | Default `zones = ["1","2","3"]` fails for some VM SKUs | Test with `zones = []` |
 | ContainerInsights orphan on destroy | RG deletion fails after AKS destroy with OMS agent | Use `az group delete` for cleanup |
+| CosmosDB very slow destroy | Account deletion takes ~8m, RG cleanup adds more | Budget extra time; northeurope more reliable than westeurope |
 
 ---
 
@@ -443,40 +615,11 @@ Integration tests validate cross-module wiring by deploying multi-module stacks 
 
 ## Validate-Only Modules (Not Yet Live-Tested)
 
-The following 16 modules have passed `terraform fmt` and `terraform validate` on both basic and complete examples but have not been live-tested against Azure.
-
-### P1 Modules
+The following 4 modules have passed `terraform fmt` and `terraform validate` on both basic and complete examples but have not been live-tested against Azure.
 
 | # | Module | Examples Validated | Notes |
 |---|--------|-------------------|-------|
-| 20 | nat-gateway | basic, complete | NAT GW + Standard public IP + association |
-| 21 | route-table | basic, complete | Routes as separate resources, BGP propagation control |
-| 22 | vnet-peering | basic, complete | Bidirectional peering (local-to-remote + remote-to-local) |
-| 23 | application-insights | basic, complete | Workspace-based only, sensitive outputs |
-| 24 | action-group | basic, complete | Email/SMS/webhook/push receivers, no location |
-
-### P2 Modules
-
-| # | Module | Examples Validated | Notes |
-|---|--------|-------------------|-------|
-| 25 | postgresql-flexible-server | basic, complete | VNet integration via delegated subnet (not PE) |
-| 26 | cosmosdb | basic, complete | SQL API, PE enabled, AzureRM 4.x connection string fix |
-
-### P3 Modules
-
-| # | Module | Examples Validated | Notes |
-|---|--------|-------------------|-------|
-| 27 | event-hub | basic, complete | Namespace + hubs + consumer groups + auth rules + PE |
-| 28 | static-web-app | basic, complete | Free/Standard SKU, no PE in v1.0 |
-| 29 | bastion | basic, complete | Basic/Standard SKU, Standard features gated |
-| 30 | mysql-flexible-server | basic, complete | VNet integration via delegated subnet (not PE) |
-| 31 | application-gateway | basic, complete | Standard_v2/WAF_v2, L7 routing, health probes, SSL |
-| 32 | api-management | basic, complete | Developer-Premium SKUs, VNet integration, PE |
-
-Previously validate-only (from earlier sessions):
-
-| # | Module | Examples Validated | Notes |
-|---|--------|-------------------|-------|
+| 32 | api-management | basic, complete | Developer-Premium SKUs, VNet integration, PE. Skipped live test due to ~45 min provision time. |
 | 33 | service-bus | basic, complete | Standard/Premium, queues, topics, subscriptions, PE |
 | 34 | redis-cache | basic, complete | Basic-Premium, firewall rules, patch schedule, PE |
 | 35 | front-door | basic, complete | Standard AzureFrontDoor, endpoints, origins, routes |
