@@ -1,0 +1,98 @@
+# static-web-app
+
+**Complexity:** Low
+
+Creates an Azure Static Web App with configurable SKU, app settings, and preview environments.
+
+## Usage
+
+```hcl
+module "static_web_app" {
+  source = "git::https://dev.azure.com/org/project/_git/terraform-modules//static-web-app?ref=static-web-app/v1.0.0"
+
+  resource_group_name = "rg-stapp-dev-weu-001"
+  location            = "westeurope"
+  name                = "stapp-myapp-dev-weu-001"
+
+  tags = local.common_tags
+}
+```
+
+## Features
+
+- Static Web App with Free or Standard SKU
+- Application settings (environment variables)
+- Preview environments for pull requests
+- Configuration file changes control
+
+## Security Defaults
+
+Static Web Apps are secure by default:
+
+| Setting | Default | Notes |
+|---------|---------|-------|
+| HTTPS | Enforced | Always HTTPS, managed by Azure |
+| Certificates | Managed | Azure manages TLS certificates |
+| Preview environments | Enabled | `preview_environments_enabled` |
+| Config file changes | Enabled | `configuration_file_changes_enabled` |
+
+## Examples
+
+- [basic](./examples/basic)
+- [complete](./examples/complete)
+
+<!-- BEGIN_TF_DOCS -->
+## Requirements
+
+| Name | Version |
+|------|---------|
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.9.0 |
+| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | >= 4.0.0 |
+
+## Providers
+
+| Name | Version |
+|------|---------|
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | >= 4.0.0 |
+
+## Modules
+
+No modules.
+
+## Resources
+
+| Name | Type |
+|------|------|
+| [azurerm_static_web_app.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/static_web_app) | resource |
+
+## Inputs
+
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| <a name="input_app_settings"></a> [app\_settings](#input\_app\_settings) | Application settings (environment variables) | `map(string)` | `{}` | no |
+| <a name="input_configuration_file_changes_enabled"></a> [configuration\_file\_changes\_enabled](#input\_configuration\_file\_changes\_enabled) | Allow configuration file changes | `bool` | `true` | no |
+| <a name="input_location"></a> [location](#input\_location) | Azure region (Static Web Apps available in: westus2, centralus, eastus2, westeurope, eastasia, eastasiaapac) | `string` | n/a | yes |
+| <a name="input_name"></a> [name](#input\_name) | Static Web App name | `string` | n/a | yes |
+| <a name="input_preview_environments_enabled"></a> [preview\_environments\_enabled](#input\_preview\_environments\_enabled) | Enable preview environments for pull requests | `bool` | `true` | no |
+| <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name) | Name of the resource group | `string` | n/a | yes |
+| <a name="input_sku_size"></a> [sku\_size](#input\_sku\_size) | SKU size for the Static Web App | `string` | `"Free"` | no |
+| <a name="input_sku_tier"></a> [sku\_tier](#input\_sku\_tier) | SKU tier for the Static Web App | `string` | `"Free"` | no |
+| <a name="input_tags"></a> [tags](#input\_tags) | Tags to apply to the resource | `map(string)` | `{}` | no |
+
+## Outputs
+
+| Name | Description |
+|------|-------------|
+| <a name="output_api_key"></a> [api\_key](#output\_api\_key) | API key for deployment (used in CI/CD pipelines) |
+| <a name="output_default_host_name"></a> [default\_host\_name](#output\_default\_host\_name) | Default hostname of the Static Web App |
+| <a name="output_id"></a> [id](#output\_id) | Static Web App resource ID |
+| <a name="output_name"></a> [name](#output\_name) | Static Web App name |
+| <a name="output_public_default_host_name"></a> [public\_default\_host\_name](#output\_public\_default\_host\_name) | Default hostname (for cross-project consumption) |
+| <a name="output_public_static_web_app_id"></a> [public\_static\_web\_app\_id](#output\_public\_static\_web\_app\_id) | Static Web App resource ID (for cross-project consumption) |
+<!-- END_TF_DOCS -->
+
+## Notes
+
+- **GitHub/Azure DevOps integration:** CI/CD pipeline integration is handled outside this module using the `api_key` output.
+- **Private endpoints:** Deferred to a future version. Azure Static Web Apps private endpoints require custom domain and network configuration that adds significant complexity.
+- **Limited region availability:** Static Web Apps are available in limited regions (westus2, centralus, eastus2, westeurope, eastasia, eastasiaapac).
