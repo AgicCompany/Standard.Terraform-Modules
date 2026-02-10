@@ -1,7 +1,7 @@
 # Terraform Modules Implementation Plan
 
-**Version:** 0.2 (Draft)  
-**Status:** In Progress  
+**Version:** 1.0
+**Status:** Implementation Complete — Live Testing P3
 **Maintainer:** Infrastructure Team
 
 This document is the implementation plan for the `terraform-modules` repository. It defines the order, scope, and workflow for building reusable Terraform modules following the organization's standards.
@@ -58,27 +58,28 @@ The module library will be hosted in a single monorepo (`terraform-modules`) wit
 
 | Priority | Module | Dependencies | Target Version | Status | Notes |
 |----------|--------|--------------|----------------|--------|-------|
-| P0 | storage-account | — | v1.0.0 | Not Started | |
-| P0 | key-vault | — | v1.0.0 | Not Started | Includes RBAC and secret management patterns in docs |
-| P0 | virtual-network | — | v1.0.0 | Not Started | Subnets inline via map variable |
-| P1 | network-security-group | — | v1.0.0 | Not Started | |
-| P1 | log-analytics-workspace | — | v1.0.0 | Not Started | |
-| P1 | diagnostic-settings | log-analytics-workspace | v1.0.0 | Not Started | Standalone module, applied selectively |
-| P1 | user-assigned-identity | — | v1.0.0 | Not Started | |
-| P1 | private-dns-zone | virtual-network | v1.0.0 | Not Started | Required by private endpoint pattern |
-| P2 | app-service-plan | — | v1.0.0 | Not Started | Required by linux-web-app and function-app |
-| P2 | linux-web-app | app-service-plan | v1.0.0 | Not Started | |
-| P2 | function-app | app-service-plan | v1.0.0 | Not Started | |
-| P2 | container-app-environment | virtual-network, log-analytics-workspace | v1.0.0 | Not Started | Shared hosting layer for container apps |
-| P2 | container-app | container-app-environment | v1.0.0 | Not Started | |
-| P2 | container-registry | — | v1.0.0 | Not Started | |
-| P2 | mssql-server | key-vault | v1.0.0 | Not Started | |
-| P2 | mssql-database | mssql-server | v1.0.0 | Not Started | |
-| P2 | aks | virtual-network, container-registry | v1.0.0 | Not Started | Complex — scope carefully, must not block rest of P2 |
-| P3 | virtual-machine | virtual-network | v1.0.0 | Not Started | |
-| P3 | service-bus | — | v1.0.0 | Not Started | |
-| P3 | redis-cache | — | v1.0.0 | Not Started | |
-| P3 | front-door | — | v1.0.0 | Not Started | |
+| P0 | storage-account | — | v1.0.0 | Released | Live-tested, 7 bugs fixed across all phases |
+| P0 | key-vault | — | v1.0.0 | Released | Includes RBAC and secret management patterns in docs |
+| P0 | virtual-network | — | v1.0.0 | Released | Subnets inline via map variable. Fixed `for_each` unknown-value bug. |
+| P1 | network-security-group | — | v1.0.0 | Released | |
+| P1 | log-analytics-workspace | — | v1.0.0 | Released | |
+| P1 | diagnostic-settings | log-analytics-workspace | v1.0.0 | Released | Standalone module, applied selectively |
+| P1 | user-assigned-identity | — | v1.0.0 | Released | |
+| P1 | private-dns-zone | virtual-network | v1.0.0 | Released | Required by private endpoint pattern |
+| P2 | app-service-plan | — | v1.0.0 | Released | Required by linux-web-app and function-app |
+| P2 | linux-web-app | app-service-plan | v1.0.0 | Released | Fixed `health_check_eviction_time_in_min` for AzureRM 4.x |
+| P2 | function-app | app-service-plan | v1.0.0 | Released | Fixed `application_stack` runtime conflict for AzureRM 4.x |
+| P2 | container-app-environment | virtual-network, log-analytics-workspace | v1.0.0 | Released | Shared hosting layer for container apps |
+| P2 | container-app | container-app-environment | v1.0.0 | Released | |
+| P2 | container-registry | — | v1.0.0 | Released | |
+| P2 | mssql-server | key-vault | v1.0.0 | Released | SQL blocked in westeurope for MPN — tested in northeurope |
+| P2 | mssql-database | mssql-server | v1.0.0 | Released | |
+| P2 | aks | virtual-network, container-registry | v1.0.0 | Released | ContainerInsights orphan on destroy — needs `az group delete` |
+| P3 | linux-virtual-machine | virtual-network | v1.0.0 | Released | Live-tested: apply + destroy clean. |
+| P3 | windows-virtual-machine | virtual-network | v1.0.0 | Released | Live-tested: apply + destroy clean. |
+| P3 | service-bus | — | v1.0.0 | Complete | `terraform validate` passing. Removed `zone_redundant` (AzureRM 4.x). |
+| P3 | redis-cache | — | v1.0.0 | Complete | `terraform validate` passing. Awaiting live test. |
+| P3 | front-door | — | v1.0.0 | Complete | `terraform validate` passing. Awaiting live test. |
 | — | cosmosdb | — | — | Backlog | |
 
 ### 3.2 Priority Definitions
@@ -96,8 +97,9 @@ The module library will be hosted in a single monorepo (`terraform-modules`) wit
 |--------|---------|
 | Not Started | No work begun |
 | In Progress | Implementation underway |
-| Review | Code complete, under review |
-| Released | Tagged and available for consumption |
+| Complete | Code complete, `terraform validate` passing, awaiting live test |
+| Testing | Live testing in progress against Azure subscription |
+| Released | Live-tested, tagged, and available for consumption |
 | Backlog | Planned but not yet prioritized |
 
 ### 3.4 Dependency Notes
@@ -153,7 +155,8 @@ Files are prefixed with the module's current priority level. When a module's pri
 | mssql-server | [p2-spec-mssql-server.md](modules/p2-spec-mssql-server.md) |
 | mssql-database | [p2-spec-mssql-database.md](modules/p2-spec-mssql-database.md) |
 | aks | [p2-spec-aks.md](modules/p2-spec-aks.md) |
-| virtual-machine | [p3-spec-virtual-machine.md](modules/p3-spec-virtual-machine.md) |
+| linux-virtual-machine | [p3-spec-linux-virtual-machine.md](modules/p3-spec-linux-virtual-machine.md) |
+| windows-virtual-machine | [p3-spec-windows-virtual-machine.md](modules/p3-spec-windows-virtual-machine.md) |
 | service-bus | [p3-spec-service-bus.md](modules/p3-spec-service-bus.md) |
 | redis-cache | [p3-spec-redis-cache.md](modules/p3-spec-redis-cache.md) |
 | front-door | [p3-spec-front-door.md](modules/p3-spec-front-door.md) |
@@ -319,6 +322,11 @@ Each module's spec file documents the Azure `subresource_names` value for its re
 | storage-account | `blob`, `file`, `table`, `queue` |
 | key-vault | `vault` |
 | mssql-server | `sqlServer` |
+| container-registry | `registry` |
+| linux-web-app | `sites` |
+| function-app | `sites` |
+| service-bus | `namespace` |
+| redis-cache | `redisCache` |
 
 #### Outputs
 
@@ -395,8 +403,8 @@ module "diagnostics" {
 | 1 | P2 module list — review pending. | Resolved | Final P2 list: app-service-plan, linux-web-app, function-app, container-app-environment, container-app, container-registry, mssql-server, mssql-database, aks. Role-assignment dropped (too thin). Key-vault-secret and key-vault-access-policy dropped (too thin / deprecated); RBAC patterns documented in key-vault module spec instead. |
 | 2 | Private endpoint: for storage accounts, should v1.0.0 support all subresource types (blob, file, table, queue) or just blob? | Resolved | All four subresource types (blob, file, table, queue) in v1.0.0. |
 | 3 | Should the `virtual-network` module manage subnets inline or should subnets be a separate module? | Resolved | Inline via `subnets` map variable (Option C). Module outputs vnet name/ID for consumers who need to manage subnets independently. A standalone subnet module can be extracted later if demand materializes. |
-| 4 | AKS v1.0.0 scope — what is the minimum viable feature set? Needs dedicated scoping discussion to avoid scope creep blocking the rest of P2. | Open | — |
-| 5 | AzureRM provider 4.x — Module Standards document `versions.tf` example still references `>= 3.75.0`. Update needed before implementation begins. | Open | — |
+| 4 | AKS v1.0.0 scope — what is the minimum viable feature set? Needs dedicated scoping discussion to avoid scope creep blocking the rest of P2. | Resolved | AKS v1.0.0 shipped with: private cluster, Azure CNI Overlay, AzureLinux nodes, system-assigned identity, OIDC, Azure RBAC, Container Insights, configurable default node pool. Live-tested and passing. ContainerInsights orphan on destroy is a known Azure issue — requires `az group delete`. |
+| 5 | AzureRM provider 4.x — Module Standards document `versions.tf` example still references `>= 3.75.0`. Update needed before implementation begins. | Resolved | All 21 modules target `azurerm >= 4.0.0`. Multiple AzureRM 4.x breaking changes caught and fixed during live testing (see TEST_RESULTS.md). |
 
 ---
 
@@ -409,3 +417,6 @@ module "diagnostics" {
 | 0.3 | — | Finalized module inventory. Added P1: private-dns-zone. Added P2: app-service-plan, function-app, container-app, container-registry, aks. Added P3: service-bus, redis-cache, front-door. Dropped role-assignment, key-vault-secret, key-vault-access-policy. Resolved open questions 1-3. Added AKS scoping as open question 4. |
 | 0.4 | — | Added container-app-environment (P2). Set provider target to AzureRM 4.x. Added tool version pinning policy. Flagged Module Standards update needed for provider version. |
 | 0.5 | — | Added public outputs as cross-cutting pattern (section 6.1). Completed P0 module specs (storage-account, key-vault, virtual-network). Completed P1 module specs (network-security-group, log-analytics-workspace, diagnostic-settings, user-assigned-identity, private-dns-zone). |
+| 0.6 | — | Completed P2 module specs (app-service-plan, linux-web-app, function-app, container-app-environment, container-app, container-registry, mssql-server, mssql-database, aks). |
+| 0.7 | — | All P0–P2 modules (17) implemented, live-tested, and passing. 4 integration stacks passing. 7 bugs fixed during live testing. |
+| 1.0 | 2026-02-09 | All P3 modules (service-bus, redis-cache, linux-virtual-machine, front-door) implemented. All 21 modules code-complete. P0–P2 live-tested and released. P3 `terraform validate` passing, live testing starting with linux-virtual-machine. Resolved all open questions. |

@@ -135,7 +135,8 @@ Each module is tested independently with its prerequisites deployed inline. The 
 
 | Module | Prerequisites | Test SKU / Config | Cost Tier |
 |--------|--------------|-------------------|-----------|
-| virtual-machine | Resource group, virtual-network (with subnet) | Standard_B1s | Medium |
+| linux-virtual-machine | Resource group, virtual-network (with subnet) | Standard_B1s | Medium |
+| windows-virtual-machine | Resource group, virtual-network (with subnet) | Standard_B2s | Medium |
 | service-bus | Resource group | Basic | Low |
 | redis-cache | Resource group | Basic C0 | High |
 | front-door | Resource group | Standard | High |

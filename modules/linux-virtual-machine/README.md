@@ -1,4 +1,4 @@
-# virtual-machine
+# linux-virtual-machine
 
 **Complexity:** Medium
 
@@ -8,7 +8,7 @@ Creates an Azure Linux Virtual Machine with network interface, optional public I
 
 ```hcl
 module "virtual_machine" {
-  source = "git::https://dev.azure.com/org/project/_git/terraform-modules//virtual-machine?ref=virtual-machine/v1.0.0"
+  source = "git::https://dev.azure.com/org/project/_git/terraform-modules//linux-virtual-machine?ref=linux-virtual-machine/v1.0.0"
 
   resource_group_name  = "rg-compute-dev-weu-001"
   location             = "westeurope"

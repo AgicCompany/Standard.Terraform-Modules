@@ -1,6 +1,6 @@
 # Example: Complete Usage
 
-Demonstrates all features of the virtual-machine module including identity, boot diagnostics, and data disks.
+Demonstrates all features of the linux-virtual-machine module including identity, boot diagnostics, and data disks.
 
 ## Usage
 

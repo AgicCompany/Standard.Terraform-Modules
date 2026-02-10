@@ -14,9 +14,9 @@
 |-------|---------------|--------|--------|------------|
 | Phase 1 (Free/Low) | 8 | 8 | 0 | 2 |
 | Phase 2 (Medium) | 8 | 8 | 0 | 4 |
-| Phase 3 (High) | 1 | 1 | 0 | 1 |
+| Phase 3 (High) | 3 | 3 | 0 | 1 |
 | Phase 4 (Integration) | 4 stacks | 4 | 0 | 0 |
-| **Total** | **17 + 4 stacks** | **All pass** | **0** | **7** |
+| **Total** | **19 + 4 stacks** | **All pass** | **0** | **7** |
 
 ---
 
@@ -271,6 +271,52 @@ No issues found.
 | Identity | SystemAssigned | SystemAssigned |
 | Node pool OS | AzureLinux | AzureLinux |
 | Tags | applied | applied |
+
+### 18. linux-virtual-machine
+
+| Property | Value |
+|----------|-------|
+| Example | `examples/basic` |
+| Resources created | 6 (1 RG, 1 VNet, 1 subnet, 1 TLS key, 1 NIC, 1 Linux VM) |
+| Result | **PASS** |
+
+No issues found. VM provisioned in ~14 seconds. Clean destroy in ~1.5 minutes.
+
+**Verified configuration:**
+
+| Setting | Expected | Verified |
+|---------|----------|----------|
+| Password auth | Disabled | `disable_password_authentication = true` |
+| SSH key | Set | Yes |
+| OS image | Ubuntu 22.04 LTS Gen2 | Canonical / 0001-com-ubuntu-server-jammy / 22_04-lts-gen2 |
+| OS disk | Premium_LRS | Premium_LRS |
+| Size | Standard_B1s | Standard_B1s |
+| Public IP | None | No public IP |
+| Tags | Applied | Yes |
+
+### 19. windows-virtual-machine
+
+| Property | Value |
+|----------|-------|
+| Example | `examples/basic` |
+| Resources created | 6 (1 RG, 1 VNet, 1 subnet, 1 random password, 1 NIC, 1 Windows VM) |
+| Result | **PASS** |
+
+No issues found. VM provisioned in ~1 minute 39 seconds. Clean destroy in ~2 minutes.
+
+**Verified configuration:**
+
+| Setting | Expected | Verified |
+|---------|----------|----------|
+| Admin password | Set (sensitive) | Yes |
+| OS image | Windows Server 2022 Datacenter Gen2 | MicrosoftWindowsServer / WindowsServer / 2022-datacenter-g2 |
+| OS disk | Premium_LRS | Premium_LRS (127 GB) |
+| Computer name | Truncated to 15 chars | `vm-winex-dev-00` (15 chars) |
+| Size | Standard_B2s | Standard_B2s |
+| Public IP | None | No public IP |
+| Automatic updates | Enabled | `automatic_updates_enabled = true` |
+| Patch mode | AutomaticByOS | AutomaticByOS |
+| Tags | Applied | Yes |
 
 ---
 
