@@ -1,7 +1,7 @@
 # Terraform Modules Implementation Plan
 
 **Version:** 1.1
-**Status:** 35 modules complete — P0-P2 live-tested, P3 awaiting live tests
+**Status:** 36 modules complete — P0-P2 live-tested, P3 awaiting live tests
 **Maintainer:** Infrastructure Team
 
 This document is the implementation plan for the `terraform-modules` repository. It defines the order, scope, and workflow for building reusable Terraform modules following the organization's standards.
@@ -93,6 +93,7 @@ The module library will be hosted in a single monorepo (`terraform-modules`) wit
 | P3 | mysql-flexible-server | — | v1.0.0 | Complete | `terraform validate` passing. VNet integration (not PE). |
 | P3 | application-gateway | virtual-network | v1.0.0 | Complete | `terraform validate` passing. Standard_v2/WAF_v2, L7 routing. |
 | P3 | api-management | — | v1.0.0 | Complete | `terraform validate` passing. VNet integration + PE. |
+| P2 | aks-node-pool | aks | v1.0.0 | Complete | `terraform validate` passing. Node pool companion for AKS. Spot, GPU, Windows, autoscaling. |
 
 ### 3.2 Priority Definitions
 

@@ -19,8 +19,8 @@
 | Phase 5 (New modules) | 12 | 12 | 0 | 0 |
 | Phase 6 (Integration P2) | 5 stacks (19 modules) | 5 | 0 | 2 |
 | **Live-tested** | **31 + 9 stacks** | **All pass** | **0** | **9** |
-| **Validate-only** | **2** | **2** | **0** | **0** |
-| **Total** | **35 modules** | **All pass** | **0** | **9** |
+| **Validate-only** | **3** | **3** | **0** | **0** |
+| **Total** | **36 modules** | **All pass** | **0** | **9** |
 
 ---
 
@@ -747,7 +747,7 @@ Five new integration test stacks covering 19 previously uncovered modules. All s
 | serverless-stack | function-app, storage-account, key-vault, application-insights, user-assigned-identity, action-group | 6 |
 | **Total** | **19 new modules** | **19** |
 
-**Integration test totals:** 12 (Phase 4) + 19 (Phase 6) = **31 of 35 modules** with integration test coverage.
+**Integration test totals:** 12 (Phase 4) + 19 (Phase 6) = **31 of 36 modules** with integration test coverage.
 
 ---
 
@@ -791,3 +791,4 @@ The following 2 modules have passed `terraform fmt` and `terraform validate` on 
 |---|--------|-------------------|-------|
 | 32 | api-management | basic, complete | Developer-Premium SKUs, VNet integration, PE. Skipped live test due to ~45 min provision time. |
 | 33 | front-door | basic, complete | Standard AzureFrontDoor, endpoints, origins, routes. Global CDN service, minimal cross-module wiring. |
+| 34 | aks-node-pool | basic, complete | Node pool companion module for AKS. `for_each` over `node_pools` map. Supports autoscaling, spot, GPU, Windows, labels/taints. |

@@ -201,10 +201,13 @@ Beyond the standard outputs (`id`, `name`):
 - ~~**Load balancer profile customization** -- Outbound IP management, idle timeout, allocated outbound ports. Relevant for production traffic patterns where SNAT exhaustion or idle connection drops become an issue.~~
 - ~~**Private DNS zone customization** -- `private_dns_zone_id` for using custom private DNS zones instead of the system-managed zone (`"System"`). Needed for hub-spoke network topologies with centralized DNS.~~
 
+### v1.3.0 -- Node pool companion module (delivered 2026-02-11)
+
+- ~~**aks-node-pool module** -- Separate module wrapping `azurerm_kubernetes_cluster_node_pool` for additional node pools. Each pool has its own lifecycle independent of the cluster. Uses `for_each` over a `node_pools` map variable. Supports autoscaling, spot instances, GPU, Windows, node labels/taints, upgrade settings, and per-pool tags.~~
+- ~~**Windows node pools** -- Supported via `os_type = "Windows"` in the `node_pools` map. Requires the AKS cluster to have a `windows_profile` configured.~~
+
 ### Backlog (unscheduled)
 
-- **aks-node-pool module** -- Separate module wrapping `azurerm_kubernetes_cluster_node_pool` for additional node pools. Each pool has its own lifecycle independent of the cluster. This is a separate module, not an AKS module change.
-- **Windows node pools** -- Requires `azurerm_kubernetes_cluster_node_pool` with `os_type = "Windows"`. Depends on the `aks-node-pool` module.
 - **User-assigned identity and kubelet identity customization** -- System-assigned is fine for most scenarios. Custom identities add complexity around pre-creation and role assignments.
 - **Storage profile customization** -- Disk CSI, file CSI, snapshot controller toggles. Azure defaults are sensible.
 - **Web app routing / managed ingress controller** -- Most teams use their own ingress controller (NGINX, Traefik, etc.).
