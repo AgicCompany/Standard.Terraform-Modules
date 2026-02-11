@@ -6,9 +6,10 @@ resource "azurerm_kubernetes_cluster" "this" {
   kubernetes_version  = var.kubernetes_version
   sku_tier            = var.sku_tier
 
-  private_cluster_enabled   = true
+  private_cluster_enabled   = length(var.authorized_ip_ranges) == 0
   local_account_disabled    = true
   oidc_issuer_enabled       = true
+  workload_identity_enabled = var.workload_identity_enabled
   automatic_upgrade_channel = var.automatic_upgrade_channel != "none" ? var.automatic_upgrade_channel : null
   node_resource_group       = var.node_resource_group_name
 
@@ -49,7 +50,7 @@ resource "azurerm_kubernetes_cluster" "this" {
   }
 
   azure_active_directory_role_based_access_control {
-    azure_rbac_enabled     = true
+    azure_rbac_enabled     = var.rbac_mode == "azure"
     admin_group_object_ids = var.admin_group_object_ids
   }
 
@@ -64,6 +65,14 @@ resource "azurerm_kubernetes_cluster" "this" {
     for_each = var.enable_container_insights ? [1] : []
     content {
       log_analytics_workspace_id = var.log_analytics_workspace_id
+    }
+  }
+
+  dynamic "key_vault_secrets_provider" {
+    for_each = var.key_vault_secrets_provider != null ? [var.key_vault_secrets_provider] : []
+    content {
+      secret_rotation_enabled  = key_vault_secrets_provider.value.secret_rotation_enabled
+      secret_rotation_interval = key_vault_secrets_provider.value.secret_rotation_interval
     }
   }
 

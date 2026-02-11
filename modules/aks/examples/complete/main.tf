@@ -87,6 +87,15 @@ module "aks" {
   # Feature flags
   enable_auto_scaling       = true
   enable_container_insights = true
+  workload_identity_enabled = true
+
+  # RBAC
+  rbac_mode = "azure"
+
+  # Key Vault CSI driver
+  key_vault_secrets_provider = {
+    secret_rotation_enabled = true
+  }
 
   log_analytics_workspace_id = azurerm_log_analytics_workspace.example.id
 

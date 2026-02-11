@@ -87,6 +87,26 @@ variable "admin_group_object_ids" {
   description = "Azure AD group object IDs for cluster admin access."
 }
 
+variable "rbac_mode" {
+  type        = string
+  default     = "azure"
+  description = "Authorization mode: 'azure' (Azure RBAC) or 'kubernetes' (Kubernetes RBAC). Azure AD authentication is always enabled regardless of mode."
+
+  validation {
+    condition     = contains(["azure", "kubernetes"], var.rbac_mode)
+    error_message = "rbac_mode must be 'azure' or 'kubernetes'."
+  }
+}
+
+variable "key_vault_secrets_provider" {
+  type = object({
+    secret_rotation_enabled  = optional(bool, false)
+    secret_rotation_interval = optional(string, "2m")
+  })
+  default     = null
+  description = "Key Vault CSI driver configuration. When null, the add-on is disabled."
+}
+
 variable "node_resource_group_name" {
   type        = string
   default     = null
@@ -126,6 +146,12 @@ variable "enable_container_insights" {
   type        = bool
   default     = true
   description = "Enable Container Insights via Log Analytics"
+}
+
+variable "workload_identity_enabled" {
+  type        = bool
+  default     = false
+  description = "Enable workload identity for pod-to-Azure-service authentication"
 }
 
 # === Tags ===

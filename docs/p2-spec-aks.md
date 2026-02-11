@@ -3,7 +3,7 @@
 **Priority:** P2
 **Complexity:** High
 **Status:** In Progress
-**Target Version:** v1.0.0
+**Target Version:** v1.1.0
 
 ## What It Creates
 
@@ -19,7 +19,7 @@ The `azurerm_kubernetes_cluster` resource has 100+ attributes. This module expos
 
 - Cluster creation with configurable Kubernetes version
 - Default (system) node pool with autoscaling
-- Private cluster (always enabled -- see Private Cluster section)
+- Private cluster (enabled by default when no authorized IP ranges -- see Private Cluster section)
 - Azure CNI Overlay networking (default) with flat CNI available via override
 - System-assigned managed identity
 - Azure AD authentication (always enabled, local accounts disabled)
@@ -36,7 +36,7 @@ See [Roadmap](#roadmap) for version targets and [Backlog](#backlog) for unschedu
 
 | Setting | Default | Override |
 |---------|---------|----------|
-| Private cluster | Enabled (hardcoded) | `authorized_ip_ranges` to allow specific IPs |
+| Private cluster | Enabled when `authorized_ip_ranges` is empty | Provide IP ranges to make cluster public with restricted access |
 | Local accounts | Disabled (hardcoded) | None -- Azure AD only |
 | Azure RBAC authorization | Enabled (hardcoded) | `rbac_mode` in v1.1.0 |
 | Network plugin | Azure CNI Overlay | `network_profile.network_plugin_mode = null` for flat CNI |
@@ -82,14 +82,12 @@ When provided, these groups receive cluster admin privileges via Azure AD integr
 
 ## Private Cluster
 
-The cluster is **always private** (`private_cluster_enabled = true`). This is hardcoded -- there is no `enable_private_cluster` toggle.
-
-The access posture is controlled by `authorized_ip_ranges`:
+The cluster is **private by default**. The `private_cluster_enabled` setting is derived from `authorized_ip_ranges` -- there is no separate toggle.
 
 | Configuration | Behavior |
 |---------------|----------|
-| `authorized_ip_ranges = []` (default) | Fully private. API server accessible only from within the VNet. |
-| `authorized_ip_ranges = ["1.2.3.4/32"]` | Private cluster with specific public IPs allowed to reach the API server. |
+| `authorized_ip_ranges = []` (default) | `private_cluster_enabled = true`. Fully private. API server accessible only from within the VNet. |
+| `authorized_ip_ranges = ["1.2.3.4/32"]` | `private_cluster_enabled = false`. Public API server restricted to the specified IP ranges. |
 
 For development and testing access to private clusters:
 
@@ -190,11 +188,11 @@ Beyond the standard outputs (`id`, `name`):
 
 ## Roadmap
 
-### v1.1.0 -- Multi-tenant and operational maturity
+### v1.1.0 -- Multi-tenant and operational maturity (delivered 2026-02-11)
 
-- **Kubernetes RBAC authorization mode** -- Add `rbac_mode` variable (`"azure"` or `"kubernetes"`) to support Kubernetes RBAC authorization for multi-tenant cluster scenarios. Azure AD authentication remains mandatory regardless of authorization mode. When `rbac_mode = "kubernetes"`, the module enables AAD authentication + Kubernetes RBAC authorization instead of Azure RBAC. Consumers manage RoleBindings inside the cluster.
-- **Workload identity federation** -- Enable `oidc_issuer_enabled` and `workload_identity_enabled`. The OIDC issuer URL is already output in v1.0.0, so the groundwork is laid. This is the recommended pattern for pod-to-Azure-service authentication (pod identity is deprecated).
-- **Key Vault CSI driver add-on** -- Common companion to workload identity. Enables pods to mount Key Vault secrets as volumes or sync them to Kubernetes secrets.
+- ~~**Kubernetes RBAC authorization mode** -- Add `rbac_mode` variable (`"azure"` or `"kubernetes"`) to support Kubernetes RBAC authorization for multi-tenant cluster scenarios. Azure AD authentication remains mandatory regardless of authorization mode. When `rbac_mode = "kubernetes"`, the module enables AAD authentication + Kubernetes RBAC authorization instead of Azure RBAC. Consumers manage RoleBindings inside the cluster.~~
+- ~~**Workload identity federation** -- Enable `oidc_issuer_enabled` and `workload_identity_enabled`. The OIDC issuer URL is already output in v1.0.0, so the groundwork is laid. This is the recommended pattern for pod-to-Azure-service authentication (pod identity is deprecated).~~
+- ~~**Key Vault CSI driver add-on** -- Common companion to workload identity. Enables pods to mount Key Vault secrets as volumes or sync them to Kubernetes secrets.~~
 
 ### v1.2.0 -- Production hardening
 
@@ -217,7 +215,7 @@ Beyond the standard outputs (`id`, `name`):
 ## Notes
 
 - **AzureRM 4.x: Stable API only.** All preview feature properties were removed from the `azurerm_kubernetes_cluster` resource. If a consumer needs preview features, they must use the `azapi` provider alongside this module. This actually helps scope v1.0.0 -- we can only use what is in the stable API.
-- **Private cluster is always on.** Unlike other modules with `enable_private_endpoint`, AKS does not use Private Link for the API server -- it uses a different mechanism (`private_cluster_enabled`). Making a public cluster private later requires cluster recreation. We avoid this by defaulting to private from day one. The `authorized_ip_ranges` variable is the escape hatch for development access.
+- **Private cluster by default.** Unlike other modules with `enable_private_endpoint`, AKS does not use Private Link for the API server -- it uses a different mechanism (`private_cluster_enabled`). The module derives this from `authorized_ip_ranges`: when empty (default), the cluster is private; when IP ranges are provided, the cluster is public with restricted access. Note that switching between private and public requires cluster recreation.
 - **Azure RBAC for Kubernetes (v1.0.0).** Authorization is handled entirely through Azure IAM. This is simpler to manage and stays within Terraform's natural reach (role assignments are `azurerm_role_assignment` resources). Kubernetes RBAC authorization is planned for v1.1.0 to support multi-tenant clusters where fine-grained namespace-level permissions are needed.
 - **DNS prefix:** Defaults to the `name` variable via `coalesce(var.dns_prefix, var.name)` in locals. Most consumers never need to set this. Override only when the cluster name does not meet DNS prefix requirements or a specific prefix is needed.
 - **`kubernetes_version = null`:** When `null`, Azure selects the latest stable version. This is convenient but means Terraform may detect drift when Azure releases new versions. For production, pin to a specific version (e.g., `"1.29"`) and upgrade deliberately.
