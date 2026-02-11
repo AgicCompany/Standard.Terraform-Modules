@@ -3,7 +3,7 @@
 **Priority:** P2
 **Complexity:** High
 **Status:** In Progress
-**Target Version:** v1.1.0
+**Target Version:** v1.2.0
 
 ## What It Creates
 
@@ -194,12 +194,12 @@ Beyond the standard outputs (`id`, `name`):
 - ~~**Workload identity federation** -- Enable `oidc_issuer_enabled` and `workload_identity_enabled`. The OIDC issuer URL is already output in v1.0.0, so the groundwork is laid. This is the recommended pattern for pod-to-Azure-service authentication (pod identity is deprecated).~~
 - ~~**Key Vault CSI driver add-on** -- Common companion to workload identity. Enables pods to mount Key Vault secrets as volumes or sync them to Kubernetes secrets.~~
 
-### v1.2.0 -- Production hardening
+### v1.2.0 -- Production hardening (delivered 2026-02-11)
 
-- **Auto-scaler profile tuning** -- Expose `auto_scaler_profile` block for fine-tuning scale-down thresholds, scan intervals, and cooldown periods. Azure defaults work for most workloads but production clusters often need tuning.
-- **Maintenance windows** -- `maintenance_window` and `maintenance_window_auto_upgrade` blocks for controlling when Azure performs cluster and node image upgrades. Important for production SLA compliance.
-- **Load balancer profile customization** -- Outbound IP management, idle timeout, allocated outbound ports. Relevant for production traffic patterns where SNAT exhaustion or idle connection drops become an issue.
-- **Private DNS zone customization** -- `private_dns_zone_id` for using custom private DNS zones instead of the system-managed zone (`"System"`). Needed for hub-spoke network topologies with centralized DNS.
+- ~~**Auto-scaler profile tuning** -- Expose `auto_scaler_profile` block for fine-tuning scale-down thresholds, scan intervals, and cooldown periods. Azure defaults work for most workloads but production clusters often need tuning.~~
+- ~~**Maintenance windows** -- `maintenance_window` and `maintenance_window_auto_upgrade` blocks for controlling when Azure performs cluster and node image upgrades. Important for production SLA compliance.~~
+- ~~**Load balancer profile customization** -- Outbound IP management, idle timeout, allocated outbound ports. Relevant for production traffic patterns where SNAT exhaustion or idle connection drops become an issue.~~
+- ~~**Private DNS zone customization** -- `private_dns_zone_id` for using custom private DNS zones instead of the system-managed zone (`"System"`). Needed for hub-spoke network topologies with centralized DNS.~~
 
 ### Backlog (unscheduled)
 

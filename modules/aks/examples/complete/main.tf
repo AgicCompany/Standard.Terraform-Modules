@@ -79,6 +79,11 @@ module "aks" {
     service_cidr        = "10.0.0.0/16"
     dns_service_ip      = "10.0.0.10"
     outbound_type       = "loadBalancer"
+    load_balancer_profile = {
+      managed_outbound_ip_count = 2
+      idle_timeout_in_minutes   = 10
+      outbound_ports_allocated  = 1024
+    }
   }
 
   authorized_ip_ranges      = ["203.0.113.0/24"]
@@ -96,6 +101,40 @@ module "aks" {
   key_vault_secrets_provider = {
     secret_rotation_enabled = true
   }
+
+  # Auto-scaler profile tuning
+  auto_scaler_profile = {
+    balance_similar_node_groups      = true
+    expander                         = "least-waste"
+    max_graceful_termination_sec     = 600
+    scale_down_delay_after_add       = "10m"
+    scale_down_unneeded              = "10m"
+    scale_down_utilization_threshold = "0.5"
+    scan_interval                    = "10s"
+    skip_nodes_with_system_pods      = true
+  }
+
+  # Maintenance windows
+  maintenance_window = {
+    allowed = [
+      { day = "Saturday", hours = [0, 1, 2, 3, 4, 5] },
+      { day = "Sunday", hours = [0, 1, 2, 3, 4, 5] }
+    ]
+    not_allowed = [
+      { start = "2026-12-20T00:00:00Z", end = "2027-01-05T00:00:00Z" }
+    ]
+  }
+
+  maintenance_window_auto_upgrade = {
+    frequency   = "Weekly"
+    interval    = 1
+    duration    = 4
+    day_of_week = "Sunday"
+    start_time  = "02:00"
+    utc_offset  = "+01:00"
+  }
+
+  # private_dns_zone_id is not set -- this example uses authorized_ip_ranges (public cluster)
 
   log_analytics_workspace_id = azurerm_log_analytics_workspace.example.id
 

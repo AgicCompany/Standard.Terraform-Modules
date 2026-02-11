@@ -70,9 +70,16 @@ variable "network_profile" {
     service_cidr        = optional(string, "10.0.0.0/16")
     dns_service_ip      = optional(string, "10.0.0.10")
     outbound_type       = optional(string, "loadBalancer")
+    load_balancer_profile = optional(object({
+      managed_outbound_ip_count = optional(number)
+      outbound_ip_address_ids   = optional(list(string))
+      outbound_ip_prefix_ids    = optional(list(string))
+      outbound_ports_allocated  = optional(number, 0)
+      idle_timeout_in_minutes   = optional(number, 30)
+    }))
   })
   default     = {}
-  description = "Network configuration. Defaults to Azure CNI Overlay."
+  description = "Network configuration. Defaults to Azure CNI Overlay. The load_balancer_profile sub-block configures outbound traffic. The outbound source fields (managed_outbound_ip_count, outbound_ip_address_ids, outbound_ip_prefix_ids) are mutually exclusive."
 }
 
 variable "authorized_ip_ranges" {
@@ -133,6 +140,86 @@ variable "automatic_upgrade_channel" {
     condition     = contains(["none", "patch", "stable", "rapid", "node-image"], var.automatic_upgrade_channel)
     error_message = "automatic_upgrade_channel must be none, patch, stable, rapid, or node-image."
   }
+}
+
+variable "auto_scaler_profile" {
+  type = object({
+    balance_similar_node_groups      = optional(bool)
+    empty_bulk_delete_max            = optional(number)
+    expander                         = optional(string)
+    max_graceful_termination_sec     = optional(number)
+    max_node_provisioning_time       = optional(string)
+    max_unready_nodes                = optional(number)
+    max_unready_percentage           = optional(number)
+    new_pod_scale_up_delay           = optional(string)
+    scale_down_delay_after_add       = optional(string)
+    scale_down_delay_after_delete    = optional(string)
+    scale_down_delay_after_failure   = optional(string)
+    scale_down_unneeded              = optional(string)
+    scale_down_unready               = optional(string)
+    scale_down_utilization_threshold = optional(string)
+    scan_interval                    = optional(string)
+    skip_nodes_with_local_storage    = optional(bool)
+    skip_nodes_with_system_pods      = optional(bool)
+  })
+  default     = null
+  description = "Cluster autoscaler profile. When null, Azure defaults apply."
+
+  validation {
+    condition     = var.auto_scaler_profile == null || try(var.auto_scaler_profile.expander == null || contains(["least-waste", "priority", "most-pods", "random"], var.auto_scaler_profile.expander), true)
+    error_message = "auto_scaler_profile.expander must be least-waste, priority, most-pods, or random."
+  }
+}
+
+variable "maintenance_window" {
+  type = object({
+    allowed = list(object({
+      day   = string
+      hours = list(number)
+    }))
+    not_allowed = optional(list(object({
+      start = string
+      end   = string
+    })))
+  })
+  default     = null
+  description = "General maintenance window. When null, Azure schedules maintenance at its discretion."
+}
+
+variable "maintenance_window_auto_upgrade" {
+  type = object({
+    frequency    = string
+    interval     = number
+    duration     = number
+    day_of_week  = optional(string)
+    day_of_month = optional(number)
+    week_index   = optional(string)
+    start_time   = optional(string)
+    utc_offset   = optional(string, "+00:00")
+    start_date   = optional(string)
+    not_allowed = optional(list(object({
+      start = string
+      end   = string
+    })))
+  })
+  default     = null
+  description = "Auto-upgrade maintenance window. frequency, interval, and duration are required. duration must be 4-24 hours."
+
+  validation {
+    condition     = var.maintenance_window_auto_upgrade == null || contains(["Daily", "Weekly", "AbsoluteMonthly", "RelativeMonthly"], var.maintenance_window_auto_upgrade.frequency)
+    error_message = "frequency must be Daily, Weekly, AbsoluteMonthly, or RelativeMonthly."
+  }
+
+  validation {
+    condition     = var.maintenance_window_auto_upgrade == null || (var.maintenance_window_auto_upgrade.duration >= 4 && var.maintenance_window_auto_upgrade.duration <= 24)
+    error_message = "duration must be between 4 and 24 hours."
+  }
+}
+
+variable "private_dns_zone_id" {
+  type        = string
+  default     = null
+  description = "Private DNS zone resource ID, \"System\", or \"None\". Only applies to private clusters (when authorized_ip_ranges is empty)."
 }
 
 # === Optional: Feature Flags ===
