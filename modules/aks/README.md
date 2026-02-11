@@ -125,15 +125,18 @@ No modules.
 | <a name="input_dns_prefix"></a> [dns\_prefix](#input\_dns\_prefix) | DNS prefix for the cluster. When null, defaults to the name variable. | `string` | `null` | no |
 | <a name="input_enable_auto_scaling"></a> [enable\_auto\_scaling](#input\_enable\_auto\_scaling) | Enable cluster autoscaler on the default node pool | `bool` | `true` | no |
 | <a name="input_enable_container_insights"></a> [enable\_container\_insights](#input\_enable\_container\_insights) | Enable Container Insights via Log Analytics | `bool` | `true` | no |
+| <a name="input_key_vault_secrets_provider"></a> [key\_vault\_secrets\_provider](#input\_key\_vault\_secrets\_provider) | Key Vault CSI driver configuration. When null, the add-on is disabled. | <pre>object({<br/>    secret_rotation_enabled  = optional(bool, false)<br/>    secret_rotation_interval = optional(string, "2m")<br/>  })</pre> | `null` | no |
 | <a name="input_kubernetes_version"></a> [kubernetes\_version](#input\_kubernetes\_version) | Kubernetes version. null = latest stable version available in the region. | `string` | `null` | no |
 | <a name="input_location"></a> [location](#input\_location) | Azure region | `string` | n/a | yes |
 | <a name="input_log_analytics_workspace_id"></a> [log\_analytics\_workspace\_id](#input\_log\_analytics\_workspace\_id) | Log Analytics workspace ID. Required when enable\_container\_insights = true. | `string` | `null` | no |
 | <a name="input_name"></a> [name](#input\_name) | AKS cluster name (full CAF-compliant name, provided by consumer) | `string` | n/a | yes |
 | <a name="input_network_profile"></a> [network\_profile](#input\_network\_profile) | Network configuration. Defaults to Azure CNI Overlay. | <pre>object({<br/>    network_plugin      = optional(string, "azure")<br/>    network_plugin_mode = optional(string, "overlay")<br/>    network_policy      = optional(string, "azure")<br/>    pod_cidr            = optional(string, "10.244.0.0/16")<br/>    service_cidr        = optional(string, "10.0.0.0/16")<br/>    dns_service_ip      = optional(string, "10.0.0.10")<br/>    outbound_type       = optional(string, "loadBalancer")<br/>  })</pre> | `{}` | no |
 | <a name="input_node_resource_group_name"></a> [node\_resource\_group\_name](#input\_node\_resource\_group\_name) | Custom name for the auto-created node resource group. When null, Azure generates MC\_<rg>\_<cluster>\_<region>. | `string` | `null` | no |
+| <a name="input_rbac_mode"></a> [rbac\_mode](#input\_rbac\_mode) | Authorization mode: 'azure' (Azure RBAC) or 'kubernetes' (Kubernetes RBAC). Azure AD authentication is always enabled regardless of mode. | `string` | `"azure"` | no |
 | <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name) | Name of the resource group | `string` | n/a | yes |
 | <a name="input_sku_tier"></a> [sku\_tier](#input\_sku\_tier) | SKU tier: Free, Standard (includes Uptime SLA), or Premium. | `string` | `"Free"` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | Tags to apply to the resource | `map(string)` | `{}` | no |
+| <a name="input_workload_identity_enabled"></a> [workload\_identity\_enabled](#input\_workload\_identity\_enabled) | Enable workload identity for pod-to-Azure-service authentication | `bool` | `false` | no |
 
 ## Outputs
 
