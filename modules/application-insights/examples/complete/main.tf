@@ -13,15 +13,15 @@ provider "azurerm" {
   features {}
 }
 
-resource "azurerm_resource_group" "this" {
+resource "azurerm_resource_group" "example" {
   name     = "rg-appi-complete-dev-weu-001"
   location = "westeurope"
 }
 
 resource "azurerm_log_analytics_workspace" "this" {
   name                = "log-appi-complete-dev-weu-001"
-  location            = azurerm_resource_group.this.location
-  resource_group_name = azurerm_resource_group.this.name
+  location            = azurerm_resource_group.example.location
+  resource_group_name = azurerm_resource_group.example.name
   sku                 = "PerGB2018"
   retention_in_days   = 30
 }
@@ -29,8 +29,8 @@ resource "azurerm_log_analytics_workspace" "this" {
 module "application_insights" {
   source = "../../"
 
-  resource_group_name = azurerm_resource_group.this.name
-  location            = azurerm_resource_group.this.location
+  resource_group_name = azurerm_resource_group.example.name
+  location            = azurerm_resource_group.example.location
   name                = "appi-complete-dev-weu-001"
   workspace_id        = azurerm_log_analytics_workspace.this.id
 
@@ -40,9 +40,10 @@ module "application_insights" {
   local_authentication_disabled = true
 
   tags = {
+    project     = "application-insights"
     environment = "dev"
-    module      = "application-insights"
-    example     = "complete"
+    owner       = "infrastructure-team"
+    managed_by  = "terraform"
   }
 }
 

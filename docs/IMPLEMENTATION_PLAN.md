@@ -141,7 +141,7 @@ Tool versions (terraform-docs, tflint, tflint Azure ruleset) are pinned at the r
 
 ## 4. Module Specifications
 
-Each module has a dedicated specification file in `docs/modules/`. These files define the v1.0.0 scope, feature flags, variables, outputs, and deferred items for each module.
+Each module has a dedicated specification file in `docs/`. These files define the v1.0.0 scope, feature flags, variables, outputs, and deferred items for each module.
 
 Files are prefixed with the module's current priority level. When a module's priority changes, the file is renamed to reflect the new priority.
 
@@ -151,28 +151,28 @@ Files are prefixed with the module's current priority level. When a module's pri
 
 | Module | Spec File |
 |--------|-----------|
-| storage-account | [p0-spec-storage-account.md](modules/p0-spec-storage-account.md) |
-| key-vault | [p0-spec-key-vault.md](modules/p0-spec-key-vault.md) |
-| virtual-network | [p0-spec-virtual-network.md](modules/p0-spec-virtual-network.md) |
-| network-security-group | [p1-spec-network-security-group.md](modules/p1-spec-network-security-group.md) |
-| log-analytics-workspace | [p1-spec-log-analytics-workspace.md](modules/p1-spec-log-analytics-workspace.md) |
-| diagnostic-settings | [p1-spec-diagnostic-settings.md](modules/p1-spec-diagnostic-settings.md) |
-| user-assigned-identity | [p1-spec-user-assigned-identity.md](modules/p1-spec-user-assigned-identity.md) |
-| private-dns-zone | [p1-spec-private-dns-zone.md](modules/p1-spec-private-dns-zone.md) |
-| app-service-plan | [p2-spec-app-service-plan.md](modules/p2-spec-app-service-plan.md) |
-| linux-web-app | [p2-spec-linux-web-app.md](modules/p2-spec-linux-web-app.md) |
-| function-app | [p2-spec-function-app.md](modules/p2-spec-function-app.md) |
-| container-app-environment | [p2-spec-container-app-environment.md](modules/p2-spec-container-app-environment.md) |
-| container-app | [p2-spec-container-app.md](modules/p2-spec-container-app.md) |
-| container-registry | [p2-spec-container-registry.md](modules/p2-spec-container-registry.md) |
-| mssql-server | [p2-spec-mssql-server.md](modules/p2-spec-mssql-server.md) |
-| mssql-database | [p2-spec-mssql-database.md](modules/p2-spec-mssql-database.md) |
-| aks | [p2-spec-aks.md](modules/p2-spec-aks.md) |
-| linux-virtual-machine | [p3-spec-linux-virtual-machine.md](modules/p3-spec-linux-virtual-machine.md) |
-| windows-virtual-machine | [p3-spec-windows-virtual-machine.md](modules/p3-spec-windows-virtual-machine.md) |
-| service-bus | [p3-spec-service-bus.md](modules/p3-spec-service-bus.md) |
-| redis-cache | [p3-spec-redis-cache.md](modules/p3-spec-redis-cache.md) |
-| front-door | [p3-spec-front-door.md](modules/p3-spec-front-door.md) |
+| storage-account | [p0-spec-storage-account.md](p0-spec-storage-account.md) |
+| key-vault | [p0-spec-key-vault.md](p0-spec-key-vault.md) |
+| virtual-network | [p0-spec-virtual-network.md](p0-spec-virtual-network.md) |
+| network-security-group | [p1-spec-network-security-group.md](p1-spec-network-security-group.md) |
+| log-analytics-workspace | [p1-spec-log-analytics-workspace.md](p1-spec-log-analytics-workspace.md) |
+| diagnostic-settings | [p1-spec-diagnostic-settings.md](p1-spec-diagnostic-settings.md) |
+| user-assigned-identity | [p1-spec-user-assigned-identity.md](p1-spec-user-assigned-identity.md) |
+| private-dns-zone | [p1-spec-private-dns-zone.md](p1-spec-private-dns-zone.md) |
+| app-service-plan | [p2-spec-app-service-plan.md](p2-spec-app-service-plan.md) |
+| linux-web-app | [p2-spec-linux-web-app.md](p2-spec-linux-web-app.md) |
+| function-app | [p2-spec-function-app.md](p2-spec-function-app.md) |
+| container-app-environment | [p2-spec-container-app-environment.md](p2-spec-container-app-environment.md) |
+| container-app | [p2-spec-container-app.md](p2-spec-container-app.md) |
+| container-registry | [p2-spec-container-registry.md](p2-spec-container-registry.md) |
+| mssql-server | [p2-spec-mssql-server.md](p2-spec-mssql-server.md) |
+| mssql-database | [p2-spec-mssql-database.md](p2-spec-mssql-database.md) |
+| aks | [p2-spec-aks.md](p2-spec-aks.md) |
+| linux-virtual-machine | [p3-spec-linux-virtual-machine.md](p3-spec-linux-virtual-machine.md) |
+| windows-virtual-machine | [p3-spec-windows-virtual-machine.md](p3-spec-windows-virtual-machine.md) |
+| service-bus | [p3-spec-service-bus.md](p3-spec-service-bus.md) |
+| redis-cache | [p3-spec-redis-cache.md](p3-spec-redis-cache.md) |
+| front-door | [p3-spec-front-door.md](p3-spec-front-door.md) |
 | nat-gateway | — (simple, no spec needed) |
 | route-table | — (simple, no spec needed) |
 | vnet-peering | — (simple, no spec needed) |
@@ -243,7 +243,7 @@ This section defines how each module goes from "Not Started" to "Released." It r
 
 Each module follows this sequence:
 
-**Step 1: Review the module spec.** Read the module's specification file in `docs/modules/`. Understand the v1.0.0 scope, feature flags, and deferred items. If anything is unclear or missing, update the spec before writing code.
+**Step 1: Review the module spec.** Read the module's specification file in `docs/`. Understand the v1.0.0 scope, feature flags, and deferred items. If anything is unclear or missing, update the spec before writing code.
 
 **Step 2: Scaffold the module.** Create the folder structure defined in Module Standards section 9. All files are created, including empty `locals.tf` and `data.tf` with comment headers.
 

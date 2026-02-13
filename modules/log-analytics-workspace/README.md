@@ -36,6 +36,14 @@ This module applies secure defaults:
 | Retention | 30 days | `retention_in_days` |
 | Daily quota | Unlimited | `daily_quota_gb` |
 
+## Public Outputs
+
+These outputs are designed for cross-project state consumption:
+
+| Output | Description |
+|--------|-------------|
+| `public_workspace_id` | Log Analytics workspace resource ID (for cross-project consumption) |
+
 ## Examples
 
 - [basic](./examples/basic)

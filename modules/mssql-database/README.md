@@ -38,6 +38,15 @@ This module does **not** include `resource_group_name` or `location` variables. 
 |---------|---------|-------------------|
 | Geo-redundant backup | Enabled | `enable_geo_redundant_backup` |
 
+## Public Outputs
+
+These outputs are designed for cross-project state consumption:
+
+| Output | Description |
+|--------|-------------|
+| `public_database_id` | SQL Database resource ID (for cross-project consumption) |
+| `public_database_name` | SQL Database name (for cross-project consumption) |
+
 ## Examples
 
 - [basic](./examples/basic)

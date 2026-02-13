@@ -15,30 +15,6 @@ output "endpoint" {
   description = "Cosmos DB account endpoint URL"
 }
 
-output "primary_key" {
-  value       = azurerm_cosmosdb_account.this.primary_key
-  description = "Cosmos DB account primary key"
-  sensitive   = true
-}
-
-output "primary_readonly_key" {
-  value       = azurerm_cosmosdb_account.this.primary_readonly_key
-  description = "Cosmos DB account primary read-only key"
-  sensitive   = true
-}
-
-output "primary_sql_connection_string" {
-  value       = azurerm_cosmosdb_account.this.primary_sql_connection_string
-  description = "Cosmos DB account primary SQL connection string"
-  sensitive   = true
-}
-
-output "secondary_sql_connection_string" {
-  value       = azurerm_cosmosdb_account.this.secondary_sql_connection_string
-  description = "Cosmos DB account secondary SQL connection string"
-  sensitive   = true
-}
-
 output "database_ids" {
   value       = { for k, v in azurerm_cosmosdb_sql_database.this : k => v.id }
   description = "Map of database names to database resource IDs"

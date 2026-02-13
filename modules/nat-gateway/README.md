@@ -29,6 +29,14 @@ module "nat_gateway" {
 
 NAT Gateway provides outbound-only internet access. No inbound connections are allowed through the NAT gateway.
 
+## Public Outputs
+
+These outputs are designed for cross-project state consumption:
+
+| Output | Description |
+|--------|-------------|
+| `public_nat_gateway_id` | NAT gateway resource ID (for cross-project consumption) |
+
 ## Examples
 
 - [basic](./examples/basic)

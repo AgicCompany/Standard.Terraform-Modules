@@ -51,9 +51,10 @@ module "vnet_peering" {
   use_remote_gateways          = false
 
   tags = {
-    Environment = "dev"
-    Project     = "framework"
-    ManagedBy   = "terraform"
+    project     = "framework"
+    environment = "dev"
+    owner       = "infrastructure-team"
+    managed_by  = "terraform"
   }
 }
 

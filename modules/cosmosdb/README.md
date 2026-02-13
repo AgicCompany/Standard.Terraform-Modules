@@ -49,6 +49,16 @@ module "cosmosdb" {
 - TLS 1.2 minimum
 - Local authentication enabled by default (set `enable_local_auth = false` for AAD-only)
 
+## Public Outputs
+
+These outputs are designed for cross-project state consumption:
+
+| Output | Description |
+|--------|-------------|
+| `public_cosmosdb_id` | Cosmos DB account resource ID (for cross-project consumption) |
+| `public_cosmosdb_name` | Cosmos DB account name (for cross-project consumption) |
+| `public_cosmosdb_endpoint` | Cosmos DB account endpoint (for cross-project consumption) |
+
 ## Examples
 
 - [basic](./examples/basic)
@@ -114,15 +124,11 @@ No modules.
 | <a name="output_endpoint"></a> [endpoint](#output\_endpoint) | Cosmos DB account endpoint URL |
 | <a name="output_id"></a> [id](#output\_id) | Cosmos DB account resource ID |
 | <a name="output_name"></a> [name](#output\_name) | Cosmos DB account name |
-| <a name="output_primary_key"></a> [primary\_key](#output\_primary\_key) | Cosmos DB account primary key |
-| <a name="output_primary_readonly_key"></a> [primary\_readonly\_key](#output\_primary\_readonly\_key) | Cosmos DB account primary read-only key |
-| <a name="output_primary_sql_connection_string"></a> [primary\_sql\_connection\_string](#output\_primary\_sql\_connection\_string) | Cosmos DB account primary SQL connection string |
 | <a name="output_private_endpoint_id"></a> [private\_endpoint\_id](#output\_private\_endpoint\_id) | Private endpoint resource ID (when enabled) |
 | <a name="output_private_ip_address"></a> [private\_ip\_address](#output\_private\_ip\_address) | Private IP address of the private endpoint (when enabled) |
 | <a name="output_public_cosmosdb_endpoint"></a> [public\_cosmosdb\_endpoint](#output\_public\_cosmosdb\_endpoint) | Cosmos DB account endpoint (for cross-project consumption) |
 | <a name="output_public_cosmosdb_id"></a> [public\_cosmosdb\_id](#output\_public\_cosmosdb\_id) | Cosmos DB account resource ID (for cross-project consumption) |
 | <a name="output_public_cosmosdb_name"></a> [public\_cosmosdb\_name](#output\_public\_cosmosdb\_name) | Cosmos DB account name (for cross-project consumption) |
-| <a name="output_secondary_sql_connection_string"></a> [secondary\_sql\_connection\_string](#output\_secondary\_sql\_connection\_string) | Cosmos DB account secondary SQL connection string |
 <!-- END_TF_DOCS -->
 
 ## Notes

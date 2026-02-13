@@ -13,7 +13,7 @@ provider "azurerm" {
   features {}
 }
 
-resource "azurerm_resource_group" "this" {
+resource "azurerm_resource_group" "example" {
   name     = "rg-rt-complete-dev-weu-001"
   location = "westeurope"
 }
@@ -21,8 +21,8 @@ resource "azurerm_resource_group" "this" {
 module "route_table" {
   source = "../../"
 
-  resource_group_name = azurerm_resource_group.this.name
-  location            = azurerm_resource_group.this.location
+  resource_group_name = azurerm_resource_group.example.name
+  location            = azurerm_resource_group.example.location
   name                = "rt-complete-dev-weu-001"
 
   disable_bgp_route_propagation = true
@@ -44,9 +44,10 @@ module "route_table" {
   }
 
   tags = {
-    Environment = "dev"
-    ManagedBy   = "terraform"
-    Project     = "route-table-example"
+    project     = "route-table-example"
+    environment = "dev"
+    owner       = "infrastructure-team"
+    managed_by  = "terraform"
   }
 }
 

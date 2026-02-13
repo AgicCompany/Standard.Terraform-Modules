@@ -13,7 +13,7 @@ provider "azurerm" {
   features {}
 }
 
-resource "azurerm_resource_group" "this" {
+resource "azurerm_resource_group" "example" {
   name     = "rg-natgw-example-dev-weu-001"
   location = "westeurope"
 }
@@ -21,13 +21,15 @@ resource "azurerm_resource_group" "this" {
 module "nat_gateway" {
   source = "../../"
 
-  resource_group_name = azurerm_resource_group.this.name
-  location            = azurerm_resource_group.this.location
+  resource_group_name = azurerm_resource_group.example.name
+  location            = azurerm_resource_group.example.location
   name                = "natgw-example-dev-weu-001"
 
   tags = {
-    Environment = "dev"
-    Terraform   = "true"
+    project     = "nat-gateway"
+    environment = "dev"
+    owner       = "infrastructure-team"
+    managed_by  = "terraform"
   }
 }
 

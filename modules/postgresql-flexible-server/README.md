@@ -44,6 +44,16 @@ module "postgresql" {
 - Password authentication enabled by default
 - TLS enforced by Azure (minimum TLS 1.2 on Flexible Server)
 
+## Public Outputs
+
+These outputs are designed for cross-project state consumption:
+
+| Output | Description |
+|--------|-------------|
+| `public_postgresql_server_id` | PostgreSQL Flexible Server resource ID (for cross-project consumption) |
+| `public_postgresql_server_name` | PostgreSQL Flexible Server name (for cross-project consumption) |
+| `public_postgresql_server_fqdn` | PostgreSQL Flexible Server FQDN (for cross-project consumption) |
+
 ## Examples
 
 - [basic](./examples/basic)

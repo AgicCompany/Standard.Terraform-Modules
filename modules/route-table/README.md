@@ -40,6 +40,14 @@ module "route_table" {
 
 BGP route propagation is enabled by default. Set `disable_bgp_route_propagation = true` for subnets that should not learn routes from on-premises networks (e.g., DMZ subnets).
 
+## Public Outputs
+
+These outputs are designed for cross-project state consumption:
+
+| Output | Description |
+|--------|-------------|
+| `public_route_table_id` | Route table resource ID (for cross-project consumption) |
+
 ## Examples
 
 - [basic](./examples/basic)

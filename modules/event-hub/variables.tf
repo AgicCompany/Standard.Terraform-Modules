@@ -11,7 +11,7 @@ variable "location" {
 
 variable "name" {
   type        = string
-  description = "Event Hub namespace name"
+  description = "Event Hub namespace name (full CAF-compliant name, provided by consumer)"
 }
 
 # === Optional: Configuration ===

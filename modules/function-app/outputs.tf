@@ -15,6 +15,11 @@ output "default_hostname" {
   description = "Default hostname of the function app"
 }
 
+output "outbound_ip_addresses" {
+  value       = azurerm_linux_function_app.this.outbound_ip_addresses
+  description = "Outbound IP addresses (comma-separated)"
+}
+
 output "principal_id" {
   value       = try(azurerm_linux_function_app.this.identity[0].principal_id, null)
   description = "System-assigned managed identity principal ID (when enabled)"

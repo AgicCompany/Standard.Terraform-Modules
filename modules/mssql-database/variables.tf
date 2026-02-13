@@ -1,7 +1,7 @@
 # === Required ===
 variable "name" {
   type        = string
-  description = "Database name"
+  description = "Database name (full CAF-compliant name, provided by consumer)"
 }
 
 variable "server_id" {

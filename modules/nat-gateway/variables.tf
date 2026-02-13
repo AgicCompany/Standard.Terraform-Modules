@@ -50,5 +50,5 @@ variable "zones" {
 variable "tags" {
   type        = map(string)
   default     = {}
-  description = "Tags to apply to all resources"
+  description = "Tags to apply to the resource"
 }

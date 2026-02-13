@@ -31,6 +31,14 @@ module "app_plan" {
 
 Service plans are compute-only resources and do not expose network endpoints. Security is managed at the app level.
 
+## Public Outputs
+
+These outputs are designed for cross-project state consumption:
+
+| Output | Description |
+|--------|-------------|
+| `public_service_plan_id` | App Service Plan resource ID (for cross-project consumption) |
+
 ## Examples
 
 - [basic](./examples/basic)

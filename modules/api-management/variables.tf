@@ -11,7 +11,7 @@ variable "location" {
 
 variable "name" {
   type        = string
-  description = "API Management service name"
+  description = "API Management service name (full CAF-compliant name, provided by consumer)"
 }
 
 variable "publisher_name" {

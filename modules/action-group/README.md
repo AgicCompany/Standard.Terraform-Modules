@@ -39,6 +39,14 @@ module "action_group" {
 - Common alert schema enabled by default (standardized notification format)
 - Action group enabled by default
 
+## Public Outputs
+
+These outputs are designed for cross-project state consumption:
+
+| Output | Description |
+|--------|-------------|
+| `public_action_group_id` | Action group resource ID (for cross-project consumption) |
+
 ## Examples
 
 - [basic](./examples/basic)

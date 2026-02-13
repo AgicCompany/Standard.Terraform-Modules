@@ -186,6 +186,11 @@ variable "private_dns_zone_ids" {
   type        = map(string)
   default     = {}
   description = "Map of subresource name (blob, file, table, queue) to private DNS zone ID."
+
+  validation {
+    condition     = alltrue([for k in keys(var.private_dns_zone_ids) : contains(["blob", "file", "table", "queue"], k)])
+    error_message = "private_dns_zone_ids keys must be a subset of: blob, file, table, queue."
+  }
 }
 
 # === Tags ===

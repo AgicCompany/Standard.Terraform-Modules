@@ -8,7 +8,7 @@ Creates an Azure Kubernetes Service (AKS) cluster with private-by-default config
 
 ```hcl
 module "aks" {
-  source = "git::https://dev.azure.com/org/project/_git/terraform-modules//aks?ref=aks/v1.0.0"
+  source = "git::https://dev.azure.com/org/project/_git/terraform-modules//aks?ref=aks/v1.2.0"
 
   resource_group_name = "rg-aks-dev-weu-001"
   location            = "westeurope"
@@ -32,7 +32,7 @@ module "aks" {
 - Azure CNI Overlay networking (default) with flat CNI available
 - System-assigned managed identity
 - Azure AD authentication (always enabled, local accounts disabled)
-- Azure RBAC for Kubernetes authorization (hardcoded in v1.0.0)
+- Azure RBAC for Kubernetes authorization (default, configurable via `rbac_mode`)
 - Admin group support for cluster admin access
 - Container Insights via Log Analytics workspace
 - Configurable Kubernetes version and upgrade channel
@@ -48,7 +48,7 @@ This module applies secure defaults:
 |---------|---------|---------|
 | Private cluster | Enabled (hardcoded) | `authorized_ip_ranges` to allow specific IPs |
 | Local accounts | Disabled (hardcoded) | None — Azure AD only |
-| Azure RBAC authorization | Enabled (hardcoded) | `rbac_mode` in v1.1.0 |
+| Azure RBAC authorization | Enabled | `rbac_mode` to switch to Kubernetes RBAC |
 | OIDC issuer | Enabled (always on) | — |
 | Container Insights | Enabled | `enable_container_insights` |
 | Autoscaling | Enabled | `enable_auto_scaling` |
@@ -164,7 +164,7 @@ No modules.
 
 - **AzureRM 4.x: Stable API only.** All preview feature properties were removed from the `azurerm_kubernetes_cluster` resource. If a consumer needs preview features, they must use the `azapi` provider alongside this module.
 - **Private cluster is always on.** Unlike other modules with `enable_private_endpoint`, AKS uses `private_cluster_enabled` instead of Private Link. Making a public cluster private later requires cluster recreation. The `authorized_ip_ranges` variable is the escape hatch for development access.
-- **Azure RBAC for Kubernetes (v1.0.0).** Authorization is handled entirely through Azure IAM. This is simpler to manage and stays within Terraform's natural reach. Kubernetes RBAC authorization is planned for v1.1.0 to support multi-tenant clusters.
+- **Azure RBAC for Kubernetes (default).** Authorization is handled entirely through Azure IAM. This is simpler to manage and stays within Terraform's natural reach. Kubernetes RBAC authorization is available since v1.1.0 via the `rbac_mode` variable to support multi-tenant clusters.
 - **DNS prefix:** Defaults to the `name` variable via `coalesce(var.dns_prefix, var.name)` in locals. Most consumers never need to set this. Override only when the cluster name does not meet DNS prefix requirements or a specific prefix is needed.
 - **`kubernetes_version = null`:** When `null`, Azure selects the latest stable version. This is convenient but means Terraform may detect drift when Azure releases new versions. For production, pin to a specific version (e.g., `"1.29"`).
 - **Node pool name:** The default node pool is always named `"system"`. This is hardcoded. Additional pools use a separate `aks-node-pool` module (future).
@@ -173,7 +173,7 @@ No modules.
 - **`temporary_name_for_rotation`:** Required when changes to the default node pool force recreation (e.g., changing `vm_size`). AKS creates a temporary pool, migrates workloads, then replaces the original.
 - **Naming:** CAF prefix for AKS is `aks`. Example: `aks-payments-dev-weu-001`.
 - **`kube_config_raw` output:** Marked as sensitive. For initial bootstrapping only — use `az aks get-credentials` with Azure AD auth for day-to-day access.
-- **OIDC issuer URL:** Output even though workload identity is deferred to v1.1.0. The URL is needed later for workload identity configuration.
+- **OIDC issuer URL:** Output for workload identity configuration, available since v1.1.0 via the `workload_identity_enabled` variable.
 - **Why CNI Overlay as default:** The framework is private-first — workloads communicate via private endpoints, internal load balancers, and ingress controllers, not direct pod-to-VNet routing. Overlay conserves VNet IPs, scales better, and is Microsoft's recommended path forward. Flat CNI is available by setting `network_plugin_mode = null`.
 - **Subnet sizing:** With CNI Overlay (default), only nodes consume subnet IPs. With flat CNI, each node and each pod consumes a subnet IP — size subnets accordingly.
 - **Subnet per node pool:** With flat Azure CNI, each node pool can use its own subnet. With CNI Overlay, all node pools share the same subnet. This is why `vnet_subnet_id` is inside `default_node_pool` rather than at the top level.

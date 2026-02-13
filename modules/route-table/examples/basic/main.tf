@@ -13,7 +13,7 @@ provider "azurerm" {
   features {}
 }
 
-resource "azurerm_resource_group" "this" {
+resource "azurerm_resource_group" "example" {
   name     = "rg-rt-example-dev-weu-001"
   location = "westeurope"
 }
@@ -21,9 +21,14 @@ resource "azurerm_resource_group" "this" {
 module "route_table" {
   source = "../../"
 
-  resource_group_name = azurerm_resource_group.this.name
-  location            = azurerm_resource_group.this.location
+  resource_group_name = azurerm_resource_group.example.name
+  location            = azurerm_resource_group.example.location
   name                = "rt-example-dev-weu-001"
+
+  tags = {
+    project     = "example"
+    environment = "dev"
+  }
 }
 
 output "route_table_id" {

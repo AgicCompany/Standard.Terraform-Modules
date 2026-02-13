@@ -1,6 +1,4 @@
-# ========================
-# Required
-# ========================
+# === Required ===
 
 variable "resource_group_name" {
   type        = string
@@ -22,9 +20,7 @@ variable "workspace_id" {
   description = "Log Analytics workspace resource ID (required for workspace-based Application Insights)"
 }
 
-# ========================
-# Optional: Configuration
-# ========================
+# === Optional: Configuration ===
 
 variable "application_type" {
   type        = string
@@ -71,9 +67,7 @@ variable "sampling_percentage" {
   }
 }
 
-# ========================
-# Optional: Feature Flags
-# ========================
+# === Optional: Feature Flags ===
 
 variable "disable_ip_masking" {
   type        = bool
@@ -105,12 +99,10 @@ variable "force_customer_storage_for_profiler" {
   description = "Force customer storage for profiler data"
 }
 
-# ========================
-# Tags
-# ========================
+# === Tags ===
 
 variable "tags" {
   type        = map(string)
   default     = {}
-  description = "Tags to apply to resources"
+  description = "Tags to apply to the resource"
 }

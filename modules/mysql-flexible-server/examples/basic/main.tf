@@ -17,7 +17,7 @@ provider "azurerm" {
   features {}
 }
 
-resource "azurerm_resource_group" "this" {
+resource "azurerm_resource_group" "example" {
   name     = "rg-mysql-example-dev-weu-001"
   location = "westeurope"
 }
@@ -31,8 +31,8 @@ resource "random_password" "admin" {
 module "mysql" {
   source = "../../"
 
-  resource_group_name    = azurerm_resource_group.this.name
-  location               = azurerm_resource_group.this.location
+  resource_group_name    = azurerm_resource_group.example.name
+  location               = azurerm_resource_group.example.location
   name                   = "mysql-example-dev-weu-001"
   administrator_login    = "mysqladmin"
   administrator_password = random_password.admin.result
@@ -44,9 +44,10 @@ module "mysql" {
   }
 
   tags = {
-    Environment = "dev"
-    Module      = "mysql-flexible-server"
-    Example     = "basic"
+    project     = "mysql-flexible-server"
+    environment = "dev"
+    owner       = "infrastructure-team"
+    managed_by  = "terraform"
   }
 }
 

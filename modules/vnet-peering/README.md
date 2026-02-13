@@ -39,6 +39,14 @@ module "vnet_peering" {
 - Forwarded traffic is denied by default
 - Gateway transit is disabled by default
 
+## Public Outputs
+
+These outputs are designed for cross-project state consumption:
+
+| Output | Description |
+|--------|-------------|
+| `public_peering_id` | Local-to-remote peering resource ID (for cross-project consumption) |
+
 ## Examples
 
 - [basic](./examples/basic)

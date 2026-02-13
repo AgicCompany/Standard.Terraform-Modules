@@ -44,6 +44,11 @@ module "vnet_peering" {
   remote_virtual_network_id                  = azurerm_virtual_network.spoke.id
   remote_virtual_network_resource_group_name = azurerm_resource_group.example.name
   remote_virtual_network_name                = azurerm_virtual_network.spoke.name
+
+  tags = {
+    project     = "example"
+    environment = "dev"
+  }
 }
 
 output "local_to_remote_peering_id" {

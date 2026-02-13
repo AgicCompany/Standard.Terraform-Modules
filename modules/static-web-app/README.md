@@ -36,6 +36,15 @@ Static Web Apps are secure by default:
 | Preview environments | Enabled | `preview_environments_enabled` |
 | Config file changes | Enabled | `configuration_file_changes_enabled` |
 
+## Public Outputs
+
+These outputs are designed for cross-project state consumption:
+
+| Output | Description |
+|--------|-------------|
+| `public_static_web_app_id` | Static Web App resource ID (for cross-project consumption) |
+| `public_default_host_name` | Default hostname (for cross-project consumption) |
+
 ## Examples
 
 - [basic](./examples/basic)

@@ -55,6 +55,14 @@ This module does **not** include a `location` variable. Private DNS zones are gl
 | Web Apps | `privatelink.azurewebsites.net` |
 | Azure Monitor | `privatelink.monitor.azure.com` |
 
+## Public Outputs
+
+These outputs are designed for cross-project state consumption:
+
+| Output | Description |
+|--------|-------------|
+| `public_dns_zone_id` | Private DNS zone resource ID (for cross-project consumption) |
+
 ## Examples
 
 - [basic](./examples/basic)

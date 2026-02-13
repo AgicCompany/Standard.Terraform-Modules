@@ -12,7 +12,7 @@ variable "location" {
 
 variable "name" {
   type        = string
-  description = "Azure Bastion host name"
+  description = "Azure Bastion host name (full CAF-compliant name, provided by consumer)"
 }
 
 variable "subnet_id" {

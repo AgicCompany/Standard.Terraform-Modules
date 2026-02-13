@@ -51,6 +51,14 @@ This module creates an empty NSG by default (no rules). Azure provides implicit 
 | AllowInternetOutBound | 65001 | Outbound | Allow |
 | DenyAllOutBound | 65500 | Outbound | Deny |
 
+## Public Outputs
+
+These outputs are designed for cross-project state consumption:
+
+| Output | Description |
+|--------|-------------|
+| `public_nsg_id` | Network security group resource ID (for cross-project consumption) |
+
 ## Examples
 
 - [basic](./examples/basic)
@@ -103,5 +111,5 @@ No modules.
 ## Notes
 
 - **Separate rule resources:** Rules are created as `azurerm_network_security_rule` resources rather than inline blocks to prevent lifecycle issues when adding or removing rules.
-- **Subnet association:** This module does not associate the NSG with subnets. Use the virtual-network module's `network_security_group_id` parameter or create `azurerm_subnet_network_security_group_association` resources separately.
+- **Subnet association:** This module does not associate the NSG with subnets. Use the virtual-network module's `subnet_nsg_associations` parameter or create `azurerm_subnet_network_security_group_association` resources separately.
 - **Rule priorities:** Must be unique per direction. Use increments of 10 or 100 to allow future insertions.

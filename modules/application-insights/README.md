@@ -34,6 +34,15 @@ module "application_insights" {
 - Local authentication enabled by default (set `local_authentication_disabled = true` for AAD-only)
 - Internet ingestion and query enabled by default (required for most application telemetry scenarios)
 
+## Public Outputs
+
+These outputs are designed for cross-project state consumption:
+
+| Output | Description |
+|--------|-------------|
+| `public_app_insights_id` | Application Insights resource ID (for cross-project consumption) |
+| `public_connection_string` | Application Insights connection string (for cross-project consumption) |
+
 ## Examples
 
 - [basic](./examples/basic)

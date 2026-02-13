@@ -13,7 +13,7 @@ provider "azurerm" {
   features {}
 }
 
-resource "azurerm_resource_group" "this" {
+resource "azurerm_resource_group" "example" {
   name     = "rg-cosmos-example-dev-weu-001"
   location = "westeurope"
 }
@@ -21,8 +21,8 @@ resource "azurerm_resource_group" "this" {
 module "cosmosdb" {
   source = "../../"
 
-  resource_group_name = azurerm_resource_group.this.name
-  location            = azurerm_resource_group.this.location
+  resource_group_name = azurerm_resource_group.example.name
+  location            = azurerm_resource_group.example.location
   name                = "cosmos-example-dev-weu-001"
 
   free_tier_enabled = true
@@ -35,8 +35,10 @@ module "cosmosdb" {
   enable_public_access    = true
 
   tags = {
-    Environment = "dev"
-    Project     = "example"
+    project     = "example"
+    environment = "dev"
+    owner       = "infrastructure-team"
+    managed_by  = "terraform"
   }
 }
 

@@ -28,6 +28,16 @@ module "identity" {
 
 This module creates a managed identity only. Role assignments are the consumer's responsibility and should follow the principle of least privilege.
 
+## Public Outputs
+
+These outputs are designed for cross-project state consumption:
+
+| Output | Description |
+|--------|-------------|
+| `public_identity_id` | User-assigned identity resource ID (for cross-project consumption) |
+| `public_principal_id` | Service principal ID (for cross-project consumption) |
+| `public_client_id` | Client ID (for cross-project consumption) |
+
 ## Examples
 
 - [basic](./examples/basic)

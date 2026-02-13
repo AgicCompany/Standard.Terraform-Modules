@@ -37,17 +37,17 @@ output "oidc_issuer_url" {
 }
 
 output "principal_id" {
-  value       = azurerm_kubernetes_cluster.this.identity[0].principal_id
+  value       = try(azurerm_kubernetes_cluster.this.identity[0].principal_id, null)
   description = "System-assigned managed identity principal ID"
 }
 
 output "tenant_id" {
-  value       = azurerm_kubernetes_cluster.this.identity[0].tenant_id
+  value       = try(azurerm_kubernetes_cluster.this.identity[0].tenant_id, null)
   description = "System-assigned managed identity tenant ID"
 }
 
 output "kubelet_identity" {
-  value       = azurerm_kubernetes_cluster.this.kubelet_identity[0]
+  value       = try(azurerm_kubernetes_cluster.this.kubelet_identity[0], null)
   description = "Kubelet managed identity (client_id, object_id, user_assigned_identity_id)"
 }
 

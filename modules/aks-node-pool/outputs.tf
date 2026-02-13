@@ -1,3 +1,4 @@
+# === Standard Outputs ===
 output "node_pool_ids" {
   value       = { for k, v in azurerm_kubernetes_cluster_node_pool.this : k => v.id }
   description = "Map of node pool names to resource IDs"

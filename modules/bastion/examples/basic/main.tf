@@ -41,6 +41,11 @@ module "bastion" {
   subnet_id           = azurerm_subnet.bastion.id
 
   sku = "Basic"
+
+  tags = {
+    project     = "example"
+    environment = "dev"
+  }
 }
 
 output "id" {

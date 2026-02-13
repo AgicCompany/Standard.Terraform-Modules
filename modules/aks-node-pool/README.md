@@ -1,3 +1,59 @@
+# aks-node-pool
+
+**Complexity:** Low
+
+Creates additional (user) node pools for an existing AKS cluster. This module is a companion to the `aks` module and manages node pools as separate resources using `for_each`, allowing independent lifecycle management without affecting the cluster or its default system pool.
+
+## Usage
+
+```hcl
+module "aks_node_pool" {
+  source = "git::https://dev.azure.com/org/project/_git/terraform-modules//aks-node-pool?ref=aks-node-pool/v1.0.0"
+
+  kubernetes_cluster_id = module.aks.id
+
+  node_pools = {
+    workload = {
+      vm_size   = "Standard_D4s_v3"
+      min_count = 2
+      max_count = 10
+    }
+  }
+}
+```
+
+## Features
+
+- `for_each`-based node pool creation from a single map variable
+- Autoscaling support (enabled by default, with configurable min/max counts)
+- Spot instance support with configurable eviction policy and max price
+- Windows node pool support (`os_type = "Windows"`)
+- Upgrade settings (max surge, drain timeout, node soak duration)
+- Availability zone configuration (defaults to zones 1, 2, 3)
+- Node labels and taints for scheduling control
+- Ultra SSD and host encryption support
+- FIPS-enabled node pool support
+- Per-pool subnet placement for flat Azure CNI topologies
+- Scale-down mode selection (Delete or Deallocate)
+- Orchestrator version pinning per pool
+- Validated inputs for mode, priority, os_type, and scale_down_mode
+
+## Examples
+
+- [basic](./examples/basic) -- single worker pool with autoscaling
+- [complete](./examples/complete) -- multiple pools including GPU and Spot instances with labels, taints, and custom subnets
+
+## Notes
+
+- **Node pool names:** Each key in the `node_pools` map becomes the Azure node pool name. AKS node pool names must be 1-12 characters, lowercase alphanumeric only (no hyphens or underscores).
+- **Autoscaling vs. fixed count:** When `auto_scaling_enabled = true` (the default), `min_count` and `max_count` control the pool size. When disabled, `node_count` sets a fixed number of nodes.
+- **Spot instances:** Set `priority = "Spot"` to use Spot VMs. The `eviction_policy` (Delete or Deallocate) and `spot_max_price` fields only apply when priority is Spot. Use `spot_max_price = -1` to accept on-demand pricing as the maximum.
+- **AzureLinux as default OS:** `os_sku = "AzureLinux"` is Microsoft's recommended Linux distribution for AKS. The `os_sku` field is automatically set to `null` for Windows pools.
+- **Subnet per pool:** With flat Azure CNI, each node pool can target its own subnet via `vnet_subnet_id`. With CNI Overlay, all pools share the cluster subnet.
+- **Upgrade settings:** Defaults to 33% max surge, 30-minute drain timeout, and no node soak. Adjust for production workloads that need graceful rolling upgrades.
+- **`temporary_name_for_rotation`:** Set this when changes to the node pool force recreation (e.g., changing `vm_size`). AKS creates a temporary pool, migrates workloads, then replaces the original.
+- **Separate lifecycle:** Because node pools are managed as individual `azurerm_kubernetes_cluster_node_pool` resources, adding or removing a pool does not trigger changes to the cluster or other pools.
+
 <!-- BEGIN_TF_DOCS -->
 ## Requirements
 

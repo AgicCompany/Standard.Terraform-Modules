@@ -6,12 +6,12 @@ variable "resource_group_name" {
 
 variable "location" {
   type        = string
-  description = "Azure region (Static Web Apps available in: westus2, centralus, eastus2, westeurope, eastasia, eastasiaapac)"
+  description = "Azure region"
 }
 
 variable "name" {
   type        = string
-  description = "Static Web App name"
+  description = "Static Web App name (full CAF-compliant name, provided by consumer)"
 }
 
 # === Optional: Configuration ===

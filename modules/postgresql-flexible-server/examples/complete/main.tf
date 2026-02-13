@@ -17,7 +17,7 @@ provider "azurerm" {
   features {}
 }
 
-resource "azurerm_resource_group" "this" {
+resource "azurerm_resource_group" "example" {
   name     = "rg-psql-complete-dev-weu-001"
   location = "westeurope"
 }
@@ -32,14 +32,14 @@ resource "random_password" "admin" {
 
 resource "azurerm_virtual_network" "this" {
   name                = "vnet-psql-complete-dev-weu-001"
-  location            = azurerm_resource_group.this.location
-  resource_group_name = azurerm_resource_group.this.name
+  location            = azurerm_resource_group.example.location
+  resource_group_name = azurerm_resource_group.example.name
   address_space       = ["10.0.0.0/16"]
 }
 
 resource "azurerm_subnet" "postgresql" {
   name                 = "snet-psql"
-  resource_group_name  = azurerm_resource_group.this.name
+  resource_group_name  = azurerm_resource_group.example.name
   virtual_network_name = azurerm_virtual_network.this.name
   address_prefixes     = ["10.0.1.0/24"]
   service_endpoints    = ["Microsoft.Storage"]
@@ -58,12 +58,12 @@ resource "azurerm_subnet" "postgresql" {
 
 resource "azurerm_private_dns_zone" "postgresql" {
   name                = "privatelink.postgres.database.azure.com"
-  resource_group_name = azurerm_resource_group.this.name
+  resource_group_name = azurerm_resource_group.example.name
 }
 
 resource "azurerm_private_dns_zone_virtual_network_link" "postgresql" {
   name                  = "psql-vnet-link"
-  resource_group_name   = azurerm_resource_group.this.name
+  resource_group_name   = azurerm_resource_group.example.name
   private_dns_zone_name = azurerm_private_dns_zone.postgresql.name
   virtual_network_id    = azurerm_virtual_network.this.id
 }
@@ -73,8 +73,8 @@ resource "azurerm_private_dns_zone_virtual_network_link" "postgresql" {
 module "postgresql" {
   source = "../../"
 
-  resource_group_name    = azurerm_resource_group.this.name
-  location               = azurerm_resource_group.this.location
+  resource_group_name    = azurerm_resource_group.example.name
+  location               = azurerm_resource_group.example.location
   name                   = "psql-complete-dev-weu-001"
   administrator_login    = "psqladmin"
   administrator_password = random_password.admin.result
@@ -115,9 +115,10 @@ module "postgresql" {
   }
 
   tags = {
-    Environment = "dev"
-    Module      = "postgresql-flexible-server"
-    Example     = "complete"
+    project     = "postgresql-flexible-server"
+    environment = "dev"
+    owner       = "infrastructure-team"
+    managed_by  = "terraform"
   }
 
   depends_on = [

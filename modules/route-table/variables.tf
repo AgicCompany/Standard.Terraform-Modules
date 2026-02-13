@@ -1,6 +1,4 @@
-# ╔══════════════════════════════════════════════════════════════════════════════╗
-# ║ Required                                                                    ║
-# ╚══════════════════════════════════════════════════════════════════════════════╝
+# === Required ===
 
 variable "resource_group_name" {
   type        = string
@@ -17,9 +15,7 @@ variable "name" {
   description = "Route table name (full CAF-compliant name, provided by consumer)"
 }
 
-# ╔══════════════════════════════════════════════════════════════════════════════╗
-# ║ Optional: Configuration                                                     ║
-# ╚══════════════════════════════════════════════════════════════════════════════╝
+# === Optional: Configuration ===
 
 variable "disable_bgp_route_propagation" {
   type        = bool
@@ -45,12 +41,10 @@ variable "routes" {
   }
 }
 
-# ╔══════════════════════════════════════════════════════════════════════════════╗
-# ║ Tags                                                                        ║
-# ╚══════════════════════════════════════════════════════════════════════════════╝
+# === Tags ===
 
 variable "tags" {
   type        = map(string)
   default     = {}
-  description = "Tags to apply to all resources"
+  description = "Tags to apply to the resource"
 }
