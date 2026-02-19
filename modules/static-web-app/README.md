@@ -14,6 +14,12 @@ module "static_web_app" {
   location            = "westeurope"
   name                = "stapp-myapp-dev-weu-001"
 
+  # PE requires Standard SKU, subnet, and DNS zone
+  sku_tier            = "Standard"
+  sku_size            = "Standard"
+  subnet_id           = module.vnet.subnet_ids["snet-pe"]
+  private_dns_zone_id = module.dns.zone_ids["privatelink.azurestaticapps.net"]
+
   tags = local.common_tags
 }
 ```
@@ -66,7 +72,7 @@ These outputs are designed for cross-project state consumption:
 
 | Name | Version |
 |------|---------|
-| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | >= 4.0.0 |
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 4.60.0 |
 
 ## Modules
 
@@ -76,6 +82,7 @@ No modules.
 
 | Name | Type |
 |------|------|
+| [azurerm_private_endpoint.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_endpoint) | resource |
 | [azurerm_static_web_app.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/static_web_app) | resource |
 
 ## Inputs
@@ -84,12 +91,16 @@ No modules.
 |------|-------------|------|---------|:--------:|
 | <a name="input_app_settings"></a> [app\_settings](#input\_app\_settings) | Application settings (environment variables) | `map(string)` | `{}` | no |
 | <a name="input_configuration_file_changes_enabled"></a> [configuration\_file\_changes\_enabled](#input\_configuration\_file\_changes\_enabled) | Allow configuration file changes | `bool` | `true` | no |
-| <a name="input_location"></a> [location](#input\_location) | Azure region (Static Web Apps available in: westus2, centralus, eastus2, westeurope, eastasia, eastasiaapac) | `string` | n/a | yes |
-| <a name="input_name"></a> [name](#input\_name) | Static Web App name | `string` | n/a | yes |
+| <a name="input_enable_private_endpoint"></a> [enable\_private\_endpoint](#input\_enable\_private\_endpoint) | Create a private endpoint for the Static Web App. Requires Standard SKU. | `bool` | `true` | no |
+| <a name="input_enable_public_access"></a> [enable\_public\_access](#input\_enable\_public\_access) | Allow public network access | `bool` | `false` | no |
+| <a name="input_location"></a> [location](#input\_location) | Azure region | `string` | n/a | yes |
+| <a name="input_name"></a> [name](#input\_name) | Static Web App name (full CAF-compliant name, provided by consumer) | `string` | n/a | yes |
 | <a name="input_preview_environments_enabled"></a> [preview\_environments\_enabled](#input\_preview\_environments\_enabled) | Enable preview environments for pull requests | `bool` | `true` | no |
+| <a name="input_private_dns_zone_id"></a> [private\_dns\_zone\_id](#input\_private\_dns\_zone\_id) | Private DNS zone ID for privatelink.azurestaticapps.net. Required when enable\_private\_endpoint = true. | `string` | `null` | no |
 | <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name) | Name of the resource group | `string` | n/a | yes |
 | <a name="input_sku_size"></a> [sku\_size](#input\_sku\_size) | SKU size for the Static Web App | `string` | `"Free"` | no |
 | <a name="input_sku_tier"></a> [sku\_tier](#input\_sku\_tier) | SKU tier for the Static Web App | `string` | `"Free"` | no |
+| <a name="input_subnet_id"></a> [subnet\_id](#input\_subnet\_id) | Subnet ID for the private endpoint. Required when enable\_private\_endpoint = true. | `string` | `null` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | Tags to apply to the resource | `map(string)` | `{}` | no |
 
 ## Outputs
@@ -100,6 +111,8 @@ No modules.
 | <a name="output_default_host_name"></a> [default\_host\_name](#output\_default\_host\_name) | Default hostname of the Static Web App |
 | <a name="output_id"></a> [id](#output\_id) | Static Web App resource ID |
 | <a name="output_name"></a> [name](#output\_name) | Static Web App name |
+| <a name="output_private_endpoint_id"></a> [private\_endpoint\_id](#output\_private\_endpoint\_id) | Private endpoint resource ID (when enabled) |
+| <a name="output_private_ip_address"></a> [private\_ip\_address](#output\_private\_ip\_address) | Private IP address of the private endpoint (when enabled) |
 | <a name="output_public_default_host_name"></a> [public\_default\_host\_name](#output\_public\_default\_host\_name) | Default hostname (for cross-project consumption) |
 | <a name="output_public_static_web_app_id"></a> [public\_static\_web\_app\_id](#output\_public\_static\_web\_app\_id) | Static Web App resource ID (for cross-project consumption) |
 <!-- END_TF_DOCS -->
