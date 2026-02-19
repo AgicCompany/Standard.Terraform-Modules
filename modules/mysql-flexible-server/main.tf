@@ -47,6 +47,36 @@ resource "azurerm_mysql_flexible_server" "this" {
   }
 
   tags = var.tags
+
+  lifecycle {
+    precondition {
+      condition     = !(var.enable_private_endpoint && var.delegated_subnet_id != null)
+      error_message = "enable_private_endpoint and delegated_subnet_id are mutually exclusive. Use one or the other."
+    }
+  }
+}
+
+resource "azurerm_private_endpoint" "this" {
+  count = var.enable_private_endpoint ? 1 : 0
+
+  name                = "pe-${var.name}"
+  location            = var.location
+  resource_group_name = var.resource_group_name
+  subnet_id           = var.subnet_id
+
+  private_service_connection {
+    name                           = "psc-${var.name}"
+    private_connection_resource_id = azurerm_mysql_flexible_server.this.id
+    subresource_names              = ["mysqlServer"]
+    is_manual_connection           = false
+  }
+
+  private_dns_zone_group {
+    name                 = "default"
+    private_dns_zone_ids = [var.private_dns_zone_id]
+  }
+
+  tags = var.tags
 }
 
 resource "azurerm_mysql_flexible_database" "this" {

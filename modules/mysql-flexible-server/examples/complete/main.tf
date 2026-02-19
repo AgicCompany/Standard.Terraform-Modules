@@ -37,23 +37,11 @@ resource "azurerm_virtual_network" "this" {
   address_space       = ["10.0.0.0/16"]
 }
 
-resource "azurerm_subnet" "mysql" {
-  name                 = "snet-mysql"
+resource "azurerm_subnet" "pe" {
+  name                 = "snet-pe"
   resource_group_name  = azurerm_resource_group.example.name
   virtual_network_name = azurerm_virtual_network.this.name
   address_prefixes     = ["10.0.1.0/24"]
-  service_endpoints    = ["Microsoft.Storage"]
-
-  delegation {
-    name = "mysql"
-
-    service_delegation {
-      name = "Microsoft.DBforMySQL/flexibleServers"
-      actions = [
-        "Microsoft.Network/virtualNetworks/subnets/join/action",
-      ]
-    }
-  }
 }
 
 resource "azurerm_private_dns_zone" "mysql" {
@@ -68,7 +56,7 @@ resource "azurerm_private_dns_zone_virtual_network_link" "mysql" {
   virtual_network_id    = azurerm_virtual_network.this.id
 }
 
-# --- MySQL Flexible Server ---
+# --- MySQL Flexible Server (Private Endpoint mode) ---
 
 module "mysql" {
   source = "../../"
@@ -89,9 +77,15 @@ module "mysql" {
 
   backup_retention_days = 14
 
-  # VNet integration
-  delegated_subnet_id = azurerm_subnet.mysql.id
-  private_dns_zone_id = azurerm_private_dns_zone.mysql.id
+  # Private endpoint (default: enabled)
+  enable_private_endpoint = true
+  subnet_id               = azurerm_subnet.pe.id
+  private_dns_zone_id     = azurerm_private_dns_zone.mysql.id
+
+  # Alternative: VNet delegation (mutually exclusive with PE)
+  # enable_private_endpoint = false
+  # delegated_subnet_id     = azurerm_subnet.mysql_delegated.id
+  # private_dns_zone_id     = azurerm_private_dns_zone.mysql.id
 
   # Maintenance window: Sunday at 02:00
   maintenance_window = {
@@ -140,4 +134,12 @@ output "fqdn" {
 
 output "database_ids" {
   value = module.mysql.database_ids
+}
+
+output "private_endpoint_id" {
+  value = module.mysql.private_endpoint_id
+}
+
+output "private_ip_address" {
+  value = module.mysql.private_ip_address
 }
