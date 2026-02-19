@@ -37,7 +37,8 @@ module "mysql" {
   administrator_login    = "mysqladmin"
   administrator_password = random_password.admin.result
 
-  enable_public_access = true
+  enable_private_endpoint = false
+  enable_public_access    = true
 
   databases = {
     appdb = {}
