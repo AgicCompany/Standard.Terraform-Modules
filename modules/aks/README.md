@@ -126,6 +126,7 @@ No modules.
 | <a name="input_dns_prefix"></a> [dns\_prefix](#input\_dns\_prefix) | DNS prefix for the cluster. When null, defaults to the name variable. | `string` | `null` | no |
 | <a name="input_enable_auto_scaling"></a> [enable\_auto\_scaling](#input\_enable\_auto\_scaling) | Enable cluster autoscaler on the default node pool | `bool` | `true` | no |
 | <a name="input_enable_container_insights"></a> [enable\_container\_insights](#input\_enable\_container\_insights) | Enable Container Insights via Log Analytics | `bool` | `true` | no |
+| <a name="input_enable_system_assigned_identity"></a> [enable\_system\_assigned\_identity](#input\_enable\_system\_assigned\_identity) | Enable system-assigned managed identity (default: true) | `bool` | `true` | no |
 | <a name="input_key_vault_secrets_provider"></a> [key\_vault\_secrets\_provider](#input\_key\_vault\_secrets\_provider) | Key Vault CSI driver configuration. When null, the add-on is disabled. | <pre>object({<br/>    secret_rotation_enabled  = optional(bool, false)<br/>    secret_rotation_interval = optional(string, "2m")<br/>  })</pre> | `null` | no |
 | <a name="input_kubernetes_version"></a> [kubernetes\_version](#input\_kubernetes\_version) | Kubernetes version. null = latest stable version available in the region. | `string` | `null` | no |
 | <a name="input_location"></a> [location](#input\_location) | Azure region | `string` | n/a | yes |
@@ -140,6 +141,7 @@ No modules.
 | <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name) | Name of the resource group | `string` | n/a | yes |
 | <a name="input_sku_tier"></a> [sku\_tier](#input\_sku\_tier) | SKU tier: Free, Standard (includes Uptime SLA), or Premium. | `string` | `"Free"` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | Tags to apply to the resource | `map(string)` | `{}` | no |
+| <a name="input_user_assigned_identity_ids"></a> [user\_assigned\_identity\_ids](#input\_user\_assigned\_identity\_ids) | List of user-assigned managed identity IDs | `list(string)` | `[]` | no |
 | <a name="input_workload_identity_enabled"></a> [workload\_identity\_enabled](#input\_workload\_identity\_enabled) | Enable workload identity for pod-to-Azure-service authentication | `bool` | `false` | no |
 
 ## Outputs
@@ -153,11 +155,11 @@ No modules.
 | <a name="output_name"></a> [name](#output\_name) | AKS cluster name |
 | <a name="output_node_resource_group"></a> [node\_resource\_group](#output\_node\_resource\_group) | Auto-created resource group for cluster infrastructure |
 | <a name="output_oidc_issuer_url"></a> [oidc\_issuer\_url](#output\_oidc\_issuer\_url) | OIDC issuer URL (for workload identity federation) |
-| <a name="output_principal_id"></a> [principal\_id](#output\_principal\_id) | System-assigned managed identity principal ID |
+| <a name="output_principal_id"></a> [principal\_id](#output\_principal\_id) | System-assigned managed identity principal ID (only available with SystemAssigned identity) |
 | <a name="output_private_fqdn"></a> [private\_fqdn](#output\_private\_fqdn) | Private FQDN of the API server |
 | <a name="output_public_aks_id"></a> [public\_aks\_id](#output\_public\_aks\_id) | AKS cluster resource ID (for cross-project consumption) |
 | <a name="output_public_aks_name"></a> [public\_aks\_name](#output\_public\_aks\_name) | AKS cluster name (for cross-project consumption) |
-| <a name="output_tenant_id"></a> [tenant\_id](#output\_tenant\_id) | System-assigned managed identity tenant ID |
+| <a name="output_tenant_id"></a> [tenant\_id](#output\_tenant\_id) | System-assigned managed identity tenant ID (only available with SystemAssigned identity) |
 <!-- END_TF_DOCS -->
 
 ## Notes
