@@ -4,6 +4,18 @@ All notable changes to this module will be documented in this file.
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-02-19
+
+### Added
+
+- Flexible identity support: system-assigned (`enable_system_assigned_identity`), user-assigned (`user_assigned_identity_ids`), or both
+- Lifecycle precondition: at least one identity type is required
+
+### Changed
+
+- Identity block is now dynamic (was hardcoded to SystemAssigned)
+- Updated `principal_id` and `tenant_id` output descriptions to note SystemAssigned dependency
+
 ## [1.2.0] - 2026-02-11
 
 ### Added

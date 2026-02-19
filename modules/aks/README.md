@@ -8,7 +8,7 @@ Creates an Azure Kubernetes Service (AKS) cluster with private-by-default config
 
 ```hcl
 module "aks" {
-  source = "git::https://dev.azure.com/org/project/_git/terraform-modules//aks?ref=aks/v1.2.0"
+  source = "git::https://dev.azure.com/org/project/_git/terraform-modules//aks?ref=aks/v1.3.0"
 
   resource_group_name = "rg-aks-dev-weu-001"
   location            = "westeurope"
@@ -30,7 +30,7 @@ module "aks" {
 - Private cluster (always enabled — no public API server)
 - Default (system) node pool with autoscaling
 - Azure CNI Overlay networking (default) with flat CNI available
-- System-assigned managed identity
+- Flexible identity: system-assigned (default), user-assigned, or both
 - Azure AD authentication (always enabled, local accounts disabled)
 - Azure RBAC for Kubernetes authorization (default, configurable via `rbac_mode`)
 - Admin group support for cluster admin access

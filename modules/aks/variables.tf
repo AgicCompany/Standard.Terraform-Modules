@@ -223,6 +223,12 @@ variable "private_dns_zone_id" {
 }
 
 # === Optional: Feature Flags ===
+variable "enable_system_assigned_identity" {
+  type        = bool
+  default     = true
+  description = "Enable system-assigned managed identity (default: true)"
+}
+
 variable "enable_auto_scaling" {
   type        = bool
   default     = true
@@ -239,6 +245,13 @@ variable "workload_identity_enabled" {
   type        = bool
   default     = false
   description = "Enable workload identity for pod-to-Azure-service authentication"
+}
+
+# === Optional: Identity ===
+variable "user_assigned_identity_ids" {
+  type        = list(string)
+  default     = []
+  description = "List of user-assigned managed identity IDs"
 }
 
 # === Tags ===

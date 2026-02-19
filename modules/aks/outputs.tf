@@ -38,12 +38,12 @@ output "oidc_issuer_url" {
 
 output "principal_id" {
   value       = try(azurerm_kubernetes_cluster.this.identity[0].principal_id, null)
-  description = "System-assigned managed identity principal ID"
+  description = "System-assigned managed identity principal ID (only available with SystemAssigned identity)"
 }
 
 output "tenant_id" {
   value       = try(azurerm_kubernetes_cluster.this.identity[0].tenant_id, null)
-  description = "System-assigned managed identity tenant ID"
+  description = "System-assigned managed identity tenant ID (only available with SystemAssigned identity)"
 }
 
 output "kubelet_identity" {

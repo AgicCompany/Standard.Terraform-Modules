@@ -59,8 +59,13 @@ resource "azurerm_kubernetes_cluster" "this" {
     }
   }
 
-  identity {
-    type = "SystemAssigned"
+  dynamic "identity" {
+    for_each = local.identity_type != null ? [1] : []
+
+    content {
+      type         = local.identity_type
+      identity_ids = length(var.user_assigned_identity_ids) > 0 ? var.user_assigned_identity_ids : null
+    }
   }
 
   network_profile {
@@ -154,4 +159,11 @@ resource "azurerm_kubernetes_cluster" "this" {
   }
 
   tags = var.tags
+
+  lifecycle {
+    precondition {
+      condition     = local.identity_type != null
+      error_message = "AKS requires at least one identity. Set enable_system_assigned_identity = true or provide user_assigned_identity_ids."
+    }
+  }
 }
