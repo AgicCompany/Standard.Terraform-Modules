@@ -135,6 +135,12 @@ variable "enable_public_access" {
   description = "Allow public network access (default: disabled for security)"
 }
 
+variable "enable_private_endpoint" {
+  type        = bool
+  default     = true
+  description = "Create a private endpoint for the PostgreSQL server. Mutually exclusive with VNet delegation (delegated_subnet_id)."
+}
+
 variable "enable_password_auth" {
   type        = bool
   default     = false
@@ -147,21 +153,32 @@ variable "enable_entra_auth" {
   description = "Enable Microsoft Entra (AAD) authentication"
 }
 
-# === VNet Integration ===
+# === Private Networking ===
+variable "subnet_id" {
+  type        = string
+  default     = null
+  description = "Subnet ID for the private endpoint. Required when enable_private_endpoint = true."
+
+  validation {
+    condition     = var.subnet_id != null || !var.enable_private_endpoint
+    error_message = "subnet_id is required when enable_private_endpoint is true."
+  }
+}
+
 variable "delegated_subnet_id" {
   type        = string
   default     = null
-  description = "Subnet ID for VNet integration (requires Microsoft.DBforPostgreSQL/flexibleServers delegation). Mutually exclusive with public access."
+  description = "Subnet ID for VNet integration (requires Microsoft.DBforPostgreSQL/flexibleServers delegation). Mutually exclusive with private endpoint."
 }
 
 variable "private_dns_zone_id" {
   type        = string
   default     = null
-  description = "Private DNS zone ID for VNet-integrated server (e.g., privatelink.postgres.database.azure.com). Required when delegated_subnet_id is set."
+  description = "Private DNS zone ID (privatelink.postgres.database.azure.com). Required when using delegation or private endpoint."
 
   validation {
-    condition     = var.private_dns_zone_id != null || var.delegated_subnet_id == null
-    error_message = "private_dns_zone_id is required when delegated_subnet_id is set."
+    condition     = var.private_dns_zone_id != null || (var.delegated_subnet_id == null && !var.enable_private_endpoint)
+    error_message = "private_dns_zone_id is required when delegated_subnet_id is set or enable_private_endpoint is true."
   }
 }
 

@@ -37,23 +37,11 @@ resource "azurerm_virtual_network" "this" {
   address_space       = ["10.0.0.0/16"]
 }
 
-resource "azurerm_subnet" "postgresql" {
-  name                 = "snet-psql"
+resource "azurerm_subnet" "pe" {
+  name                 = "snet-pe"
   resource_group_name  = azurerm_resource_group.example.name
   virtual_network_name = azurerm_virtual_network.this.name
   address_prefixes     = ["10.0.1.0/24"]
-  service_endpoints    = ["Microsoft.Storage"]
-
-  delegation {
-    name = "postgresql"
-
-    service_delegation {
-      name = "Microsoft.DBforPostgreSQL/flexibleServers"
-      actions = [
-        "Microsoft.Network/virtualNetworks/subnets/join/action",
-      ]
-    }
-  }
 }
 
 resource "azurerm_private_dns_zone" "postgresql" {
@@ -68,7 +56,7 @@ resource "azurerm_private_dns_zone_virtual_network_link" "postgresql" {
   virtual_network_id    = azurerm_virtual_network.this.id
 }
 
-# --- PostgreSQL Flexible Server ---
+# --- PostgreSQL Flexible Server (Private Endpoint mode) ---
 
 module "postgresql" {
   source = "../../"
@@ -85,9 +73,15 @@ module "postgresql" {
   storage_mb            = 65536
   backup_retention_days = 14
 
-  # VNet integration
-  delegated_subnet_id = azurerm_subnet.postgresql.id
-  private_dns_zone_id = azurerm_private_dns_zone.postgresql.id
+  # Private endpoint (default: enabled)
+  enable_private_endpoint = true
+  subnet_id               = azurerm_subnet.pe.id
+  private_dns_zone_id     = azurerm_private_dns_zone.postgresql.id
+
+  # Alternative: VNet delegation (mutually exclusive with PE)
+  # enable_private_endpoint = false
+  # delegated_subnet_id     = azurerm_subnet.psql_delegated.id
+  # private_dns_zone_id     = azurerm_private_dns_zone.postgresql.id
 
   # Maintenance window: Sunday at 02:00
   maintenance_window = {
@@ -136,4 +130,12 @@ output "fqdn" {
 
 output "database_ids" {
   value = module.postgresql.database_ids
+}
+
+output "private_endpoint_id" {
+  value = module.postgresql.private_endpoint_id
+}
+
+output "private_ip_address" {
+  value = module.postgresql.private_ip_address
 }
