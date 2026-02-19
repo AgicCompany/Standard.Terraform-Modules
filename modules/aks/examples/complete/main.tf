@@ -115,13 +115,14 @@ module "aks" {
   }
 
   # Maintenance windows
+  # Note: not_allowed in maintenance_window blocks ALL maintenance for that period.
+  # Azure requires >= 1 allowed hour per week for every week of the year, so
+  # not_allowed periods must not span full weeks. Use not_allowed in
+  # maintenance_window_auto_upgrade to block only auto-upgrades during holidays.
   maintenance_window = {
     allowed = [
       { day = "Saturday", hours = [0, 1, 2, 3, 4, 5] },
       { day = "Sunday", hours = [0, 1, 2, 3, 4, 5] }
-    ]
-    not_allowed = [
-      { start = "2026-12-20T00:00:00Z", end = "2027-01-05T00:00:00Z" }
     ]
   }
 
@@ -132,6 +133,9 @@ module "aks" {
     day_of_week = "Sunday"
     start_time  = "02:00"
     utc_offset  = "+01:00"
+    not_allowed = [
+      { start = "2026-12-20T00:00:00Z", end = "2027-01-05T00:00:00Z" }
+    ]
   }
 
   # private_dns_zone_id is not set -- this example uses authorized_ip_ranges (public cluster)
