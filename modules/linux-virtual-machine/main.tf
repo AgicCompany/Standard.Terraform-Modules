@@ -32,14 +32,19 @@ resource "azurerm_linux_virtual_machine" "this" {
   resource_group_name             = var.resource_group_name
   size                            = var.size
   admin_username                  = var.admin_username
-  disable_password_authentication = true
+  admin_password                  = var.enable_password_auth ? var.admin_password : null
+  disable_password_authentication = !var.enable_password_auth
   zone                            = var.zone
   custom_data                     = var.custom_data
   network_interface_ids           = [azurerm_network_interface.this.id]
 
-  admin_ssh_key {
-    username   = var.admin_username
-    public_key = var.admin_ssh_public_key
+  dynamic "admin_ssh_key" {
+    for_each = var.admin_ssh_public_key != null ? [1] : []
+
+    content {
+      username   = var.admin_username
+      public_key = var.admin_ssh_public_key
+    }
   }
 
   os_disk {
@@ -73,6 +78,13 @@ resource "azurerm_linux_virtual_machine" "this" {
   }
 
   tags = var.tags
+
+  lifecycle {
+    precondition {
+      condition     = var.admin_ssh_public_key != null || var.enable_password_auth
+      error_message = "At least one authentication method required: provide admin_ssh_public_key or set enable_password_auth = true."
+    }
+  }
 }
 
 resource "azurerm_managed_disk" "this" {

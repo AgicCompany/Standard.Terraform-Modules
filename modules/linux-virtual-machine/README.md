@@ -8,7 +8,7 @@ Creates an Azure Linux Virtual Machine with network interface, optional public I
 
 ```hcl
 module "virtual_machine" {
-  source = "git::https://dev.azure.com/org/project/_git/terraform-modules//linux-virtual-machine?ref=linux-virtual-machine/v1.0.0"
+  source = "git::https://dev.azure.com/org/project/_git/terraform-modules//linux-virtual-machine?ref=linux-virtual-machine/v1.1.0"
 
   resource_group_name  = "rg-compute-dev-weu-001"
   location             = "westeurope"
@@ -24,7 +24,7 @@ module "virtual_machine" {
 
 ## Features
 
-- Linux VM with SSH key authentication (password auth disabled)
+- Linux VM with SSH key authentication (default) or optional password auth
 - Network interface with configurable IP allocation
 - Optional public IP address
 - Data disk management with for_each
@@ -39,7 +39,7 @@ This module applies secure defaults:
 
 | Setting | Default | Override Variable |
 |---------|---------|-------------------|
-| Password auth | Disabled | N/A (SSH-only) |
+| Password auth | Disabled | `enable_password_auth` |
 | Public IP | None | `enable_public_ip` |
 | OS disk type | Premium_LRS | `os_disk.storage_account_type` |
 
@@ -129,7 +129,7 @@ No modules.
 
 ## Notes
 
-- **SSH-only access:** Password authentication is always disabled. The `admin_ssh_public_key` variable is required. This is a deliberate security decision with no override.
+- **SSH-only by default:** Password authentication is disabled by default. Set `enable_password_auth = true` and provide `admin_password` to enable it. At least one authentication method (SSH key or password) is always required.
 - **No private endpoint:** VMs don't use private endpoints. Network isolation is achieved through subnet placement and NSG rules.
 - **B-series VMs:** B-series (burstable) VMs don't support accelerated networking. The module doesn't set `accelerated_networking_enabled` to avoid deployment failures with small VM sizes.
 - **Data disk zones:** Data disks are created in the same availability zone as the VM. This is required -- cross-zone disk attachment is not supported.

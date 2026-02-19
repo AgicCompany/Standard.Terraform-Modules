@@ -31,10 +31,18 @@ variable "admin_username" {
 
 variable "admin_ssh_public_key" {
   type        = string
-  description = "SSH public key for admin user authentication"
+  default     = null
+  description = "SSH public key for admin user authentication. Required when enable_password_auth = false."
 }
 
 # === Optional: Configuration ===
+variable "admin_password" {
+  type        = string
+  default     = null
+  sensitive   = true
+  description = "Admin password. Required when enable_password_auth = true."
+}
+
 variable "source_image_reference" {
   type = object({
     publisher = string
@@ -125,6 +133,12 @@ variable "enable_system_assigned_identity" {
   type        = bool
   default     = false
   description = "Enable system-assigned managed identity"
+}
+
+variable "enable_password_auth" {
+  type        = bool
+  default     = false
+  description = "Enable password authentication (default: SSH-only for security)"
 }
 
 variable "enable_public_ip" {
