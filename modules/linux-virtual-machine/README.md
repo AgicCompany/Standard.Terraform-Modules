@@ -70,7 +70,7 @@ These outputs are designed for cross-project state consumption:
 
 | Name | Version |
 |------|---------|
-| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | >= 4.0.0 |
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 4.60.0 |
 
 ## Modules
 
@@ -90,12 +90,14 @@ No modules.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_admin_ssh_public_key"></a> [admin\_ssh\_public\_key](#input\_admin\_ssh\_public\_key) | SSH public key for admin user authentication | `string` | n/a | yes |
+| <a name="input_admin_password"></a> [admin\_password](#input\_admin\_password) | Admin password. Required when enable\_password\_auth = true. | `string` | `null` | no |
+| <a name="input_admin_ssh_public_key"></a> [admin\_ssh\_public\_key](#input\_admin\_ssh\_public\_key) | SSH public key for admin user authentication. Required when enable\_password\_auth = false. | `string` | `null` | no |
 | <a name="input_admin_username"></a> [admin\_username](#input\_admin\_username) | Admin username for the VM | `string` | n/a | yes |
 | <a name="input_boot_diagnostics_storage_uri"></a> [boot\_diagnostics\_storage\_uri](#input\_boot\_diagnostics\_storage\_uri) | Storage account URI for boot diagnostics. If null with boot diagnostics enabled, uses managed storage. | `string` | `null` | no |
 | <a name="input_custom_data"></a> [custom\_data](#input\_custom\_data) | Base64-encoded custom data (cloud-init) to pass to the VM | `string` | `null` | no |
 | <a name="input_data_disks"></a> [data\_disks](#input\_data\_disks) | Map of data disks to attach. Key is used as disk name suffix. | <pre>map(object({<br/>    lun                  = number<br/>    disk_size_gb         = number<br/>    storage_account_type = optional(string, "Premium_LRS")<br/>    caching              = optional(string, "ReadOnly")<br/>  }))</pre> | `{}` | no |
 | <a name="input_enable_boot_diagnostics"></a> [enable\_boot\_diagnostics](#input\_enable\_boot\_diagnostics) | Enable boot diagnostics | `bool` | `false` | no |
+| <a name="input_enable_password_auth"></a> [enable\_password\_auth](#input\_enable\_password\_auth) | Enable password authentication (default: SSH-only for security) | `bool` | `false` | no |
 | <a name="input_enable_public_ip"></a> [enable\_public\_ip](#input\_enable\_public\_ip) | Create and attach a public IP address | `bool` | `false` | no |
 | <a name="input_enable_system_assigned_identity"></a> [enable\_system\_assigned\_identity](#input\_enable\_system\_assigned\_identity) | Enable system-assigned managed identity | `bool` | `false` | no |
 | <a name="input_location"></a> [location](#input\_location) | Azure region | `string` | n/a | yes |
