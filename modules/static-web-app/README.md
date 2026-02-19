@@ -8,7 +8,7 @@ Creates an Azure Static Web App with configurable SKU, app settings, and preview
 
 ```hcl
 module "static_web_app" {
-  source = "git::https://dev.azure.com/org/project/_git/terraform-modules//static-web-app?ref=static-web-app/v1.0.0"
+  source = "git::https://dev.azure.com/org/project/_git/terraform-modules//static-web-app?ref=static-web-app/v1.1.0"
 
   resource_group_name = "rg-stapp-dev-weu-001"
   location            = "westeurope"
@@ -21,6 +21,8 @@ module "static_web_app" {
 ## Features
 
 - Static Web App with Free or Standard SKU
+- Private endpoint support (Standard SKU required)
+- Public network access control
 - Application settings (environment variables)
 - Preview environments for pull requests
 - Configuration file changes control
@@ -33,6 +35,8 @@ Static Web Apps are secure by default:
 |---------|---------|-------|
 | HTTPS | Enforced | Always HTTPS, managed by Azure |
 | Certificates | Managed | Azure manages TLS certificates |
+| Private endpoint | Enabled | `enable_private_endpoint` (requires Standard SKU) |
+| Public access | Disabled | `enable_public_access` |
 | Preview environments | Enabled | `preview_environments_enabled` |
 | Config file changes | Enabled | `configuration_file_changes_enabled` |
 
@@ -103,5 +107,5 @@ No modules.
 ## Notes
 
 - **GitHub/Azure DevOps integration:** CI/CD pipeline integration is handled outside this module using the `api_key` output.
-- **Private endpoints:** Deferred to a future version. Azure Static Web Apps private endpoints require custom domain and network configuration that adds significant complexity.
+- **Private endpoints:** Require Standard SKU. The module enforces this with a lifecycle precondition. The consumer provides the PE subnet and private DNS zone (`privatelink.azurestaticapps.net`).
 - **Limited region availability:** Static Web Apps are available in limited regions (westus2, centralus, eastus2, westeurope, eastasia, eastasiaapac).

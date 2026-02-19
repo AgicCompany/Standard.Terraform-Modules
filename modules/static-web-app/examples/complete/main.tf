@@ -18,6 +18,36 @@ resource "azurerm_resource_group" "example" {
   location = "westeurope"
 }
 
+# --- Networking ---
+
+resource "azurerm_virtual_network" "this" {
+  name                = "vnet-stapp-complete-dev-weu-001"
+  location            = azurerm_resource_group.example.location
+  resource_group_name = azurerm_resource_group.example.name
+  address_space       = ["10.0.0.0/16"]
+}
+
+resource "azurerm_subnet" "pe" {
+  name                 = "snet-pe"
+  resource_group_name  = azurerm_resource_group.example.name
+  virtual_network_name = azurerm_virtual_network.this.name
+  address_prefixes     = ["10.0.1.0/24"]
+}
+
+resource "azurerm_private_dns_zone" "stapp" {
+  name                = "privatelink.azurestaticapps.net"
+  resource_group_name = azurerm_resource_group.example.name
+}
+
+resource "azurerm_private_dns_zone_virtual_network_link" "stapp" {
+  name                  = "stapp-vnet-link"
+  resource_group_name   = azurerm_resource_group.example.name
+  private_dns_zone_name = azurerm_private_dns_zone.stapp.name
+  virtual_network_id    = azurerm_virtual_network.this.id
+}
+
+# --- Static Web App ---
+
 module "static_web_app" {
   source = "../../"
 
@@ -34,6 +64,11 @@ module "static_web_app" {
   }
 
   preview_environments_enabled = true
+
+  # Private endpoint (requires Standard SKU)
+  enable_private_endpoint = true
+  subnet_id               = azurerm_subnet.pe.id
+  private_dns_zone_id     = azurerm_private_dns_zone.stapp.id
 
   tags = {
     project     = "complete-example"
@@ -53,4 +88,12 @@ output "default_host_name" {
 
 output "name" {
   value = module.static_web_app.name
+}
+
+output "private_endpoint_id" {
+  value = module.static_web_app.private_endpoint_id
+}
+
+output "private_ip_address" {
+  value = module.static_web_app.private_ip_address
 }

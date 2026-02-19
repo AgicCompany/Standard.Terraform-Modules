@@ -56,6 +56,41 @@ variable "preview_environments_enabled" {
   description = "Enable preview environments for pull requests"
 }
 
+variable "enable_private_endpoint" {
+  type        = bool
+  default     = true
+  description = "Create a private endpoint for the Static Web App. Requires Standard SKU."
+}
+
+variable "enable_public_access" {
+  type        = bool
+  default     = false
+  description = "Allow public network access"
+}
+
+# === Private Endpoint ===
+variable "subnet_id" {
+  type        = string
+  default     = null
+  description = "Subnet ID for the private endpoint. Required when enable_private_endpoint = true."
+
+  validation {
+    condition     = var.subnet_id != null || !var.enable_private_endpoint
+    error_message = "subnet_id is required when enable_private_endpoint is true."
+  }
+}
+
+variable "private_dns_zone_id" {
+  type        = string
+  default     = null
+  description = "Private DNS zone ID for privatelink.azurestaticapps.net. Required when enable_private_endpoint = true."
+
+  validation {
+    condition     = var.private_dns_zone_id != null || !var.enable_private_endpoint
+    error_message = "private_dns_zone_id is required when enable_private_endpoint is true."
+  }
+}
+
 # === Tags ===
 variable "tags" {
   type        = map(string)
