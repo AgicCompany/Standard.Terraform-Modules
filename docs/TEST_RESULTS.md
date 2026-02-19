@@ -1,6 +1,6 @@
 # Module Test Results
 
-**Date:** 2026-02-10
+**Date:** 2026-02-19 (Phase 7 update)
 **Terraform:** 1.13.0
 **AzureRM Provider:** 4.59.0
 **Subscription:** MPN (AGIC – MPN Mihai)
@@ -18,9 +18,10 @@
 | Phase 4 (Integration) | 4 stacks | 4 | 0 | 0 |
 | Phase 5 (New modules) | 12 | 12 | 0 | 0 |
 | Phase 6 (Integration P2) | 5 stacks (19 modules) | 5 | 0 | 2 |
-| **Live-tested** | **31 + 9 stacks** | **All pass** | **0** | **9** |
+| Phase 7 (PE & features) | 5 modules | 5 | 0 | 1 |
+| **Live-tested** | **36 + 9 stacks** | **All pass** | **0** | **10** |
 | **Validate-only** | **3** | **3** | **0** | **0** |
-| **Total** | **36 modules** | **All pass** | **0** | **9** |
+| **Total** | **36 modules** | **All pass** | **0** | **10** |
 
 ---
 
@@ -751,6 +752,127 @@ Five new integration test stacks covering 19 previously uncovered modules. All s
 
 ---
 
+## Phase 7: PE Support & Feature Enhancements
+
+Live tests of v2.0.0/v1.1.0/v1.3.0 module updates adding private endpoint support, password auth, and flexible identity.
+
+### 35. static-web-app (v1.1.0 — PE support)
+
+| Property | Value |
+|----------|-------|
+| Example | `examples/complete` |
+| Region | westeurope |
+| Resources created | 7 (1 RG, 1 VNet, 1 subnet, 1 DNS zone, 1 VNet link, 1 static web app, 1 PE) |
+| Result | **PASS** |
+
+**Verified configuration:**
+
+| Setting | Expected | Verified |
+|---------|----------|----------|
+| SKU | Standard | Standard |
+| Private endpoint | Enabled | PE created (`pe-stapp-complete-dev-weu-001`) |
+| Private IP | Allocated | `10.0.1.4` |
+| Public access | Disabled | `public_network_access_enabled = false` |
+| DNS zone | `privatelink.azurestaticapps.net` | Linked |
+| Clean destroy | Yes | 7/7 |
+
+### 36. mysql-flexible-server (v2.0.0 — PE support)
+
+| Property | Value |
+|----------|-------|
+| Example | `examples/complete` |
+| Region | **swedencentral** (westeurope/northeurope/uksouth blocked for MPN) |
+| Resources created | 12 (1 RG, 1 VNet, 1 subnet, 1 DNS zone, 1 VNet link, 1 password, 1 MySQL server, 2 databases, 2 configs, 1 PE) |
+| Result | **PASS** |
+
+**Verified configuration:**
+
+| Setting | Expected | Verified |
+|---------|----------|----------|
+| Private endpoint | Enabled | PE created (`pe-mysql-complete-dev-weu-001`) |
+| Private IP | Allocated | `10.0.1.4` |
+| Subresource | `mysqlServer` | Yes |
+| Databases | 2 (`appdb`, `analyticsdb`) | Created |
+| Server configs | 2 (`slow_query_log`, `long_query_time`) | Applied |
+| FQDN | Set | `mysql-complete-dev-weu-001.mysql.database.azure.com` |
+| Clean destroy | Yes | 12/12 |
+
+### 37. postgresql-flexible-server (v2.0.0 — PE support)
+
+| Property | Value |
+|----------|-------|
+| Example | `examples/complete` |
+| Region | **northeurope** |
+| Resources created | 12 (1 RG, 1 VNet, 1 subnet, 1 DNS zone, 1 VNet link, 1 password, 1 PostgreSQL server, 2 databases, 2 configs, 1 PE) |
+| Result | **PASS** |
+
+**Verified configuration:**
+
+| Setting | Expected | Verified |
+|---------|----------|----------|
+| Private endpoint | Enabled | PE created |
+| Private IP | Allocated | `10.0.1.4` |
+| Subresource | `postgresqlServer` | Yes |
+| Clean destroy | Yes | 12/12 |
+
+### 38. linux-virtual-machine (v1.1.0 — password auth)
+
+| Property | Value |
+|----------|-------|
+| Example | `examples/complete` |
+| Region | **swedencentral** (B-series unavailable in westeurope/northeurope for MPN) |
+| Resources created | 8 (1 RG, 1 VNet, 1 subnet, 1 TLS key, 1 NIC, 1 managed disk, 1 Linux VM, 1 disk attachment) |
+| Result | **PASS** |
+
+**Verified configuration:**
+
+| Setting | Expected | Verified |
+|---------|----------|----------|
+| Password auth | Disabled (default) | `disable_password_authentication = true` |
+| SSH key | Dynamic block | Set via `tls_private_key` |
+| System identity | Enabled | `principal_id` populated |
+| Data disk | 32 GB | Attached at LUN 0 |
+| Boot diagnostics | Managed | Enabled |
+| Private IP | Allocated | `10.0.1.4` |
+| Clean destroy | Yes | 8/8 |
+
+### 39. aks (v1.3.0 — flexible identity)
+
+| Property | Value |
+|----------|-------|
+| Example | `examples/complete` |
+| Region | westeurope |
+| Resources created | 5 (1 RG, 1 VNet, 1 subnet, 1 LAW, 1 AKS cluster) |
+| Result | **PASS** (after fix) |
+
+**Bug found:**
+
+1. **maintenance_window not_allowed spans full weeks (MEDIUM):** The `not_allowed` period in `maintenance_window` (Dec 20 - Jan 5 = 16 days) completely overrides `allowed` hours for 2+ full weeks. Azure's API requires >= 1 allowed hour per week for every week, causing `NeedAtLeastOneHourPerWeekForUpdate`. The `not_allowed` in `maintenance_window` blocks ALL maintenance types; it should be in `maintenance_window_auto_upgrade` to only block auto-upgrades.
+
+   **Fix:** Moved `not_allowed` from `maintenance_window` to `maintenance_window_auto_upgrade` with explanatory comment.
+
+   **Files changed:** `examples/complete/main.tf`
+
+**Verified configuration:**
+
+| Setting | Expected | Verified |
+|---------|----------|----------|
+| Identity | SystemAssigned | `type = "SystemAssigned"` |
+| Principal ID | Populated | `318ba874-970a-4224-be11-cb16966c92a0` |
+| Workload identity | Enabled | Yes |
+| Azure RBAC | Enabled | Yes |
+| Local accounts disabled | Yes | Yes |
+| OIDC issuer | Enabled | URL populated |
+| Auto-scaler profile | Tuned | All settings applied |
+| Key Vault CSI driver | Enabled | Secret rotation enabled |
+| Container Insights | Enabled | OMS agent connected to LAW |
+| Network (overlay) | azure + overlay | `network_plugin_mode = "overlay"` |
+| Load balancer profile | 2 outbound IPs | Yes |
+| Zones | `["3"]` (MPN limitation) | Set |
+| Clean destroy | Yes (after `az group delete` for ContainerInsights orphan) | 5/5 |
+
+---
+
 ## Subscription Limitations
 
 | Limitation | Impact | Workaround |
@@ -759,8 +881,11 @@ Five new integration test stacks covering 19 previously uncovered modules. All s
 | MySQL Flexible Server blocked in westeurope | mysql-flexible-server example fails | Test in swedencentral |
 | PostgreSQL Flexible Server blocked in westeurope | postgresql-flexible-server example fails | Test in swedencentral |
 | Zone redundant SQL not available | mssql-database complete example fails with Premium SKU | Test with Standard SKU (S0) |
-| AKS zones limited in westeurope | Default `zones = ["1","2","3"]` fails for some VM SKUs | Test with `zones = []` |
+| AKS zones limited in westeurope | Default `zones = ["1","2","3"]` fails for some VM SKUs | Test with `zones = ["3"]` or `zones = []` |
+| B-series VMs unavailable in westeurope/northeurope | Standard_B1s/B2s blocked for MPN | Test in swedencentral |
+| MySQL blocked in uksouth | `ProvisionNotSupportedForRegion` | Test in swedencentral |
 | ContainerInsights orphan on destroy | RG deletion fails after AKS destroy with OMS agent | Use `az group delete` for cleanup |
+| AKS maintenance_window not_allowed | Periods spanning full weeks fail with `NeedAtLeastOneHourPerWeekForUpdate` | Use not_allowed in maintenance_window_auto_upgrade instead |
 | CosmosDB very slow destroy | Account deletion takes ~8m, RG cleanup adds more | Budget extra time; northeurope more reliable than westeurope |
 | CosmosDB westeurope capacity | Account creation fails with `ServiceUnavailable` | Use northeurope `geo_locations` override |
 | Service Bus PE requires Premium | Standard SKU returns `PrivateEndpointInvalidSku` | Use `sku = "Premium"` with `capacity = 1` |
@@ -780,15 +905,21 @@ Five new integration test stacks covering 19 previously uncovered modules. All s
 | `94f909d` | Add P3 modules: event-hub, static-web-app, bastion, mysql-flexible-server |
 | `9e04b38` | Add P3 modules: application-gateway, api-management |
 | `3928b10` | Add 5 integration test stacks covering 19 new modules |
+| `f236c56` | Add static-web-app v1.1.0: PE support |
+| `afe7506` | Add mysql-flexible-server v2.0.0: PE as default |
+| `cc85891` | Add postgresql-flexible-server v2.0.0: PE as default |
+| `87e05a1` | Add linux-virtual-machine v1.1.0: optional password auth |
+| `54c98e3` | Add AKS v1.3.0: flexible identity |
+| `65cd3cf`..`a12eeeb` | Fix basic examples and regenerate READMEs for updated modules |
 
 ---
 
 ## Validate-Only Modules (Not Yet Live-Tested)
 
-The following 2 modules have passed `terraform fmt` and `terraform validate` on both basic and complete examples but have not been live-tested against Azure.
+The following 3 modules have passed `terraform fmt` and `terraform validate` on both basic and complete examples but have not been live-tested against Azure.
 
 | # | Module | Examples Validated | Notes |
 |---|--------|-------------------|-------|
-| 32 | api-management | basic, complete | Developer-Premium SKUs, VNet integration, PE. Skipped live test due to ~45 min provision time. |
-| 33 | front-door | basic, complete | Standard AzureFrontDoor, endpoints, origins, routes. Global CDN service, minimal cross-module wiring. |
-| 34 | aks-node-pool | basic, complete | Node pool companion module for AKS. `for_each` over `node_pools` map. Supports autoscaling, spot, GPU, Windows, labels/taints. |
+| 40 | api-management | basic, complete | Developer-Premium SKUs, VNet integration, PE. Skipped live test due to ~45 min provision time. |
+| 41 | front-door | basic, complete | Standard AzureFrontDoor, endpoints, origins, routes. Global CDN service, minimal cross-module wiring. |
+| 42 | aks-node-pool | basic, complete | Node pool companion module for AKS. `for_each` over `node_pools` map. Supports autoscaling, spot, GPU, Windows, labels/taints. |
