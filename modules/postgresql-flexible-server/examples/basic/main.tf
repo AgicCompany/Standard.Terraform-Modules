@@ -37,8 +37,9 @@ module "postgresql" {
   administrator_login    = "psqladmin"
   administrator_password = random_password.admin.result
 
-  enable_password_auth = true
-  enable_public_access = true
+  enable_private_endpoint = false
+  enable_password_auth    = true
+  enable_public_access    = true
 
   databases = {
     appdb = {}
