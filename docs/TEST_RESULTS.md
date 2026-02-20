@@ -1,6 +1,6 @@
 # Module Test Results
 
-**Date:** 2026-02-19 (Phase 7 update)
+**Date:** 2026-02-20 (AKS v1.4.0 update)
 **Terraform:** 1.13.0
 **AzureRM Provider:** 4.59.0
 **Subscription:** MPN (AGIC – MPN Mihai)
@@ -873,6 +873,52 @@ Live tests of v2.0.0/v1.1.0/v1.3.0 module updates adding private endpoint suppor
 
 ---
 
+## AKS v1.4.0: Default Maintenance Windows
+
+### 40. aks (v1.4.0 — default maintenance windows + node OS upgrade)
+
+#### Basic Example (defaults test)
+
+| Property | Value |
+|----------|-------|
+| Example | `examples/basic` |
+| Region | **swedencentral** (westeurope zones limited for MPN) |
+| Resources created | 3 (1 RG, 1 LAW, 1 AKS cluster) |
+| Provision time | ~8 minutes |
+| Result | **PASS** |
+
+**Verified maintenance windows (via `az aks maintenanceconfiguration list`):**
+
+| Configuration | Schedule | Verified |
+|---------------|----------|----------|
+| `default` (general) | Saturday+Sunday, hours 0-5 UTC | Yes |
+| `aksManagedAutoUpgradeSchedule` | Weekly Sunday 02:00 UTC, 4h, `+00:00` | Yes |
+| `aksManagedNodeOSUpgradeSchedule` | Weekly Saturday 02:00 UTC, 4h, `+00:00` | Yes |
+
+No explicit maintenance_window variables passed — all three windows came from module defaults.
+
+#### Complete Example (overrides test)
+
+| Property | Value |
+|----------|-------|
+| Example | `examples/complete` |
+| Region | **swedencentral** (westeurope zones limited for MPN) |
+| Resources created | 5 (1 RG, 1 VNet, 1 subnet, 1 LAW, 1 AKS cluster) |
+| Provision time | ~5 minutes |
+| Result | **PASS** |
+
+**Verified maintenance window overrides (via `az aks maintenanceconfiguration list`):**
+
+| Configuration | Override | Verified |
+|---------------|----------|----------|
+| `aksManagedAutoUpgradeSchedule` | `utc_offset = "+01:00"` (CET) | Yes |
+| `aksManagedAutoUpgradeSchedule` | `not_allowed: 2026-12-20 → 2027-01-05` | Yes |
+| `aksManagedNodeOSUpgradeSchedule` | `utc_offset = "+01:00"` (CET) | Yes |
+| `aksManagedNodeOSUpgradeSchedule` | `not_allowed: 2026-12-20 → 2027-01-05` | Yes |
+| `default` (general) | Same as defaults (Saturday+Sunday 0-5h) | Yes |
+
+---
+
 ## Subscription Limitations
 
 | Limitation | Impact | Workaround |
@@ -911,6 +957,7 @@ Live tests of v2.0.0/v1.1.0/v1.3.0 module updates adding private endpoint suppor
 | `87e05a1` | Add linux-virtual-machine v1.1.0: optional password auth |
 | `54c98e3` | Add AKS v1.3.0: flexible identity |
 | `65cd3cf`..`a12eeeb` | Fix basic examples and regenerate READMEs for updated modules |
+| `76b915a` | Add AKS v1.4.0: default maintenance windows + node OS upgrade support |
 
 ---
 
