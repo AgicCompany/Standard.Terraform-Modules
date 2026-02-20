@@ -38,7 +38,7 @@ A library of reusable, production-ready Terraform modules for Microsoft Azure. A
 
 | Module | Description |
 |--------|-------------|
-| [aks](modules/aks) | Azure Kubernetes Service with private cluster and Azure AD auth |
+| [aks](modules/aks) | Azure Kubernetes Service with private cluster, Azure AD auth, and default maintenance windows |
 | [aks-node-pool](modules/aks-node-pool) | AKS node pool companion module with for_each support |
 | [app-service-plan](modules/app-service-plan) | App Service plan (Linux/Windows) |
 | [linux-web-app](modules/linux-web-app) | Linux Web App with VNet integration and private endpoint |
@@ -46,10 +46,10 @@ A library of reusable, production-ready Terraform modules for Microsoft Azure. A
 | [container-app-environment](modules/container-app-environment) | Container Apps environment with VNet integration |
 | [container-app](modules/container-app) | Container App with ingress, secrets, and scaling rules |
 | [container-registry](modules/container-registry) | Container Registry with geo-replication and private endpoint |
-| [linux-virtual-machine](modules/linux-virtual-machine) | Linux VM with managed identity and SSH key auth |
+| [linux-virtual-machine](modules/linux-virtual-machine) | Linux VM with managed identity, SSH key or password auth |
 | [windows-virtual-machine](modules/windows-virtual-machine) | Windows VM with managed identity |
 | [bastion](modules/bastion) | Azure Bastion host for secure VM access |
-| [static-web-app](modules/static-web-app) | Azure Static Web App |
+| [static-web-app](modules/static-web-app) | Azure Static Web App with optional private endpoint |
 
 ### Data
 
@@ -57,8 +57,8 @@ A library of reusable, production-ready Terraform modules for Microsoft Azure. A
 |--------|-------------|
 | [mssql-server](modules/mssql-server) | Azure SQL Server with Azure AD admin and private endpoint |
 | [mssql-database](modules/mssql-database) | Azure SQL Database with configurable SKU and retention |
-| [mysql-flexible-server](modules/mysql-flexible-server) | MySQL Flexible Server with VNet integration |
-| [postgresql-flexible-server](modules/postgresql-flexible-server) | PostgreSQL Flexible Server with VNet integration |
+| [mysql-flexible-server](modules/mysql-flexible-server) | MySQL Flexible Server with private endpoint or VNet integration |
+| [postgresql-flexible-server](modules/postgresql-flexible-server) | PostgreSQL Flexible Server with private endpoint or VNet integration |
 | [cosmosdb](modules/cosmosdb) | Cosmos DB account with SQL databases and private endpoint |
 | [redis-cache](modules/redis-cache) | Azure Cache for Redis with private endpoint |
 
