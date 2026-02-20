@@ -131,6 +131,28 @@ resource "azurerm_kubernetes_cluster" "this" {
     }
   }
 
+  dynamic "maintenance_window_node_os" {
+    for_each = var.maintenance_window_node_os != null ? [var.maintenance_window_node_os] : []
+    content {
+      frequency    = maintenance_window_node_os.value.frequency
+      interval     = maintenance_window_node_os.value.interval
+      duration     = maintenance_window_node_os.value.duration
+      day_of_week  = maintenance_window_node_os.value.day_of_week
+      day_of_month = maintenance_window_node_os.value.day_of_month
+      week_index   = maintenance_window_node_os.value.week_index
+      start_time   = maintenance_window_node_os.value.start_time
+      utc_offset   = maintenance_window_node_os.value.utc_offset
+      start_date   = maintenance_window_node_os.value.start_date
+      dynamic "not_allowed" {
+        for_each = maintenance_window_node_os.value.not_allowed != null ? maintenance_window_node_os.value.not_allowed : []
+        content {
+          start = not_allowed.value.start
+          end   = not_allowed.value.end
+        }
+      }
+    }
+  }
+
   azure_active_directory_role_based_access_control {
     azure_rbac_enabled     = var.rbac_mode == "azure"
     admin_group_object_ids = var.admin_group_object_ids

@@ -182,8 +182,13 @@ variable "maintenance_window" {
       end   = string
     })))
   })
-  default     = null
-  description = "General maintenance window. When null, Azure schedules maintenance at its discretion."
+  default = {
+    allowed = [
+      { day = "Saturday", hours = [0, 1, 2, 3, 4, 5] },
+      { day = "Sunday", hours = [0, 1, 2, 3, 4, 5] }
+    ]
+  }
+  description = "General maintenance window. Defaults to Saturday+Sunday 00:00-06:00 UTC. Set to null to let Azure schedule at its discretion."
 }
 
 variable "maintenance_window_auto_upgrade" {
@@ -202,8 +207,14 @@ variable "maintenance_window_auto_upgrade" {
       end   = string
     })))
   })
-  default     = null
-  description = "Auto-upgrade maintenance window. frequency, interval, and duration are required. duration must be 4-24 hours."
+  default = {
+    frequency   = "Weekly"
+    interval    = 1
+    duration    = 4
+    day_of_week = "Sunday"
+    start_time  = "02:00"
+  }
+  description = "Auto-upgrade maintenance window. Defaults to Weekly Sunday 02:00 UTC, 4h duration. Set to null to disable."
 
   validation {
     condition     = var.maintenance_window_auto_upgrade == null || contains(["Daily", "Weekly", "AbsoluteMonthly", "RelativeMonthly"], var.maintenance_window_auto_upgrade.frequency)
@@ -212,6 +223,42 @@ variable "maintenance_window_auto_upgrade" {
 
   validation {
     condition     = var.maintenance_window_auto_upgrade == null || (var.maintenance_window_auto_upgrade.duration >= 4 && var.maintenance_window_auto_upgrade.duration <= 24)
+    error_message = "duration must be between 4 and 24 hours."
+  }
+}
+
+variable "maintenance_window_node_os" {
+  type = object({
+    frequency    = string
+    interval     = number
+    duration     = number
+    day_of_week  = optional(string)
+    day_of_month = optional(number)
+    week_index   = optional(string)
+    start_time   = optional(string)
+    utc_offset   = optional(string, "+00:00")
+    start_date   = optional(string)
+    not_allowed = optional(list(object({
+      start = string
+      end   = string
+    })))
+  })
+  default = {
+    frequency   = "Weekly"
+    interval    = 1
+    duration    = 4
+    day_of_week = "Saturday"
+    start_time  = "02:00"
+  }
+  description = "Node OS upgrade maintenance window. Defaults to Weekly Saturday 02:00 UTC, 4h duration. Set to null to disable."
+
+  validation {
+    condition     = var.maintenance_window_node_os == null || contains(["Daily", "Weekly", "AbsoluteMonthly", "RelativeMonthly"], var.maintenance_window_node_os.frequency)
+    error_message = "frequency must be Daily, Weekly, AbsoluteMonthly, or RelativeMonthly."
+  }
+
+  validation {
+    condition     = var.maintenance_window_node_os == null || (var.maintenance_window_node_os.duration >= 4 && var.maintenance_window_node_os.duration <= 24)
     error_message = "duration must be between 4 and 24 hours."
   }
 }

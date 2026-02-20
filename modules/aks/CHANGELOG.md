@@ -4,6 +4,22 @@ All notable changes to this module will be documented in this file.
 
 ## [Unreleased]
 
+## [1.4.0] - 2026-02-20
+
+### Added
+
+- Node OS upgrade maintenance window (`maintenance_window_node_os`) with same scheduling options as auto-upgrade window
+
+### Changed
+
+- `maintenance_window` now defaults to Saturday+Sunday 00:00-06:00 UTC instead of null (Azure-managed)
+- `maintenance_window_auto_upgrade` now defaults to Weekly Sunday 02:00 UTC, 4h duration instead of null
+- `maintenance_window_node_os` defaults to Weekly Saturday 02:00 UTC, 4h duration
+
+### Migration notes
+
+- Consumers who previously relied on `maintenance_window = null` (Azure-managed scheduling) will now get explicit maintenance windows. Pass `maintenance_window = null` to restore the previous behavior.
+
 ## [1.3.0] - 2026-02-19
 
 ### Added
