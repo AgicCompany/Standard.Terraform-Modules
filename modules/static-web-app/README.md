@@ -41,8 +41,8 @@ Static Web Apps are secure by default:
 |---------|---------|-------|
 | HTTPS | Enforced | Always HTTPS, managed by Azure |
 | Certificates | Managed | Azure manages TLS certificates |
-| Private endpoint | Enabled | `enable_private_endpoint` (requires Standard SKU) |
-| Public access | Disabled | `enable_public_access` |
+| Private endpoint | Disabled | `enable_private_endpoint` (requires Standard SKU) |
+| Public access | Enabled | `enable_public_access` (disabling requires Standard SKU) |
 | Preview environments | Enabled | `preview_environments_enabled` |
 | Config file changes | Enabled | `configuration_file_changes_enabled` |
 
@@ -91,8 +91,8 @@ No modules.
 |------|-------------|------|---------|:--------:|
 | <a name="input_app_settings"></a> [app\_settings](#input\_app\_settings) | Application settings (environment variables) | `map(string)` | `{}` | no |
 | <a name="input_configuration_file_changes_enabled"></a> [configuration\_file\_changes\_enabled](#input\_configuration\_file\_changes\_enabled) | Allow configuration file changes | `bool` | `true` | no |
-| <a name="input_enable_private_endpoint"></a> [enable\_private\_endpoint](#input\_enable\_private\_endpoint) | Create a private endpoint for the Static Web App. Requires Standard SKU. | `bool` | `true` | no |
-| <a name="input_enable_public_access"></a> [enable\_public\_access](#input\_enable\_public\_access) | Allow public network access | `bool` | `false` | no |
+| <a name="input_enable_private_endpoint"></a> [enable\_private\_endpoint](#input\_enable\_private\_endpoint) | Create a private endpoint for the Static Web App. Requires Standard SKU. | `bool` | `false` | no |
+| <a name="input_enable_public_access"></a> [enable\_public\_access](#input\_enable\_public\_access) | Allow public network access. Disabling requires Standard SKU. | `bool` | `true` | no |
 | <a name="input_location"></a> [location](#input\_location) | Azure region | `string` | n/a | yes |
 | <a name="input_name"></a> [name](#input\_name) | Static Web App name (full CAF-compliant name, provided by consumer) | `string` | n/a | yes |
 | <a name="input_preview_environments_enabled"></a> [preview\_environments\_enabled](#input\_preview\_environments\_enabled) | Enable preview environments for pull requests | `bool` | `true` | no |

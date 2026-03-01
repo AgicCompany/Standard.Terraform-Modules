@@ -26,7 +26,7 @@ module "bastion" {
 
 ## Features
 
-- Basic, Standard, and Developer SKU support
+- Basic and Standard SKU support
 - Standard SKU features: file copy, IP-based connection, shareable links, native client tunneling, scale units
 - Automatic public IP provisioning (Standard SKU, static allocation)
 

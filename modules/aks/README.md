@@ -157,7 +157,7 @@ No modules.
 | <a name="output_node_resource_group"></a> [node\_resource\_group](#output\_node\_resource\_group) | Auto-created resource group for cluster infrastructure |
 | <a name="output_oidc_issuer_url"></a> [oidc\_issuer\_url](#output\_oidc\_issuer\_url) | OIDC issuer URL (for workload identity federation) |
 | <a name="output_principal_id"></a> [principal\_id](#output\_principal\_id) | System-assigned managed identity principal ID (only available with SystemAssigned identity) |
-| <a name="output_private_fqdn"></a> [private\_fqdn](#output\_private\_fqdn) | Private FQDN of the API server |
+| <a name="output_private_fqdn"></a> [private\_fqdn](#output\_private\_fqdn) | Private FQDN of the API server (null for public clusters) |
 | <a name="output_public_aks_id"></a> [public\_aks\_id](#output\_public\_aks\_id) | AKS cluster resource ID (for cross-project consumption) |
 | <a name="output_public_aks_name"></a> [public\_aks\_name](#output\_public\_aks\_name) | AKS cluster name (for cross-project consumption) |
 | <a name="output_tenant_id"></a> [tenant\_id](#output\_tenant\_id) | System-assigned managed identity tenant ID (only available with SystemAssigned identity) |

@@ -102,7 +102,7 @@ No modules.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_additional_locations"></a> [additional\_locations](#input\_additional\_locations) | Additional deployment locations for multi-region (Premium SKU only) | <pre>list(object({<br/>    location                  = string<br/>    sku_name                  = optional(string)<br/>    zones                     = optional(list(string))<br/>    virtual_network_subnet_id = optional(string)<br/>  }))</pre> | `[]` | no |
+| <a name="input_additional_locations"></a> [additional\_locations](#input\_additional\_locations) | Additional deployment locations for multi-region (Premium SKU only) | <pre>list(object({<br/>    location                  = string<br/>    zones                     = optional(list(string))<br/>    virtual_network_subnet_id = optional(string)<br/>  }))</pre> | `[]` | no |
 | <a name="input_client_certificate_enabled"></a> [client\_certificate\_enabled](#input\_client\_certificate\_enabled) | Enable client certificate authentication | `bool` | `false` | no |
 | <a name="input_enable_private_endpoint"></a> [enable\_private\_endpoint](#input\_enable\_private\_endpoint) | Create a private endpoint for this API Management service | `bool` | `true` | no |
 | <a name="input_enable_public_access"></a> [enable\_public\_access](#input\_enable\_public\_access) | Allow public network access | `bool` | `false` | no |

@@ -103,11 +103,11 @@ No modules.
 | Name | Description |
 |------|-------------|
 | <a name="output_default_domain"></a> [default\_domain](#output\_default\_domain) | Default domain of the environment |
-| <a name="output_docker_bridge_cidr"></a> [docker\_bridge\_cidr](#output\_docker\_bridge\_cidr) | Docker bridge CIDR |
+| <a name="output_docker_bridge_cidr"></a> [docker\_bridge\_cidr](#output\_docker\_bridge\_cidr) | Docker bridge CIDR (null for non-VNet environments) |
 | <a name="output_id"></a> [id](#output\_id) | Container Apps Environment resource ID |
 | <a name="output_name"></a> [name](#output\_name) | Container Apps Environment name |
-| <a name="output_platform_reserved_cidr"></a> [platform\_reserved\_cidr](#output\_platform\_reserved\_cidr) | Platform reserved CIDR |
-| <a name="output_platform_reserved_dns_ip_address"></a> [platform\_reserved\_dns\_ip\_address](#output\_platform\_reserved\_dns\_ip\_address) | Platform reserved DNS IP address |
+| <a name="output_platform_reserved_cidr"></a> [platform\_reserved\_cidr](#output\_platform\_reserved\_cidr) | Platform reserved CIDR (null for non-VNet environments) |
+| <a name="output_platform_reserved_dns_ip_address"></a> [platform\_reserved\_dns\_ip\_address](#output\_platform\_reserved\_dns\_ip\_address) | Platform reserved DNS IP address (null for non-VNet environments) |
 | <a name="output_public_container_app_environment_default_domain"></a> [public\_container\_app\_environment\_default\_domain](#output\_public\_container\_app\_environment\_default\_domain) | Default domain of the environment (for cross-project consumption) |
 | <a name="output_public_container_app_environment_id"></a> [public\_container\_app\_environment\_id](#output\_public\_container\_app\_environment\_id) | Container Apps Environment resource ID (for cross-project consumption) |
 | <a name="output_static_ip_address"></a> [static\_ip\_address](#output\_static\_ip\_address) | Static IP address of the environment |

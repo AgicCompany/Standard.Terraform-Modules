@@ -109,7 +109,7 @@ No modules.
 | <a name="input_name"></a> [name](#input\_name) | Redis Cache name (full CAF-compliant name, provided by consumer) | `string` | n/a | yes |
 | <a name="input_patch_schedule"></a> [patch\_schedule](#input\_patch\_schedule) | Patch schedule for Redis updates. Premium SKU only. | <pre>object({<br/>    day_of_week    = string<br/>    start_hour_utc = optional(number, 0)<br/>  })</pre> | `null` | no |
 | <a name="input_private_dns_zone_id"></a> [private\_dns\_zone\_id](#input\_private\_dns\_zone\_id) | Private DNS zone ID for privatelink.redis.cache.windows.net. Required when enable\_private\_endpoint = true. | `string` | `null` | no |
-| <a name="input_redis_configuration"></a> [redis\_configuration](#input\_redis\_configuration) | Redis configuration block. Premium-only fields (AOF, RDB) are ignored for lower SKUs. | <pre>object({<br/>    maxmemory_policy                = optional(string, "volatile-lru")<br/>    maxmemory_reserved              = optional(number)<br/>    maxfragmentationmemory_reserved = optional(number)<br/>    notify_keyspace_events          = optional(string)<br/>    aof_backup_enabled              = optional(bool)<br/>    rdb_backup_enabled              = optional(bool)<br/>    rdb_backup_frequency            = optional(number)<br/>    rdb_backup_max_snapshot_count   = optional(number)<br/>    rdb_storage_connection_string   = optional(string)<br/>  })</pre> | `{}` | no |
+| <a name="input_redis_configuration"></a> [redis\_configuration](#input\_redis\_configuration) | Redis configuration block. Premium-only fields (AOF, RDB) are ignored for lower SKUs. (sensitive) | <pre>object({<br/>    maxmemory_policy                = optional(string, "volatile-lru")<br/>    maxmemory_reserved              = optional(number)<br/>    maxfragmentationmemory_reserved = optional(number)<br/>    notify_keyspace_events          = optional(string)<br/>    aof_backup_enabled              = optional(bool)<br/>    rdb_backup_enabled              = optional(bool)<br/>    rdb_backup_frequency            = optional(number)<br/>    rdb_backup_max_snapshot_count   = optional(number)<br/>    rdb_storage_connection_string   = optional(string)<br/>  })</pre> | `{}` | no |
 | <a name="input_redis_version"></a> [redis\_version](#input\_redis\_version) | Redis version: 6 | `string` | `"6"` | no |
 | <a name="input_replicas_per_master"></a> [replicas\_per\_master](#input\_replicas\_per\_master) | Number of replicas per master. Premium SKU only. | `number` | `null` | no |
 | <a name="input_replicas_per_primary"></a> [replicas\_per\_primary](#input\_replicas\_per\_primary) | Number of replicas per primary. Premium SKU only. | `number` | `null` | no |
@@ -137,7 +137,7 @@ No modules.
 
 ## Notes
 
-- **SKU defaults to Basic:** Basic C0 is the most cost-effective option for development. Standard adds replication, Premium adds clustering, persistence, and VNet injection. Private endpoints work with all SKUs.
+- **SKU defaults to Basic:** Basic C0 is the most cost-effective option for development. Standard adds replication, Premium adds clustering, persistence, and VNet injection. Private endpoints require Standard or Premium SKU.
 - **Provisioning time:** Redis Cache creation takes 15-25 minutes. Plan accordingly.
 - **Access keys not exposed:** For security, primary and secondary access keys are not output. Use managed identity or retrieve keys via Azure CLI/Portal when needed.
 - **Family mapping:** Use `C` family for Basic/Standard SKUs and `P` family for Premium. Mismatched family/SKU combinations will fail.

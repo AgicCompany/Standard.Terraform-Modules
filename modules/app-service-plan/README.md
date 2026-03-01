@@ -2,7 +2,7 @@
 
 **Complexity:** Low
 
-Creates an Azure App Service Plan (Linux) with configurable SKU, worker count, and optional zone redundancy.
+Creates an Azure App Service Plan with configurable OS type, SKU, worker count, and optional zone redundancy.
 
 ## Usage
 
@@ -21,7 +21,7 @@ module "app_plan" {
 
 ## Features
 
-- Linux App Service Plan (`azurerm_service_plan`)
+- App Service Plan (`azurerm_service_plan`) with configurable OS type (Linux, Windows, WindowsContainer)
 - Configurable SKU (Basic, Standard, Premium, Consumption, Elastic Premium)
 - Configurable worker count (instance scaling)
 - Zone redundancy support via feature flag
@@ -76,6 +76,7 @@ No modules.
 | <a name="input_enable_zone_redundancy"></a> [enable\_zone\_redundancy](#input\_enable\_zone\_redundancy) | Enable zone redundant deployment | `bool` | `false` | no |
 | <a name="input_location"></a> [location](#input\_location) | Azure region | `string` | n/a | yes |
 | <a name="input_name"></a> [name](#input\_name) | App Service Plan name (full CAF-compliant name, provided by consumer) | `string` | n/a | yes |
+| <a name="input_os_type"></a> [os\_type](#input\_os\_type) | OS type for the App Service Plan | `string` | `"Linux"` | no |
 | <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name) | Name of the resource group | `string` | n/a | yes |
 | <a name="input_sku_name"></a> [sku\_name](#input\_sku\_name) | The SKU for the plan (e.g., B1, S1, P1v3, Y1) | `string` | n/a | yes |
 | <a name="input_tags"></a> [tags](#input\_tags) | Tags to apply to the resource | `map(string)` | `{}` | no |

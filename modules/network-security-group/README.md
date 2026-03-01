@@ -20,8 +20,8 @@ module "nsg" {
       direction                  = "Inbound"
       access                     = "Allow"
       protocol                   = "Tcp"
-      source_port_range          = "*"
-      destination_port_range     = "443"
+      source_port_range          = "*"   # required: one of source_port_range or source_port_ranges
+      destination_port_range     = "443" # required: one of destination_port_range or destination_port_ranges
       source_address_prefix      = "*"
       destination_address_prefix = "*"
     }
@@ -96,7 +96,7 @@ No modules.
 | <a name="input_location"></a> [location](#input\_location) | Azure region | `string` | n/a | yes |
 | <a name="input_name"></a> [name](#input\_name) | Network security group name (full CAF-compliant name, provided by consumer) | `string` | n/a | yes |
 | <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name) | Name of the resource group | `string` | n/a | yes |
-| <a name="input_security_rules"></a> [security\_rules](#input\_security\_rules) | Map of security rules. Key is used as the rule name. | <pre>map(object({<br/>    priority                                   = number<br/>    direction                                  = string<br/>    access                                     = string<br/>    protocol                                   = string<br/>    source_port_range                          = optional(string, "*")<br/>    destination_port_range                     = optional(string, null)<br/>    source_port_ranges                         = optional(list(string), null)<br/>    destination_port_ranges                    = optional(list(string), null)<br/>    source_address_prefix                      = optional(string, null)<br/>    destination_address_prefix                 = optional(string, null)<br/>    source_address_prefixes                    = optional(list(string), null)<br/>    destination_address_prefixes               = optional(list(string), null)<br/>    source_application_security_group_ids      = optional(list(string), null)<br/>    destination_application_security_group_ids = optional(list(string), null)<br/>    description                                = optional(string, "")<br/>  }))</pre> | `{}` | no |
+| <a name="input_security_rules"></a> [security\_rules](#input\_security\_rules) | Map of security rules. Key is used as the rule name. | <pre>map(object({<br/>    priority                                   = number<br/>    direction                                  = string<br/>    access                                     = string<br/>    protocol                                   = string<br/>    source_port_range                          = optional(string, null)<br/>    destination_port_range                     = optional(string, null)<br/>    source_port_ranges                         = optional(list(string), null)<br/>    destination_port_ranges                    = optional(list(string), null)<br/>    source_address_prefix                      = optional(string, null)<br/>    destination_address_prefix                 = optional(string, null)<br/>    source_address_prefixes                    = optional(list(string), null)<br/>    destination_address_prefixes               = optional(list(string), null)<br/>    source_application_security_group_ids      = optional(list(string), null)<br/>    destination_application_security_group_ids = optional(list(string), null)<br/>    description                                = optional(string, "")<br/>  }))</pre> | `{}` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | Tags to apply to the resource | `map(string)` | `{}` | no |
 
 ## Outputs
@@ -112,4 +112,5 @@ No modules.
 
 - **Separate rule resources:** Rules are created as `azurerm_network_security_rule` resources rather than inline blocks to prevent lifecycle issues when adding or removing rules.
 - **Subnet association:** This module does not associate the NSG with subnets. Use the virtual-network module's `subnet_nsg_associations` parameter or create `azurerm_subnet_network_security_group_association` resources separately.
+- **Port range fields:** Each rule must specify exactly one of `source_port_range` or `source_port_ranges`, and exactly one of `destination_port_range` or `destination_port_ranges`. Neither has a default — both must be explicitly set.
 - **Rule priorities:** Must be unique per direction. Use increments of 10 or 100 to allow future insertions.
