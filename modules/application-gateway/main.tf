@@ -171,4 +171,35 @@ resource "azurerm_application_gateway" "this" {
   }
 
   tags = var.tags
+
+  lifecycle {
+    precondition {
+      condition     = var.sku_name == var.sku_tier
+      error_message = "sku_name and sku_tier must match (e.g., both \"Standard_v2\" or both \"WAF_v2\")."
+    }
+
+    precondition {
+      condition = alltrue([
+        for rule in values(var.request_routing_rules) :
+        contains(keys(var.http_listeners), rule.http_listener_name)
+      ])
+      error_message = "All request_routing_rules must reference an http_listener_name that exists in http_listeners."
+    }
+
+    precondition {
+      condition = alltrue([
+        for rule in values(var.request_routing_rules) :
+        rule.backend_address_pool_name == null || contains(keys(var.backend_address_pools), rule.backend_address_pool_name)
+      ])
+      error_message = "All request_routing_rules must reference a backend_address_pool_name that exists in backend_address_pools (or be null)."
+    }
+
+    precondition {
+      condition = alltrue([
+        for rule in values(var.request_routing_rules) :
+        rule.backend_http_settings_name == null || contains(keys(var.backend_http_settings), rule.backend_http_settings_name)
+      ])
+      error_message = "All request_routing_rules must reference a backend_http_settings_name that exists in backend_http_settings (or be null)."
+    }
+  }
 }

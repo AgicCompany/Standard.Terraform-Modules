@@ -36,6 +36,13 @@ resource "azurerm_subnet_network_security_group_association" "this" {
 
   subnet_id                 = azurerm_subnet.this[each.key].id
   network_security_group_id = each.value
+
+  lifecycle {
+    precondition {
+      condition     = contains(keys(var.subnets), each.key)
+      error_message = "NSG association key '${each.key}' does not match any subnet in var.subnets."
+    }
+  }
 }
 
 resource "azurerm_subnet_route_table_association" "this" {
@@ -43,4 +50,11 @@ resource "azurerm_subnet_route_table_association" "this" {
 
   subnet_id      = azurerm_subnet.this[each.key].id
   route_table_id = each.value
+
+  lifecycle {
+    precondition {
+      condition     = contains(keys(var.subnets), each.key)
+      error_message = "Route table association key '${each.key}' does not match any subnet in var.subnets."
+    }
+  }
 }

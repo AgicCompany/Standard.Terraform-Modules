@@ -21,7 +21,7 @@ variable "security_rules" {
     direction                                  = string
     access                                     = string
     protocol                                   = string
-    source_port_range                          = optional(string, "*")
+    source_port_range                          = optional(string, null)
     destination_port_range                     = optional(string, null)
     source_port_ranges                         = optional(list(string), null)
     destination_port_ranges                    = optional(list(string), null)
@@ -39,17 +39,17 @@ variable "security_rules" {
   validation {
     condition = alltrue([
       for k, v in var.security_rules :
-      !(v.source_port_range != null && v.source_port_ranges != null)
+      (v.source_port_range != null) != (v.source_port_ranges != null)
     ])
-    error_message = "Each rule must specify either source_port_range or source_port_ranges, not both."
+    error_message = "Each rule must specify exactly one of source_port_range or source_port_ranges."
   }
 
   validation {
     condition = alltrue([
       for k, v in var.security_rules :
-      !(v.destination_port_range != null && v.destination_port_ranges != null)
+      (v.destination_port_range != null) != (v.destination_port_ranges != null)
     ])
-    error_message = "Each rule must specify either destination_port_range or destination_port_ranges, not both."
+    error_message = "Each rule must specify exactly one of destination_port_range or destination_port_ranges."
   }
 
   validation {

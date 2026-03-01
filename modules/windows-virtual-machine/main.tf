@@ -24,6 +24,13 @@ resource "azurerm_network_interface" "this" {
   }
 
   tags = var.tags
+
+  lifecycle {
+    precondition {
+      condition     = var.private_ip_address_allocation != "Static" || var.private_ip_address != null
+      error_message = "private_ip_address is required when private_ip_address_allocation is \"Static\"."
+    }
+  }
 }
 
 resource "azurerm_windows_virtual_machine" "this" {

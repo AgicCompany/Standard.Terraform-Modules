@@ -21,12 +21,12 @@ output "network_interface_id" {
 }
 
 output "principal_id" {
-  value       = var.enable_system_assigned_identity ? azurerm_windows_virtual_machine.this.identity[0].principal_id : null
+  value       = try(azurerm_windows_virtual_machine.this.identity[0].principal_id, null)
   description = "System-assigned managed identity principal ID (when enabled)"
 }
 
 output "tenant_id" {
-  value       = var.enable_system_assigned_identity ? azurerm_windows_virtual_machine.this.identity[0].tenant_id : null
+  value       = try(azurerm_windows_virtual_machine.this.identity[0].tenant_id, null)
   description = "System-assigned managed identity tenant ID (when enabled)"
 }
 

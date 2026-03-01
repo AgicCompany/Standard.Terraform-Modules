@@ -28,8 +28,8 @@ variable "sku" {
   description = "Bastion host SKU"
 
   validation {
-    condition     = contains(["Basic", "Standard", "Developer"], var.sku)
-    error_message = "SKU must be one of: Basic, Standard, Developer."
+    condition     = contains(["Basic", "Standard"], var.sku)
+    error_message = "SKU must be Basic or Standard. Developer SKU requires a different deployment model (no Public IP)."
   }
 }
 

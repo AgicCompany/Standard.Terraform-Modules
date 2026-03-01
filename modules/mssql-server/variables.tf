@@ -49,8 +49,8 @@ variable "minimum_tls_version" {
   description = "Minimum TLS version"
 
   validation {
-    condition     = contains(["1.0", "1.1", "1.2", "Disabled"], var.minimum_tls_version)
-    error_message = "minimum_tls_version must be \"1.0\", \"1.1\", \"1.2\", or \"Disabled\"."
+    condition     = contains(["1.0", "1.1", "1.2"], var.minimum_tls_version)
+    error_message = "minimum_tls_version must be \"1.0\", \"1.1\", or \"1.2\"."
   }
 }
 

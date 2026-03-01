@@ -14,6 +14,18 @@ resource "azurerm_eventhub_namespace" "this" {
   local_authentication_enabled  = var.enable_local_auth
 
   tags = var.tags
+
+  lifecycle {
+    precondition {
+      condition     = !var.auto_inflate_enabled || var.sku != "Basic"
+      error_message = "Auto-inflate is only supported on Standard and Premium SKUs."
+    }
+
+    precondition {
+      condition     = !var.auto_inflate_enabled || var.maximum_throughput_units != null
+      error_message = "maximum_throughput_units is required when auto_inflate_enabled is true."
+    }
+  }
 }
 
 resource "azurerm_eventhub" "this" {
@@ -24,6 +36,18 @@ resource "azurerm_eventhub" "this" {
 
   partition_count   = each.value.partition_count
   message_retention = each.value.message_retention
+
+  lifecycle {
+    precondition {
+      condition     = var.sku != "Basic" || each.value.message_retention == 1
+      error_message = "Event Hub '${each.key}': message_retention must be 1 for Basic SKU."
+    }
+
+    precondition {
+      condition     = var.sku != "Standard" || each.value.message_retention <= 7
+      error_message = "Event Hub '${each.key}': message_retention must be 1-7 for Standard SKU."
+    }
+  }
 }
 
 resource "azurerm_eventhub_consumer_group" "this" {
@@ -64,9 +88,13 @@ resource "azurerm_private_endpoint" "this" {
     is_manual_connection           = false
   }
 
-  private_dns_zone_group {
-    name                 = "default"
-    private_dns_zone_ids = [var.private_dns_zone_id]
+  dynamic "private_dns_zone_group" {
+    for_each = var.private_dns_zone_id != null ? [1] : []
+
+    content {
+      name                 = "default"
+      private_dns_zone_ids = [var.private_dns_zone_id]
+    }
   }
 
   tags = var.tags

@@ -7,8 +7,20 @@ resource "azurerm_servicebus_namespace" "this" {
   minimum_tls_version           = var.minimum_tls_version
   local_auth_enabled            = var.enable_local_auth
   public_network_access_enabled = var.enable_public_access
-  premium_messaging_partitions  = var.sku == "Premium" ? (var.capacity > 0 ? var.capacity : 1) : 0
+  premium_messaging_partitions  = var.sku == "Premium" ? min(4, var.capacity > 0 ? var.capacity : 1) : 0
   tags                          = var.tags
+
+  lifecycle {
+    precondition {
+      condition     = var.sku != "Premium" || var.capacity > 0
+      error_message = "capacity must be greater than 0 for Premium SKU. Valid values: 1, 2, 4, 8, 16."
+    }
+
+    precondition {
+      condition     = length(var.topics) == 0 || var.sku != "Basic"
+      error_message = "Topics require Standard or Premium SKU. Set sku to \"Standard\" or \"Premium\", or remove topics."
+    }
+  }
 }
 
 resource "azurerm_servicebus_queue" "this" {
@@ -72,9 +84,13 @@ resource "azurerm_private_endpoint" "this" {
     is_manual_connection           = false
   }
 
-  private_dns_zone_group {
-    name                 = "default"
-    private_dns_zone_ids = [var.private_dns_zone_id]
+  dynamic "private_dns_zone_group" {
+    for_each = var.private_dns_zone_id != null ? [1] : []
+
+    content {
+      name                 = "default"
+      private_dns_zone_ids = [var.private_dns_zone_id]
+    }
   }
 
   tags = var.tags

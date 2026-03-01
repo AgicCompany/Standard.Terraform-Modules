@@ -49,6 +49,13 @@ resource "azurerm_storage_account" "this" {
   }
 
   tags = var.tags
+
+  lifecycle {
+    precondition {
+      condition     = var.network_rules == null || var.enable_public_access
+      error_message = "network_rules are only applied when enable_public_access = true. Remove network_rules or set enable_public_access = true."
+    }
+  }
 }
 
 resource "azurerm_private_endpoint" "this" {

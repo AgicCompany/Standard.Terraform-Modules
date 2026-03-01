@@ -19,6 +19,11 @@ resource "azurerm_static_web_app" "this" {
       condition     = !var.enable_private_endpoint || var.sku_tier == "Standard"
       error_message = "Private endpoints require Standard SKU. Set sku_tier = \"Standard\" or disable PE."
     }
+
+    precondition {
+      condition     = var.enable_public_access || var.sku_tier == "Standard"
+      error_message = "Disabling public network access requires Standard SKU. Set sku_tier = \"Standard\" or set enable_public_access = true."
+    }
   }
 }
 
@@ -37,9 +42,13 @@ resource "azurerm_private_endpoint" "this" {
     is_manual_connection           = false
   }
 
-  private_dns_zone_group {
-    name                 = "default"
-    private_dns_zone_ids = [var.private_dns_zone_id]
+  dynamic "private_dns_zone_group" {
+    for_each = var.private_dns_zone_id != null ? [1] : []
+
+    content {
+      name                 = "default"
+      private_dns_zone_ids = [var.private_dns_zone_id]
+    }
   }
 
   tags = var.tags

@@ -54,6 +54,13 @@ resource "azurerm_cdn_frontdoor_origin" "this" {
   weight                         = each.value.weight
   certificate_name_check_enabled = each.value.certificate_name_check_enabled
   enabled                        = each.value.enabled
+
+  lifecycle {
+    precondition {
+      condition     = contains(keys(var.origin_groups), each.value.origin_group_name)
+      error_message = "Origin '${each.key}' references origin_group_name '${each.value.origin_group_name}' which does not exist in origin_groups."
+    }
+  }
 }
 
 resource "azurerm_cdn_frontdoor_route" "this" {
@@ -69,4 +76,21 @@ resource "azurerm_cdn_frontdoor_route" "this" {
   https_redirect_enabled        = each.value.https_redirect_enabled
   link_to_default_domain        = each.value.link_to_default_domain
   enabled                       = each.value.enabled
+
+  lifecycle {
+    precondition {
+      condition     = contains(keys(var.endpoints), each.value.endpoint_name)
+      error_message = "Route '${each.key}' references endpoint_name '${each.value.endpoint_name}' which does not exist in endpoints."
+    }
+
+    precondition {
+      condition     = contains(keys(var.origin_groups), each.value.origin_group_name)
+      error_message = "Route '${each.key}' references origin_group_name '${each.value.origin_group_name}' which does not exist in origin_groups."
+    }
+
+    precondition {
+      condition     = each.value.origin_names == null || alltrue([for name in coalesce(each.value.origin_names, []) : contains(keys(var.origins), name)])
+      error_message = "Route '${each.key}' references origin_names that do not exist in origins."
+    }
+  }
 }

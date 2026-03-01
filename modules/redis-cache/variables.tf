@@ -67,7 +67,8 @@ variable "redis_configuration" {
     rdb_storage_connection_string   = optional(string)
   })
   default     = {}
-  description = "Redis configuration block. Premium-only fields (AOF, RDB) are ignored for lower SKUs."
+  sensitive   = true
+  description = "Redis configuration block. Premium-only fields (AOF, RDB) are ignored for lower SKUs. Marked sensitive due to rdb_storage_connection_string."
 }
 
 variable "patch_schedule" {

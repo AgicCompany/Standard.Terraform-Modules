@@ -74,7 +74,6 @@ variable "zones" {
 variable "additional_locations" {
   type = list(object({
     location                  = string
-    sku_name                  = optional(string)
     zones                     = optional(list(string))
     virtual_network_subnet_id = optional(string)
   }))

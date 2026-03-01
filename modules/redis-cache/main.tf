@@ -9,9 +9,9 @@ resource "azurerm_redis_cache" "this" {
   non_ssl_port_enabled          = var.enable_non_ssl_port
   public_network_access_enabled = var.enable_public_access
   redis_version                 = var.redis_version
-  replicas_per_master           = var.replicas_per_master
-  replicas_per_primary          = var.replicas_per_primary
-  zones                         = length(var.zones) > 0 ? var.zones : null
+  replicas_per_master           = var.sku_name == "Premium" ? var.replicas_per_master : null
+  replicas_per_primary          = var.sku_name == "Premium" ? var.replicas_per_primary : null
+  zones                         = var.sku_name == "Premium" && length(var.zones) > 0 ? var.zones : null
 
   redis_configuration {
     maxmemory_policy                = var.redis_configuration.maxmemory_policy
@@ -26,7 +26,7 @@ resource "azurerm_redis_cache" "this" {
   }
 
   dynamic "patch_schedule" {
-    for_each = var.patch_schedule != null ? [var.patch_schedule] : []
+    for_each = var.sku_name == "Premium" && var.patch_schedule != null ? [var.patch_schedule] : []
 
     content {
       day_of_week    = patch_schedule.value.day_of_week
@@ -35,6 +35,21 @@ resource "azurerm_redis_cache" "this" {
   }
 
   tags = var.tags
+
+  lifecycle {
+    precondition {
+      condition = (
+        (contains(["Basic", "Standard"], var.sku_name) && var.family == "C") ||
+        (var.sku_name == "Premium" && var.family == "P")
+      )
+      error_message = "Basic/Standard SKUs require family \"C\". Premium SKU requires family \"P\"."
+    }
+
+    precondition {
+      condition     = !var.enable_private_endpoint || var.sku_name != "Basic"
+      error_message = "Private endpoints require Standard or Premium SKU. Set sku_name to \"Standard\" or \"Premium\", or disable the private endpoint."
+    }
+  }
 }
 
 resource "azurerm_redis_firewall_rule" "this" {
@@ -62,9 +77,13 @@ resource "azurerm_private_endpoint" "this" {
     is_manual_connection           = false
   }
 
-  private_dns_zone_group {
-    name                 = "default"
-    private_dns_zone_ids = [var.private_dns_zone_id]
+  dynamic "private_dns_zone_group" {
+    for_each = var.private_dns_zone_id != null ? [1] : []
+
+    content {
+      name                 = "default"
+      private_dns_zone_ids = [var.private_dns_zone_id]
+    }
   }
 
   tags = var.tags

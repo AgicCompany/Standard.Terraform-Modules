@@ -24,6 +24,18 @@ resource "azurerm_container_registry" "this" {
   }
 
   tags = var.tags
+
+  lifecycle {
+    precondition {
+      condition     = !var.enable_geo_replication || var.sku == "Premium"
+      error_message = "Geo-replication requires Premium SKU. Set sku = \"Premium\" or disable geo-replication."
+    }
+
+    precondition {
+      condition     = !var.enable_content_trust || var.sku == "Premium"
+      error_message = "Content trust requires Premium SKU. Set sku = \"Premium\" or disable content trust."
+    }
+  }
 }
 
 resource "azurerm_private_endpoint" "this" {
@@ -41,9 +53,13 @@ resource "azurerm_private_endpoint" "this" {
     is_manual_connection           = false
   }
 
-  private_dns_zone_group {
-    name                 = "default"
-    private_dns_zone_ids = [var.private_dns_zone_id]
+  dynamic "private_dns_zone_group" {
+    for_each = var.private_dns_zone_id != null ? [1] : []
+
+    content {
+      name                 = "default"
+      private_dns_zone_ids = [var.private_dns_zone_id]
+    }
   }
 
   tags = var.tags

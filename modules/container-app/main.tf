@@ -135,4 +135,14 @@ resource "azurerm_container_app" "this" {
   }
 
   tags = var.tags
+
+  lifecycle {
+    precondition {
+      condition = alltrue([
+        for name, env in var.container.env :
+        !(env.value != null && env.secret_name != null)
+      ])
+      error_message = "Container env variables must set either 'value' or 'secret_name', not both."
+    }
+  }
 }

@@ -22,8 +22,8 @@ output "fqdn" {
 }
 
 output "private_fqdn" {
-  value       = azurerm_kubernetes_cluster.this.private_fqdn
-  description = "Private FQDN of the API server"
+  value       = length(var.authorized_ip_ranges) == 0 ? azurerm_kubernetes_cluster.this.private_fqdn : null
+  description = "Private FQDN of the API server (null for public clusters)"
 }
 
 output "node_resource_group" {

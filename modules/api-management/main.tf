@@ -51,6 +51,18 @@ resource "azurerm_api_management" "this" {
   }
 
   tags = var.tags
+
+  lifecycle {
+    precondition {
+      condition     = var.virtual_network_type == "None" || var.virtual_network_subnet_id != null
+      error_message = "virtual_network_subnet_id is required when virtual_network_type is \"External\" or \"Internal\"."
+    }
+
+    precondition {
+      condition     = !contains(["UserAssigned", "SystemAssigned, UserAssigned"], var.identity_type) || length(var.identity_ids) > 0
+      error_message = "identity_ids must contain at least one identity when identity_type is \"UserAssigned\" or \"SystemAssigned, UserAssigned\"."
+    }
+  }
 }
 
 resource "azurerm_private_endpoint" "this" {
@@ -68,9 +80,13 @@ resource "azurerm_private_endpoint" "this" {
     is_manual_connection           = false
   }
 
-  private_dns_zone_group {
-    name                 = "default"
-    private_dns_zone_ids = [var.private_dns_zone_id]
+  dynamic "private_dns_zone_group" {
+    for_each = var.private_dns_zone_id != null ? [1] : []
+
+    content {
+      name                 = "default"
+      private_dns_zone_ids = [var.private_dns_zone_id]
+    }
   }
 
   tags = var.tags

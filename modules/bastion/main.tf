@@ -21,7 +21,7 @@ resource "azurerm_bastion_host" "this" {
   ip_connect_enabled     = var.sku == "Standard" ? var.ip_connect_enabled : false
   shareable_link_enabled = var.sku == "Standard" ? var.shareable_link_enabled : false
   tunneling_enabled      = var.sku == "Standard" ? var.tunneling_enabled : false
-  scale_units            = var.sku == "Standard" ? var.scale_units : 2
+  scale_units            = var.sku == "Standard" ? var.scale_units : null
 
   ip_configuration {
     name                 = "configuration"
@@ -30,4 +30,11 @@ resource "azurerm_bastion_host" "this" {
   }
 
   tags = var.tags
+
+  lifecycle {
+    precondition {
+      condition     = var.sku == "Standard" || (!var.file_copy_enabled && !var.ip_connect_enabled && !var.shareable_link_enabled && !var.tunneling_enabled)
+      error_message = "file_copy_enabled, ip_connect_enabled, shareable_link_enabled, and tunneling_enabled require Standard SKU."
+    }
+  }
 }

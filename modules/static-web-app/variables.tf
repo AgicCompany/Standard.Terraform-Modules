@@ -58,14 +58,14 @@ variable "preview_environments_enabled" {
 
 variable "enable_private_endpoint" {
   type        = bool
-  default     = true
+  default     = false
   description = "Create a private endpoint for the Static Web App. Requires Standard SKU."
 }
 
 variable "enable_public_access" {
   type        = bool
-  default     = false
-  description = "Allow public network access"
+  default     = true
+  description = "Allow public network access. Disabling requires Standard SKU."
 }
 
 # === Private Endpoint ===

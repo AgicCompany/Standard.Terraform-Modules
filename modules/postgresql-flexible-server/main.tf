@@ -22,13 +22,9 @@ resource "azurerm_postgresql_flexible_server" "this" {
   delegated_subnet_id = var.delegated_subnet_id
   private_dns_zone_id = var.delegated_subnet_id != null ? var.private_dns_zone_id : null
 
-  dynamic "authentication" {
-    for_each = var.enable_entra_auth ? [1] : []
-
-    content {
-      active_directory_auth_enabled = true
-      password_auth_enabled         = var.enable_password_auth
-    }
+  authentication {
+    active_directory_auth_enabled = var.enable_entra_auth
+    password_auth_enabled         = var.enable_password_auth
   }
 
   dynamic "high_availability" {
@@ -57,6 +53,16 @@ resource "azurerm_postgresql_flexible_server" "this" {
       condition     = !(var.enable_private_endpoint && var.delegated_subnet_id != null)
       error_message = "enable_private_endpoint and delegated_subnet_id are mutually exclusive. Use one or the other."
     }
+
+    precondition {
+      condition     = var.enable_entra_auth || var.enable_password_auth
+      error_message = "At least one authentication method must be enabled: set enable_entra_auth = true or enable_password_auth = true."
+    }
+
+    precondition {
+      condition     = (var.enable_entra_auth && !var.enable_password_auth) || (var.administrator_login != null && var.administrator_password != null)
+      error_message = "administrator_login and administrator_password are required unless using Entra-only authentication (enable_entra_auth = true and enable_password_auth = false)."
+    }
   }
 }
 
@@ -75,9 +81,13 @@ resource "azurerm_private_endpoint" "this" {
     is_manual_connection           = false
   }
 
-  private_dns_zone_group {
-    name                 = "default"
-    private_dns_zone_ids = [var.private_dns_zone_id]
+  dynamic "private_dns_zone_group" {
+    for_each = var.private_dns_zone_id != null ? [1] : []
+
+    content {
+      name                 = "default"
+      private_dns_zone_ids = [var.private_dns_zone_id]
+    }
   }
 
   tags = var.tags

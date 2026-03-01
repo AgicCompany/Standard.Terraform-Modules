@@ -51,6 +51,7 @@ variable "connection_strings" {
     value = string
   }))
   default     = {}
+  sensitive   = true
   description = "Connection strings. Key is used as the connection string name."
 }
 

@@ -60,4 +60,19 @@ variable "node_pools" {
     condition     = alltrue([for k, v in var.node_pools : contains(["Delete", "Deallocate"], v.scale_down_mode)])
     error_message = "scale_down_mode must be Delete or Deallocate."
   }
+
+  validation {
+    condition     = alltrue([for k, v in var.node_pools : v.priority != "Spot" || contains(["Delete", "Deallocate"], coalesce(v.eviction_policy, ""))])
+    error_message = "eviction_policy is required when priority is \"Spot\" and must be \"Delete\" or \"Deallocate\"."
+  }
+
+  validation {
+    condition     = alltrue([for k, v in var.node_pools : can(regex("^[a-z][a-z0-9]{0,11}$", k))])
+    error_message = "Node pool names (map keys) must be 1-12 lowercase alphanumeric characters starting with a letter."
+  }
+
+  validation {
+    condition     = alltrue([for k, v in var.node_pools : v.os_type != "Windows" || length(k) <= 6])
+    error_message = "Windows node pool names (map keys) must be 6 characters or fewer."
+  }
 }

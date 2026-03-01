@@ -16,4 +16,11 @@ resource "azurerm_mssql_database" "this" {
   }
 
   tags = var.tags
+
+  lifecycle {
+    precondition {
+      condition     = !can(regex("^HS_", var.sku_name)) || !var.enable_geo_redundant_backup
+      error_message = "geo_backup_enabled is not supported for Hyperscale (HS_*) SKUs. Set enable_geo_redundant_backup = false."
+    }
+  }
 }

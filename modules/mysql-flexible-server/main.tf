@@ -12,6 +12,8 @@ resource "azurerm_mysql_flexible_server" "this" {
   backup_retention_days        = var.backup_retention_days
   geo_redundant_backup_enabled = var.geo_redundant_backup_enabled
 
+  public_network_access_enabled = var.enable_public_access
+
   zone = var.zone
 
   delegated_subnet_id = var.delegated_subnet_id
@@ -53,6 +55,11 @@ resource "azurerm_mysql_flexible_server" "this" {
       condition     = !(var.enable_private_endpoint && var.delegated_subnet_id != null)
       error_message = "enable_private_endpoint and delegated_subnet_id are mutually exclusive. Use one or the other."
     }
+
+    precondition {
+      condition     = var.administrator_login != null && var.administrator_password != null
+      error_message = "administrator_login and administrator_password are required for MySQL Flexible Server."
+    }
   }
 }
 
@@ -71,9 +78,13 @@ resource "azurerm_private_endpoint" "this" {
     is_manual_connection           = false
   }
 
-  private_dns_zone_group {
-    name                 = "default"
-    private_dns_zone_ids = [var.private_dns_zone_id]
+  dynamic "private_dns_zone_group" {
+    for_each = var.private_dns_zone_id != null ? [1] : []
+
+    content {
+      name                 = "default"
+      private_dns_zone_ids = [var.private_dns_zone_id]
+    }
   }
 
   tags = var.tags

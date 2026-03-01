@@ -79,6 +79,7 @@ variable "vnet_integration_subnet_id" {
 variable "application_insights_connection_string" {
   type        = string
   default     = null
+  sensitive   = true
   description = "Application Insights connection string. Required when enable_application_insights = true."
 
   validation {

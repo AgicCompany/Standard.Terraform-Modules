@@ -21,18 +21,18 @@ output "static_ip_address" {
 }
 
 output "docker_bridge_cidr" {
-  value       = azurerm_container_app_environment.this.docker_bridge_cidr
-  description = "Docker bridge CIDR"
+  value       = var.infrastructure_subnet_id != null ? azurerm_container_app_environment.this.docker_bridge_cidr : null
+  description = "Docker bridge CIDR (null for non-VNet environments)"
 }
 
 output "platform_reserved_cidr" {
-  value       = azurerm_container_app_environment.this.platform_reserved_cidr
-  description = "Platform reserved CIDR"
+  value       = var.infrastructure_subnet_id != null ? azurerm_container_app_environment.this.platform_reserved_cidr : null
+  description = "Platform reserved CIDR (null for non-VNet environments)"
 }
 
 output "platform_reserved_dns_ip_address" {
-  value       = azurerm_container_app_environment.this.platform_reserved_dns_ip_address
-  description = "Platform reserved DNS IP address"
+  value       = var.infrastructure_subnet_id != null ? azurerm_container_app_environment.this.platform_reserved_dns_ip_address : null
+  description = "Platform reserved DNS IP address (null for non-VNet environments)"
 }
 
 # === Public Outputs (Cross-Project Consumption) ===
