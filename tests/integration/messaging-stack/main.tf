@@ -208,7 +208,7 @@ module "redis_cache" {
   location            = azurerm_resource_group.this.location
   name                = "redis-tftest-messaging-weu-001"
 
-  sku_name = "Basic"
+  sku_name = "Standard"
   family   = "C"
   capacity = 0
 

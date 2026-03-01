@@ -135,8 +135,9 @@ module "mysql" {
   administrator_login    = "mysqladmin"
   administrator_password = random_password.mysql.result
 
-  delegated_subnet_id = module.virtual_network.subnet_ids["snet-mysql"]
-  private_dns_zone_id = module.dns_mysql.id
+  enable_private_endpoint = false
+  delegated_subnet_id     = module.virtual_network.subnet_ids["snet-mysql"]
+  private_dns_zone_id     = module.dns_mysql.id
 
   databases = {
     testdb = {
@@ -166,8 +167,9 @@ module "postgresql" {
   administrator_password = random_password.postgres.result
   enable_password_auth   = true
 
-  delegated_subnet_id = module.virtual_network.subnet_ids["snet-postgres"]
-  private_dns_zone_id = module.dns_postgres.id
+  enable_private_endpoint = false
+  delegated_subnet_id     = module.virtual_network.subnet_ids["snet-postgres"]
+  private_dns_zone_id     = module.dns_postgres.id
 
   # DNS zone VNet link must be fully provisioned before server creation
   depends_on = [module.dns_postgres]
