@@ -39,6 +39,38 @@ variable "security_rules" {
   validation {
     condition = alltrue([
       for k, v in var.security_rules :
+      contains(["Inbound", "Outbound"], v.direction)
+    ])
+    error_message = "direction must be \"Inbound\" or \"Outbound\"."
+  }
+
+  validation {
+    condition = alltrue([
+      for k, v in var.security_rules :
+      contains(["Allow", "Deny"], v.access)
+    ])
+    error_message = "access must be \"Allow\" or \"Deny\"."
+  }
+
+  validation {
+    condition = alltrue([
+      for k, v in var.security_rules :
+      contains(["Tcp", "Udp", "Icmp", "*"], v.protocol)
+    ])
+    error_message = "protocol must be \"Tcp\", \"Udp\", \"Icmp\", or \"*\"."
+  }
+
+  validation {
+    condition = alltrue([
+      for k, v in var.security_rules :
+      v.priority >= 100 && v.priority <= 4096
+    ])
+    error_message = "priority must be between 100 and 4096."
+  }
+
+  validation {
+    condition = alltrue([
+      for k, v in var.security_rules :
       (v.source_port_range != null) != (v.source_port_ranges != null)
     ])
     error_message = "Each rule must specify exactly one of source_port_range or source_port_ranges."

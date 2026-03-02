@@ -35,6 +35,14 @@ variable "routes" {
   validation {
     condition = alltrue([
       for k, v in var.routes :
+      contains(["Internet", "VirtualAppliance", "VnetLocal", "VirtualNetworkGateway", "None"], v.next_hop_type)
+    ])
+    error_message = "next_hop_type must be \"Internet\", \"VirtualAppliance\", \"VnetLocal\", \"VirtualNetworkGateway\", or \"None\"."
+  }
+
+  validation {
+    condition = alltrue([
+      for k, v in var.routes :
       v.next_hop_type != "VirtualAppliance" || v.next_hop_in_ip_address != null
     ])
     error_message = "next_hop_in_ip_address must be set when next_hop_type is VirtualAppliance."

@@ -75,6 +75,11 @@ variable "ingress" {
   })
   default     = null
   description = "Ingress configuration. Only used when enable_ingress = true."
+
+  validation {
+    condition     = var.ingress == null || contains(["auto", "http", "http2", "tcp"], var.ingress.transport)
+    error_message = "ingress.transport must be \"auto\", \"http\", \"http2\", or \"tcp\"."
+  }
 }
 
 variable "secrets" {

@@ -103,6 +103,22 @@ variable "backend_http_settings" {
   }))
   default     = {}
   description = "Map of backend HTTP settings. Key is used as the setting name."
+
+  validation {
+    condition = alltrue([
+      for k, v in var.backend_http_settings :
+      contains(["Http", "Https"], v.protocol)
+    ])
+    error_message = "backend_http_settings protocol must be \"Http\" or \"Https\"."
+  }
+
+  validation {
+    condition = alltrue([
+      for k, v in var.backend_http_settings :
+      contains(["Enabled", "Disabled"], v.cookie_based_affinity)
+    ])
+    error_message = "backend_http_settings cookie_based_affinity must be \"Enabled\" or \"Disabled\"."
+  }
 }
 
 variable "http_listeners" {
@@ -115,6 +131,14 @@ variable "http_listeners" {
   }))
   default     = {}
   description = "Map of HTTP listeners. Key is used as the listener name."
+
+  validation {
+    condition = alltrue([
+      for k, v in var.http_listeners :
+      contains(["Http", "Https"], v.protocol)
+    ])
+    error_message = "http_listeners protocol must be \"Http\" or \"Https\"."
+  }
 }
 
 variable "request_routing_rules" {
@@ -129,6 +153,14 @@ variable "request_routing_rules" {
   }))
   default     = {}
   description = "Map of request routing rules. Key is used as the rule name."
+
+  validation {
+    condition = alltrue([
+      for k, v in var.request_routing_rules :
+      contains(["Basic", "PathBasedRouting"], v.rule_type)
+    ])
+    error_message = "request_routing_rules rule_type must be \"Basic\" or \"PathBasedRouting\"."
+  }
 }
 
 variable "probes" {
@@ -145,6 +177,14 @@ variable "probes" {
   }))
   default     = {}
   description = "Map of health probes. Key is used as the probe name."
+
+  validation {
+    condition = alltrue([
+      for k, v in var.probes :
+      contains(["Http", "Https"], v.protocol)
+    ])
+    error_message = "probes protocol must be \"Http\" or \"Https\"."
+  }
 }
 
 variable "ssl_certificates" {
@@ -168,6 +208,14 @@ variable "redirect_configurations" {
   }))
   default     = {}
   description = "Map of redirect configurations. Key is used as the configuration name."
+
+  validation {
+    condition = alltrue([
+      for k, v in var.redirect_configurations :
+      contains(["Permanent", "Found", "SeeOther", "Temporary"], v.redirect_type)
+    ])
+    error_message = "redirect_type must be \"Permanent\", \"Found\", \"SeeOther\", or \"Temporary\"."
+  }
 }
 
 variable "url_path_maps" {

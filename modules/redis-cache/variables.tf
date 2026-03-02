@@ -69,6 +69,14 @@ variable "redis_configuration" {
   default     = {}
   sensitive   = true
   description = "Redis configuration block. Premium-only fields (AOF, RDB) are ignored for lower SKUs. Marked sensitive due to rdb_storage_connection_string."
+
+  validation {
+    condition = var.redis_configuration.maxmemory_policy == null || contains(
+      ["volatile-lru", "allkeys-lru", "volatile-lfu", "allkeys-lfu", "volatile-random", "allkeys-random", "volatile-ttl", "noeviction"],
+      var.redis_configuration.maxmemory_policy
+    )
+    error_message = "maxmemory_policy must be one of: volatile-lru, allkeys-lru, volatile-lfu, allkeys-lfu, volatile-random, allkeys-random, volatile-ttl, noeviction."
+  }
 }
 
 variable "patch_schedule" {
@@ -78,6 +86,14 @@ variable "patch_schedule" {
   })
   default     = null
   description = "Patch schedule for Redis updates. Premium SKU only."
+
+  validation {
+    condition = var.patch_schedule == null || contains(
+      ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday", "Everyday", "Weekend"],
+      var.patch_schedule.day_of_week
+    )
+    error_message = "patch_schedule.day_of_week must be a day name (Monday-Sunday), \"Everyday\", or \"Weekend\"."
+  }
 }
 
 variable "firewall_rules" {

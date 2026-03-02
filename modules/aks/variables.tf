@@ -189,6 +189,14 @@ variable "maintenance_window" {
     ]
   }
   description = "General maintenance window. Defaults to Saturday+Sunday 00:00-06:00 UTC. Set to null to let Azure schedule at its discretion."
+
+  validation {
+    condition = var.maintenance_window == null || alltrue([
+      for a in var.maintenance_window.allowed :
+      contains(["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"], a.day)
+    ])
+    error_message = "maintenance_window.allowed.day must be a day name (Monday-Sunday)."
+  }
 }
 
 variable "maintenance_window_auto_upgrade" {
@@ -225,6 +233,19 @@ variable "maintenance_window_auto_upgrade" {
     condition     = var.maintenance_window_auto_upgrade == null || (var.maintenance_window_auto_upgrade.duration >= 4 && var.maintenance_window_auto_upgrade.duration <= 24)
     error_message = "duration must be between 4 and 24 hours."
   }
+
+  validation {
+    condition = var.maintenance_window_auto_upgrade == null || var.maintenance_window_auto_upgrade.day_of_week == null || contains(
+      ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+      var.maintenance_window_auto_upgrade.day_of_week
+    )
+    error_message = "day_of_week must be a day name (Monday-Sunday)."
+  }
+
+  validation {
+    condition     = var.maintenance_window_auto_upgrade == null || var.maintenance_window_auto_upgrade.start_time == null || can(regex("^[0-2][0-9]:[0-5][0-9]$", var.maintenance_window_auto_upgrade.start_time))
+    error_message = "start_time must be in HH:MM format (e.g. \"02:00\")."
+  }
 }
 
 variable "maintenance_window_node_os" {
@@ -260,6 +281,19 @@ variable "maintenance_window_node_os" {
   validation {
     condition     = var.maintenance_window_node_os == null || (var.maintenance_window_node_os.duration >= 4 && var.maintenance_window_node_os.duration <= 24)
     error_message = "duration must be between 4 and 24 hours."
+  }
+
+  validation {
+    condition = var.maintenance_window_node_os == null || var.maintenance_window_node_os.day_of_week == null || contains(
+      ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+      var.maintenance_window_node_os.day_of_week
+    )
+    error_message = "day_of_week must be a day name (Monday-Sunday)."
+  }
+
+  validation {
+    condition     = var.maintenance_window_node_os == null || var.maintenance_window_node_os.start_time == null || can(regex("^[0-2][0-9]:[0-5][0-9]$", var.maintenance_window_node_os.start_time))
+    error_message = "start_time must be in HH:MM format (e.g. \"02:00\")."
   }
 }
 
