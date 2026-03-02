@@ -141,7 +141,7 @@ No modules.
 - **Azure AD-only authentication:** Default is `enable_aad_only_auth = true`, which disables SQL authentication entirely. This is the Microsoft-recommended security posture. When enabled, `administrator_login` and `administrator_login_password` are not required. When disabled, SQL auth is available alongside Azure AD auth, and the SQL admin credentials must be provided.
 - **SQL admin password from Key Vault:** When SQL auth is enabled, the consumer retrieves the admin password from Key Vault using a `data.azurerm_key_vault_secret` block and passes it to this module. The module does not interact with Key Vault directly.
 - **Naming constraint:** SQL server names must be globally unique, 1-63 characters, lowercase alphanumeric and hyphens. CAF prefix: `sql`. Example: `sql-payments-dev-weu-001`.
-- **Minimum TLS version:** Valid values are `"1.0"`, `"1.1"`, and `"1.2"`. Default is `"1.2"`.
+- **Minimum TLS version:** Only `"1.2"` is accepted. TLS 1.0 and 1.1 were retired by Azure on 2025-08-31.
 - **`version = "12.0"`:** This is the only version currently supported by Azure. The variable exists for forward compatibility.
 - **Connection policy:** `Default` uses Redirect within Azure and Proxy from outside Azure. `Redirect` has better performance for Azure-to-Azure connections. `Proxy` forces all connections through the Azure SQL gateway. For private endpoint access, `Default` is fine.
 - **System-assigned identity:** Always enabled on the server to support features like TDE with CMK and Azure AD integration.
