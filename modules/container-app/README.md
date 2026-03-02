@@ -136,3 +136,4 @@ No modules.
 - **Scale to zero:** Default `min_replicas = 0` allows scale to zero on Consumption plans. Set `min_replicas = 1` to keep at least one instance running (useful for reducing cold starts).
 - **Naming:** CAF prefix for Container Apps is `ca`. Example: `ca-payments-api-dev-weu-001`.
 - **Revision mode:** `Single` is simpler -- only one revision is active. `Multiple` enables traffic splitting and blue/green deployments but requires more management. Default to `Single`.
+- **Ingress transport:** Valid values are `auto`, `http`, `http2`, `tcp`. Default is `auto`.

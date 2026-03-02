@@ -113,4 +113,5 @@ No modules.
 - **Separate rule resources:** Rules are created as `azurerm_network_security_rule` resources rather than inline blocks to prevent lifecycle issues when adding or removing rules.
 - **Subnet association:** This module does not associate the NSG with subnets. Use the virtual-network module's `subnet_nsg_associations` parameter or create `azurerm_subnet_network_security_group_association` resources separately.
 - **Port range fields:** Each rule must specify exactly one of `source_port_range` or `source_port_ranges`, and exactly one of `destination_port_range` or `destination_port_ranges`. Neither has a default — both must be explicitly set.
-- **Rule priorities:** Must be unique per direction. Use increments of 10 or 100 to allow future insertions.
+- **Rule priorities:** Must be between 100 and 4096, unique per direction. Use increments of 10 or 100 to allow future insertions.
+- **Validated fields:** `direction` (`Inbound`/`Outbound`), `access` (`Allow`/`Deny`), `protocol` (`Tcp`/`Udp`/`Icmp`/`*`) — all case-sensitive Azure API values.

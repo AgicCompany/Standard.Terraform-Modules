@@ -172,6 +172,7 @@ No modules.
 - **v2 SKUs only:** This module supports only `Standard_v2` and `WAF_v2` SKUs. Legacy v1 SKUs are not supported.
 - **WAF policy is external:** The module does not create WAF policies. Consumers provide a `firewall_policy_id` if WAF is needed.
 - **Internal cross-references use map keys:** Routing rules reference listeners, backend pools, and HTTP settings by their map key names, not resource IDs.
+- **Validated fields:** `protocol` (`Http`/`Https`) on backend HTTP settings, listeners, and probes. `cookie_based_affinity` (`Enabled`/`Disabled`). `rule_type` (`Basic`/`PathBasedRouting`). `redirect_type` (`Permanent`/`Found`/`SeeOther`/`Temporary`). All case-sensitive.
 - **Provisioning time:** Application Gateway creation takes 5-10 minutes. Plan accordingly.
 - **No private endpoint:** Application Gateway uses a dedicated subnet and does not support private endpoints. It provides L7 load balancing to backend services.
 - **Naming:** CAF prefix for Application Gateway is `agw`. Example: `agw-payments-dev-weu-001`.

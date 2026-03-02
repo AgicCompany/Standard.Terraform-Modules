@@ -182,3 +182,4 @@ No modules.
 - **Subnet per node pool:** With flat Azure CNI, each node pool can use its own subnet. With CNI Overlay, all node pools share the same subnet. This is why `vnet_subnet_id` is inside `default_node_pool` rather than at the top level.
 - **ACR integration:** The `kubelet_identity.object_id` output provides the principal ID needed for `AcrPull` role assignment. See "Container Registry Integration" section above.
 - **Kubenet:** Not supported. Use Azure CNI or Azure CNI Overlay.
+- **Maintenance window validations:** `day_of_week` must be a day name (Monday-Sunday). `start_time` must be in `HH:MM` format (e.g. `"02:00"`). `frequency` must be `Daily`, `Weekly`, `AbsoluteMonthly`, or `RelativeMonthly`. `duration` must be 4-24 hours.

@@ -142,4 +142,5 @@ No modules.
 - **Access keys not exposed:** For security, primary and secondary access keys are not output. Use managed identity or retrieve keys via Azure CLI/Portal when needed.
 - **Family mapping:** Use `C` family for Basic/Standard SKUs and `P` family for Premium. Mismatched family/SKU combinations will fail.
 - **Non-SSL port:** Port 6379 is disabled by default. Only enable for legacy clients that don't support TLS. Use port 6380 (SSL) for all new workloads.
+- **Validated fields:** `maxmemory_policy` accepts: `volatile-lru`, `allkeys-lru`, `volatile-lfu`, `allkeys-lfu`, `volatile-random`, `allkeys-random`, `volatile-ttl`, `noeviction`. `patch_schedule.day_of_week` accepts day names (Monday-Sunday), `Everyday`, or `Weekend`.
 - **AzureRM 4.x:** Uses `non_ssl_port_enabled` (not `enable_non_ssl_port`). The variable name uses `enable_` for framework consistency.

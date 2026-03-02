@@ -103,4 +103,5 @@ No modules.
 
 - **Subnet association:** This module does not associate the route table with subnets. Use `azurerm_subnet_route_table_association` resources separately or configure `route_table_id` on subnets in the virtual-network module.
 - **Separate route resources:** Routes are created as `azurerm_route` resources rather than inline blocks to prevent lifecycle issues when adding or removing routes.
+- **Valid `next_hop_type` values:** `Internet`, `VirtualAppliance`, `VnetLocal`, `VirtualNetworkGateway`, `None`. Case-sensitive.
 - **Virtual Appliance routes:** When `next_hop_type = "VirtualAppliance"`, `next_hop_in_ip_address` is required (typically a firewall's private IP).
