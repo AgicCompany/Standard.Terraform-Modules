@@ -68,6 +68,11 @@ variable "min_tls_version" {
   type        = string
   default     = "TLS1_2"
   description = "Minimum TLS version"
+
+  validation {
+    condition     = var.min_tls_version == "TLS1_2"
+    error_message = "min_tls_version must be \"TLS1_2\". TLS 1.0 and 1.1 were retired by Azure on 2026-02-03."
+  }
 }
 
 variable "allow_nested_items_to_be_public" {

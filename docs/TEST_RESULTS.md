@@ -1,8 +1,8 @@
 # Module Test Results
 
-**Date:** 2026-02-24 (AKS v1.4.0 update)
+**Date:** 2026-03-01 (full regression after lifecycle preconditions & PE improvements)
 **Terraform:** 1.13.0
-**AzureRM Provider:** 4.59.0
+**AzureRM Provider:** 4.62.0
 **Subscription:** MPN (AGIC – MPN Mihai)
 **Region:** westeurope (unless noted)
 
@@ -19,9 +19,10 @@
 | Phase 5 (New modules) | 12 | 12 | 0 | 0 |
 | Phase 6 (Integration P2) | 5 stacks (19 modules) | 5 | 0 | 2 |
 | Phase 7 (PE & features) | 5 modules | 5 | 0 | 1 |
-| **Live-tested** | **36 + 9 stacks** | **All pass** | **0** | **10** |
+| Phase 8 (Full regression) | 36 modules + 9 stacks | All pass | 0 | 5 |
+| **Live-tested** | **36 + 9 stacks** | **All pass** | **0** | **15** |
 | **Validate-only** | **3** | **3** | **0** | **0** |
-| **Total** | **36 modules** | **All pass** | **0** | **10** |
+| **Total** | **36 modules** | **All pass** | **0** | **15** |
 
 ---
 
@@ -919,6 +920,69 @@ No explicit maintenance_window variables passed — all three windows came from 
 
 ---
 
+## Phase 8: Full Regression — Lifecycle Preconditions & PE Improvements
+
+Full regression test after adding lifecycle preconditions, dynamic `private_dns_zone_group` blocks, sensitive output markings, and bug fixes across 37 files in all PE-enabled modules.
+
+### Step 1: Terraform Validate (All 36 Modules)
+
+All 36 modules passed `terraform validate`. One bug found:
+
+1. **mysql-flexible-server: read-only attribute (HIGH):** `public_network_access_enabled` is a computed/read-only attribute in AzureRM 4.x. Setting it in the resource block caused a validation error.
+
+   **Fix:** Removed `public_network_access_enabled = var.enable_public_access` from `main.tf`.
+
+   **Files changed:** `modules/mysql-flexible-server/main.tf`
+
+### Step 2: Terraform Plan (All 9 Integration Stacks)
+
+All 9 stacks passed `terraform plan` after fixing 4 test configuration issues:
+
+1. **NSG source_port_range default change (MEDIUM):** The new precondition validation requires exactly one of `source_port_range`/`source_port_ranges` to be set. The networking-stack and vm-stack NSG rules didn't set `source_port_range` explicitly (the default changed from `"*"` to `null` with the new validation).
+
+   **Fix:** Added explicit `source_port_range = "*"` to all NSG rules in both stacks.
+
+2. **Redis Basic SKU + PE precondition (MEDIUM):** The messaging-stack used Redis `sku_name = "Basic"` with `enable_private_endpoint = true`. The new precondition correctly caught this — Basic SKU doesn't support PE.
+
+   **Fix:** Changed Redis to `sku_name = "Standard"`.
+
+3. **MySQL/PostgreSQL PE + delegated_subnet mutual exclusion (MEDIUM):** The oss-database-stack used `delegated_subnet_id` (VNet integration) but didn't set `enable_private_endpoint = false`. The new precondition correctly caught the mutually exclusive configuration.
+
+   **Fix:** Added `enable_private_endpoint = false` to both MySQL and PostgreSQL module calls.
+
+   **Files changed:** `tests/integration/networking-stack/main.tf`, `tests/integration/vm-stack/main.tf`, `tests/integration/messaging-stack/main.tf`, `tests/integration/oss-database-stack/main.tf`
+
+### Step 3: Terraform Apply (All 9 Integration Stacks)
+
+All 9 stacks deployed successfully with 132 total resources:
+
+| Stack | Resources | Region | Result |
+|-------|-----------|--------|--------|
+| networking-stack | 21 | westeurope | **PASS** |
+| vm-stack | 14 | westeurope | **PASS** |
+| database-stack | 8 | northeurope | **PASS** |
+| web-app-stack | 11 | westeurope | **PASS** |
+| container-stack | 11 | westeurope | **PASS** |
+| messaging-stack | 23 | westeurope | **PASS** |
+| oss-database-stack | 14 | swedencentral | **PASS** |
+| serverless-stack | 21 | westeurope | **PASS** (retry) |
+| aks-stack | 9 | westeurope | **PASS** |
+
+**Notes:**
+- serverless-stack hit a transient Azure 409 capacity error on first attempt; passed on retry.
+- All stacks destroyed cleanly. serverless-stack and aks-stack RGs required `az group delete` due to orphaned resources (same known issue as previous phases).
+
+### Changes Tested
+
+| Category | Description | Modules Affected |
+|----------|-------------|-----------------|
+| Dynamic `private_dns_zone_group` | PE DNS zone group only created when `private_dns_zone_id` is set | 13 PE-enabled modules |
+| Lifecycle preconditions | Input validation for mutually exclusive fields, required fields, SKU constraints | 15+ modules |
+| Sensitive outputs | Connection strings, keys marked as sensitive | function-app, linux-web-app, redis-cache |
+| Bug fixes | app-service-plan `os_type`, bastion `scale_units`, VM identity outputs, NSG port range defaults | 6 modules |
+
+---
+
 ## Subscription Limitations
 
 | Limitation | Impact | Workaround |
@@ -936,6 +1000,8 @@ No explicit maintenance_window variables passed — all three windows came from 
 | CosmosDB westeurope capacity | Account creation fails with `ServiceUnavailable` | Use northeurope `geo_locations` override |
 | Service Bus PE requires Premium | Standard SKU returns `PrivateEndpointInvalidSku` | Use `sku = "Premium"` with `capacity = 1` |
 | MySQL/PostgreSQL DNS race condition | Flexible server fails with `VnetNotLinkedToPrivateDnsZone` | Add `depends_on` for DNS zone module |
+| MySQL `public_network_access_enabled` read-only in AzureRM 4.x | Setting it in resource block causes validation error | Remove from resource; it's computed-only |
+| Redis Basic SKU + PE | Basic SKU does not support private endpoints | Use Standard or Premium SKU with PE |
 
 ---
 
@@ -958,6 +1024,10 @@ No explicit maintenance_window variables passed — all three windows came from 
 | `54c98e3` | Add AKS v1.3.0: flexible identity |
 | `65cd3cf`..`a12eeeb` | Fix basic examples and regenerate READMEs for updated modules |
 | `76b915a` | Add AKS v1.4.0: default maintenance windows + node OS upgrade support |
+| `825524b` | Add lifecycle preconditions, optional DNS zone groups, and bug fixes across modules |
+| `b8c51c5` | Update READMEs to reflect recent bug fixes and variable changes |
+| `d311116` | Fix mysql-flexible-server: remove read-only public_network_access_enabled |
+| `b38e99a` | Fix integration test stacks for new validations and preconditions |
 
 ---
 

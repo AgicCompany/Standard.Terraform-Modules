@@ -77,8 +77,8 @@ variable "minimal_tls_version" {
   description = "Minimum TLS version"
 
   validation {
-    condition     = contains(["Tls", "Tls11", "Tls12"], var.minimal_tls_version)
-    error_message = "minimal_tls_version must be one of: Tls, Tls11, Tls12."
+    condition     = var.minimal_tls_version == "Tls12"
+    error_message = "minimal_tls_version must be \"Tls12\". TLS 1.0 and 1.1 were retired by Azure on 2025-08-31."
   }
 }
 
