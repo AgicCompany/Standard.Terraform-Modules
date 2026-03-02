@@ -1,6 +1,6 @@
 # Module Test Results
 
-**Date:** 2026-03-01 (full regression after lifecycle preconditions & PE improvements)
+**Date:** 2026-03-02 (TLS 1.2 enforcement + enum validations)
 **Terraform:** 1.13.0
 **AzureRM Provider:** 4.62.0
 **Subscription:** MPN (AGIC – MPN Mihai)
@@ -983,6 +983,38 @@ All 9 stacks deployed successfully with 132 total resources:
 
 ---
 
+## Post-Regression Hardening
+
+### TLS 1.2 Enforcement
+
+TLS 1.0 and 1.1 have been retired across all Azure services. Validation rules tightened to reject deprecated versions:
+
+| Module | Variable | Old Validation | New Validation | Azure Retirement Date |
+|--------|----------|---------------|----------------|----------------------|
+| event-hub | `minimum_tls_version` | `"1.0"`, `"1.1"`, `"1.2"` | `"1.2"` only | 2024-10-31 |
+| redis-cache | `minimum_tls_version` | `"1.0"`, `"1.1"`, `"1.2"` | `"1.2"` only | 2025-04-01 |
+| mssql-server | `minimum_tls_version` | `"1.0"`, `"1.1"`, `"1.2"` | `"1.2"` only | 2025-08-31 |
+| cosmosdb | `minimal_tls_version` | `"Tls"`, `"Tls11"`, `"Tls12"` | `"Tls12"` only | 2025-08-31 |
+| service-bus | `minimum_tls_version` | `"1.0"`, `"1.1"`, `"1.2"` | `"1.2"` only | 2025-10-20 |
+| storage-account | `min_tls_version` | no validation | `"TLS1_2"` only | 2026-02-03 |
+
+### Enum and Format Validations
+
+Added plan-time validations for enum-like string fields that previously only failed at apply time with cryptic Azure API errors:
+
+| Module | Fields Validated |
+|--------|-----------------|
+| network-security-group | `direction` (Inbound/Outbound), `access` (Allow/Deny), `protocol` (Tcp/Udp/Icmp/\*), `priority` (100-4096) |
+| application-gateway | `protocol` (Http/Https), `cookie_based_affinity` (Enabled/Disabled), `rule_type` (Basic/PathBasedRouting), `redirect_type` (Permanent/Found/SeeOther/Temporary) |
+| route-table | `next_hop_type` (Internet/VirtualAppliance/VnetLocal/VirtualNetworkGateway/None) |
+| container-app | `ingress.transport` (auto/http/http2/tcp) |
+| redis-cache | `maxmemory_policy` (8 eviction policies), `patch_schedule.day_of_week` (day names/Everyday/Weekend) |
+| aks | `maintenance_window.day` (Monday-Sunday), `day_of_week` + `start_time` (HH:MM regex) on auto_upgrade and node_os windows |
+
+All 36 modules pass `terraform validate` after these changes.
+
+---
+
 ## Subscription Limitations
 
 | Limitation | Impact | Workaround |
@@ -1028,6 +1060,10 @@ All 9 stacks deployed successfully with 132 total resources:
 | `b8c51c5` | Update READMEs to reflect recent bug fixes and variable changes |
 | `d311116` | Fix mysql-flexible-server: remove read-only public_network_access_enabled |
 | `b38e99a` | Fix integration test stacks for new validations and preconditions |
+| `a2dfc90` | Enforce TLS 1.2 minimum across all modules |
+| `1be1424` | Update mssql-server README: TLS 1.0/1.1 no longer accepted |
+| `4ccb74b` | Add enum and format validations to 6 modules |
+| `6e56bea` | Update READMEs with new validation rules documentation |
 
 ---
 
