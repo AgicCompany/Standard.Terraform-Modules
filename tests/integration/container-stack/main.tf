@@ -134,10 +134,8 @@ module "container_app" {
     target_port = 80
     transport   = "auto"
     traffic_weight = {
-      latest = {
-        latest_revision = true
-        percentage      = 100
-      }
+      latest_revision = true
+      percentage      = 100
     }
   }
 

@@ -18,11 +18,11 @@ resource "azurerm_redis_cache" "this" {
     maxmemory_reserved              = var.redis_configuration.maxmemory_reserved
     maxfragmentationmemory_reserved = var.redis_configuration.maxfragmentationmemory_reserved
     notify_keyspace_events          = var.redis_configuration.notify_keyspace_events
-    aof_backup_enabled              = var.redis_configuration.aof_backup_enabled
-    rdb_backup_enabled              = var.redis_configuration.rdb_backup_enabled
-    rdb_backup_frequency            = var.redis_configuration.rdb_backup_frequency
-    rdb_backup_max_snapshot_count   = var.redis_configuration.rdb_backup_max_snapshot_count
-    rdb_storage_connection_string   = var.redis_configuration.rdb_storage_connection_string
+    aof_backup_enabled              = var.sku_name == "Premium" ? var.redis_configuration.aof_backup_enabled : null
+    rdb_backup_enabled              = var.sku_name == "Premium" ? var.redis_configuration.rdb_backup_enabled : null
+    rdb_backup_frequency            = var.sku_name == "Premium" ? var.redis_configuration.rdb_backup_frequency : null
+    rdb_backup_max_snapshot_count   = var.sku_name == "Premium" ? var.redis_configuration.rdb_backup_max_snapshot_count : null
+    rdb_storage_connection_string   = var.sku_name == "Premium" ? var.redis_configuration.rdb_storage_connection_string : null
   }
 
   dynamic "patch_schedule" {

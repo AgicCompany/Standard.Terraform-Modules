@@ -99,13 +99,14 @@ module "application_gateway" {
     }
   }
 
-  # Two listeners: HTTP and HTTPS (using Http protocol for validation simplicity)
+  # Two listeners: HTTP on port 80, host-filtered on port 443
+  # NOTE: For HTTPS, add ssl_certificates and set ssl_certificate_name on the listener
   http_listeners = {
     http-listener = {
       frontend_port_name = "http"
       protocol           = "Http"
     }
-    https-api-listener = {
+    api-listener = {
       frontend_port_name = "https"
       protocol           = "Http"
       host_name          = "api.example.com"
@@ -122,7 +123,7 @@ module "application_gateway" {
     }
     api-rule = {
       priority                   = 200
-      http_listener_name         = "https-api-listener"
+      http_listener_name         = "api-listener"
       backend_address_pool_name  = "api-servers"
       backend_http_settings_name = "api-https"
     }

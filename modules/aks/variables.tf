@@ -243,8 +243,8 @@ variable "maintenance_window_auto_upgrade" {
   }
 
   validation {
-    condition     = var.maintenance_window_auto_upgrade == null || var.maintenance_window_auto_upgrade.start_time == null || can(regex("^[0-2][0-9]:[0-5][0-9]$", var.maintenance_window_auto_upgrade.start_time))
-    error_message = "start_time must be in HH:MM format (e.g. \"02:00\")."
+    condition     = var.maintenance_window_auto_upgrade == null || var.maintenance_window_auto_upgrade.start_time == null || can(regex("^([01][0-9]|2[0-3]):[0-5][0-9]$", var.maintenance_window_auto_upgrade.start_time))
+    error_message = "start_time must be in HH:MM format (00:00-23:59, e.g. \"02:00\")."
   }
 }
 
@@ -292,8 +292,8 @@ variable "maintenance_window_node_os" {
   }
 
   validation {
-    condition     = var.maintenance_window_node_os == null || var.maintenance_window_node_os.start_time == null || can(regex("^[0-2][0-9]:[0-5][0-9]$", var.maintenance_window_node_os.start_time))
-    error_message = "start_time must be in HH:MM format (e.g. \"02:00\")."
+    condition     = var.maintenance_window_node_os == null || var.maintenance_window_node_os.start_time == null || can(regex("^([01][0-9]|2[0-3]):[0-5][0-9]$", var.maintenance_window_node_os.start_time))
+    error_message = "start_time must be in HH:MM format (00:00-23:59, e.g. \"02:00\")."
   }
 }
 
