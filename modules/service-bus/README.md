@@ -8,7 +8,7 @@ Creates an Azure Service Bus namespace with queues, topics, subscriptions, and o
 
 ```hcl
 module "service_bus" {
-  source = "git::https://dev.azure.com/org/project/_git/terraform-modules//service-bus?ref=service-bus/v1.0.0"
+  source = "git::https://dev.azure.com/org/project/_git/terraform-modules//service-bus?ref=service-bus/v1.1.0"
 
   resource_group_name = "rg-messaging-dev-weu-001"
   location            = "westeurope"

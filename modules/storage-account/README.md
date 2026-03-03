@@ -8,7 +8,7 @@ Creates an Azure Storage Account with secure defaults and optional private endpo
 
 ```hcl
 module "storage_account" {
-  source = "git::https://dev.azure.com/org/project/_git/terraform-modules//storage-account?ref=storage-account/v1.0.0"
+  source = "git::https://dev.azure.com/org/project/_git/terraform-modules//storage-account?ref=storage-account/v1.1.0"
 
   resource_group_name = "rg-payments-dev-weu-001"
   location            = "westeurope"

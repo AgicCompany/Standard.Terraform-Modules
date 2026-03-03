@@ -8,7 +8,7 @@ Creates an Azure SQL logical server with secure defaults, Azure AD authenticatio
 
 ```hcl
 module "sql_server" {
-  source = "git::https://dev.azure.com/org/project/_git/terraform-modules//mssql-server?ref=mssql-server/v1.0.0"
+  source = "git::https://dev.azure.com/org/project/_git/terraform-modules//mssql-server?ref=mssql-server/v1.1.0"
 
   resource_group_name = "rg-sql-dev-weu-001"
   location            = "westeurope"

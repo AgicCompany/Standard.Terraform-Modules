@@ -8,7 +8,7 @@ Creates an Azure Route Table with configurable routes managed as separate resour
 
 ```hcl
 module "route_table" {
-  source = "git::https://dev.azure.com/org/project/_git/terraform-modules//route-table?ref=route-table/v1.0.0"
+  source = "git::https://dev.azure.com/org/project/_git/terraform-modules//route-table?ref=route-table/v1.1.0"
 
   resource_group_name = "rg-example-dev-weu-001"
   location            = "westeurope"

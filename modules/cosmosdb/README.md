@@ -8,7 +8,7 @@ Creates an Azure Cosmos DB account with SQL API databases and optional private e
 
 ```hcl
 module "cosmosdb" {
-  source = "git::https://dev.azure.com/org/project/_git/terraform-modules//cosmosdb?ref=cosmosdb/v1.0.0"
+  source = "git::https://dev.azure.com/org/project/_git/terraform-modules//cosmosdb?ref=cosmosdb/v1.1.0"
 
   resource_group_name = azurerm_resource_group.this.name
   location            = azurerm_resource_group.this.location
