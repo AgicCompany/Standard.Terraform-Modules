@@ -8,7 +8,7 @@ Creates an Azure Private DNS Zone with virtual network linking for private endpo
 
 ```hcl
 module "dns_blob" {
-  source = "git::https://dev.azure.com/org/project/_git/terraform-modules//private-dns-zone?ref=private-dns-zone/v1.0.0"
+  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//private-dns-zone?ref=private-dns-zone/v1.0.0"
 
   resource_group_name = "rg-dns-dev-weu-001"
   name                = "privatelink.blob.core.windows.net"

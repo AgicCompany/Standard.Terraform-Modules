@@ -8,7 +8,7 @@ Creates an Azure Container Apps Environment with secure defaults and VNet integr
 
 ```hcl
 module "cae" {
-  source = "git::https://dev.azure.com/org/project/_git/terraform-modules//container-app-environment?ref=container-app-environment/v1.0.0"
+  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//container-app-environment?ref=container-app-environment/v1.0.0"
 
   resource_group_name = "rg-cae-dev-weu-001"
   location            = "westeurope"

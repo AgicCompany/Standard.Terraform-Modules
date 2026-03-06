@@ -8,7 +8,7 @@ Creates an Azure Linux Web App with secure defaults, application stack configura
 
 ```hcl
 module "web_app" {
-  source = "git::https://dev.azure.com/org/project/_git/terraform-modules//linux-web-app?ref=linux-web-app/v1.0.0"
+  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//linux-web-app?ref=linux-web-app/v1.0.0"
 
   resource_group_name = "rg-app-dev-weu-001"
   location            = "westeurope"

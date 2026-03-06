@@ -8,7 +8,7 @@ Creates an Azure Linux Function App with secure defaults, application stack conf
 
 ```hcl
 module "function_app" {
-  source = "git::https://dev.azure.com/org/project/_git/terraform-modules//function-app?ref=function-app/v1.0.0"
+  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//function-app?ref=function-app/v1.0.0"
 
   resource_group_name = "rg-func-dev-weu-001"
   location            = "westeurope"

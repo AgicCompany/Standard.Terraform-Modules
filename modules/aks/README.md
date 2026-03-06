@@ -8,7 +8,7 @@ Creates an Azure Kubernetes Service (AKS) cluster with private-by-default config
 
 ```hcl
 module "aks" {
-  source = "git::https://dev.azure.com/org/project/_git/terraform-modules//aks?ref=aks/v1.5.0"
+  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//aks?ref=aks/v1.5.0"
 
   resource_group_name = "rg-aks-dev-weu-001"
   location            = "westeurope"

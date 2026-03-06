@@ -8,7 +8,7 @@ Creates an Azure Log Analytics workspace with secure defaults for centralized lo
 
 ```hcl
 module "log_analytics" {
-  source = "git::https://dev.azure.com/org/project/_git/terraform-modules//log-analytics-workspace?ref=log-analytics-workspace/v1.0.0"
+  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//log-analytics-workspace?ref=log-analytics-workspace/v1.0.0"
 
   resource_group_name = "rg-monitoring-dev-weu-001"
   location            = "westeurope"

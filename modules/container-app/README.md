@@ -8,7 +8,7 @@ Creates an Azure Container App in an existing Container Apps Environment.
 
 ```hcl
 module "container_app" {
-  source = "git::https://dev.azure.com/org/project/_git/terraform-modules//container-app?ref=container-app/v1.1.0"
+  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//container-app?ref=container-app/v1.1.0"
 
   resource_group_name          = "rg-ca-dev-weu-001"
   name                         = "ca-payments-api-dev-weu-001"

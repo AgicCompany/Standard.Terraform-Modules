@@ -8,7 +8,7 @@ Creates an Azure Bastion host with automatic public IP provisioning, providing s
 
 ```hcl
 module "bastion" {
-  source = "git::https://dev.azure.com/org/project/_git/terraform-modules//bastion?ref=bastion/v1.0.0"
+  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//bastion?ref=bastion/v1.0.0"
 
   resource_group_name = "rg-connectivity-dev-weu-001"
   location            = "westeurope"

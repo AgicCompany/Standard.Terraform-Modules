@@ -172,7 +172,7 @@ infrastructures/iac/
 ```hcl
 # Remote (standard)
 module "storage" {
-  source = "git::https://dev.azure.com/org/project/_git/terraform-modules//storage-account?ref=storage-account/v1.2.0"
+  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//storage-account?ref=storage-account/v1.2.0"
 }
 
 # Local (when remote not possible)
@@ -501,11 +501,11 @@ Strict adherence to semantic versioning:
 
 ```hcl
 module "storage" {
-  source = "git::https://dev.azure.com/org/project/_git/terraform-modules//storage-account?ref=storage-account/v1.0.0"
+  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//storage-account?ref=storage-account/v1.0.0"
 }
 
 module "network" {
-  source = "git::https://dev.azure.com/org/project/_git/terraform-modules//virtual-network?ref=virtual-network/v2.3.1"
+  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//virtual-network?ref=virtual-network/v2.3.1"
 }
 ```
 
@@ -596,7 +596,7 @@ Brief description of what this module creates.
 
 \```hcl
 module "example" {
-  source = "git::https://dev.azure.com/org/project/_git/terraform-modules//<module>?ref=<module>/v1.0.0"
+  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//<module>?ref=<module>/v1.0.0"
 
   resource_group_name = "rg-example-dev-weu-001"
   location            = "westeurope"

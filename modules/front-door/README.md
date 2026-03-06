@@ -8,7 +8,7 @@ Creates an Azure Front Door profile with endpoints, origin groups, origins, and 
 
 ```hcl
 module "front_door" {
-  source = "git::https://dev.azure.com/org/project/_git/terraform-modules//front-door?ref=front-door/v1.0.0"
+  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//front-door?ref=front-door/v1.0.0"
 
   resource_group_name = "rg-cdn-dev-weu-001"
   name                = "afd-web-dev-001"

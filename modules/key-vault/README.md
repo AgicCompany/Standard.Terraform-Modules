@@ -8,7 +8,7 @@ Creates an Azure Key Vault with RBAC authorization and optional private endpoint
 
 ```hcl
 module "key_vault" {
-  source = "git::https://dev.azure.com/org/project/_git/terraform-modules//key-vault?ref=key-vault/v1.0.0"
+  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//key-vault?ref=key-vault/v1.0.0"
 
   resource_group_name = "rg-payments-dev-weu-001"
   location            = "westeurope"

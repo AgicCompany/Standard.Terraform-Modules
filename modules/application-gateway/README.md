@@ -8,7 +8,7 @@ Creates an Azure Application Gateway (v2) with a Standard SKU public IP for L7 l
 
 ```hcl
 module "application_gateway" {
-  source = "git::https://dev.azure.com/org/project/_git/terraform-modules//application-gateway?ref=application-gateway/v1.1.0"
+  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//application-gateway?ref=application-gateway/v1.1.0"
 
   resource_group_name = "rg-appgw-dev-weu-001"
   location            = "westeurope"

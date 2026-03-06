@@ -8,7 +8,7 @@ Creates an Azure User-Assigned Managed Identity for workload authentication.
 
 ```hcl
 module "identity" {
-  source = "git::https://dev.azure.com/org/project/_git/terraform-modules//user-assigned-identity?ref=user-assigned-identity/v1.0.0"
+  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//user-assigned-identity?ref=user-assigned-identity/v1.0.0"
 
   resource_group_name = "rg-payments-dev-weu-001"
   location            = "westeurope"

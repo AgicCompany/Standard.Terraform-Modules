@@ -8,7 +8,7 @@ Creates an Azure Windows Virtual Machine with network interface, optional public
 
 ```hcl
 module "virtual_machine" {
-  source = "git::https://dev.azure.com/org/project/_git/terraform-modules//windows-virtual-machine?ref=windows-virtual-machine/v1.0.0"
+  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//windows-virtual-machine?ref=windows-virtual-machine/v1.0.0"
 
   resource_group_name = "rg-compute-dev-weu-001"
   location            = "westeurope"

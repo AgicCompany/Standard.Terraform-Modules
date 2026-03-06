@@ -191,7 +191,7 @@ One-line description of what this module creates.
 
 \```hcl
 module "example" {
-  source = "git::https://dev.azure.com/org/project/_git/terraform-modules//<module>?ref=<module>/v1.0.0"
+  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//<module>?ref=<module>/v1.0.0"
 
   resource_group_name = "rg-example-dev-weu-001"
   location            = "westeurope"
@@ -557,7 +557,7 @@ For multi-region scenarios where a module needs a specific provider alias, docum
 
 ```hcl
 module "storage_secondary" {
-  source    = "git::https://dev.azure.com/org/project/_git/terraform-modules//storage-account?ref=storage-account/v1.0.0"
+  source    = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//storage-account?ref=storage-account/v1.0.0"
   providers = {
     azurerm = azurerm.secondary
   }
