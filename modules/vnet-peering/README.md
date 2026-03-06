@@ -8,7 +8,7 @@ Creates bidirectional Azure Virtual Network peering between two VNets. Both peer
 
 ```hcl
 module "vnet_peering" {
-  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//vnet-peering?ref=vnet-peering/v1.0.0"
+  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/vnet-peering?ref=vnet-peering/v1.0.0"
 
   name = "hub-to-spoke"
 

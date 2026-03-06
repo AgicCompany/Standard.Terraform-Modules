@@ -8,7 +8,7 @@ Creates an Azure Network Security Group with configurable security rules managed
 
 ```hcl
 module "nsg" {
-  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//network-security-group?ref=network-security-group/v1.1.0"
+  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/network-security-group?ref=network-security-group/v1.1.0"
 
   resource_group_name = "rg-payments-dev-weu-001"
   location            = "westeurope"

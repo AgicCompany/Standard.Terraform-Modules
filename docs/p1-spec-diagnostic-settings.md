@@ -59,7 +59,7 @@ This module does not follow the standard interface (`resource_group_name`, `loca
 
 ```hcl
 module "appgw_diagnostics" {
-  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//diagnostic-settings?ref=diagnostic-settings/v1.0.0"
+  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/diagnostic-settings?ref=diagnostic-settings/v1.0.0"
 
   name                       = "diag-appgw-payments-dev-weu-001"
   target_resource_id         = module.application_gateway.id
@@ -80,7 +80,7 @@ locals {
 
 module "diagnostics" {
   for_each = local.monitored_resources
-  source   = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//diagnostic-settings?ref=diagnostic-settings/v1.0.0"
+  source   = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/diagnostic-settings?ref=diagnostic-settings/v1.0.0"
 
   name                       = "diag-${each.key}-${var.project}-${var.environment}-${var.region_short}-001"
   target_resource_id         = each.value
@@ -92,7 +92,7 @@ module "diagnostics" {
 
 ```hcl
 module "kv_diagnostics" {
-  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//diagnostic-settings?ref=diagnostic-settings/v1.0.0"
+  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/diagnostic-settings?ref=diagnostic-settings/v1.0.0"
 
   name                       = "diag-kv-payments-dev-weu-001"
   target_resource_id         = module.key_vault.id

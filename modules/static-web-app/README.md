@@ -8,7 +8,7 @@ Creates an Azure Static Web App with configurable SKU, app settings, and preview
 
 ```hcl
 module "static_web_app" {
-  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//static-web-app?ref=static-web-app/v1.1.0"
+  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/static-web-app?ref=static-web-app/v1.1.0"
 
   resource_group_name = "rg-stapp-dev-weu-001"
   location            = "westeurope"

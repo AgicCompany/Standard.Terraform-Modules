@@ -8,7 +8,7 @@ Creates an Azure SQL Database on an existing SQL server with configurable SKU, b
 
 ```hcl
 module "db" {
-  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//mssql-database?ref=mssql-database/v1.0.0"
+  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/mssql-database?ref=mssql-database/v1.0.0"
 
   name      = "payments-api"
   server_id = module.sql_server.id

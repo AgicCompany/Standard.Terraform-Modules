@@ -8,7 +8,7 @@ Creates an Azure App Service Plan with configurable OS type, SKU, worker count, 
 
 ```hcl
 module "app_plan" {
-  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//app-service-plan?ref=app-service-plan/v1.0.0"
+  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/app-service-plan?ref=app-service-plan/v1.0.0"
 
   resource_group_name = "rg-app-dev-weu-001"
   location            = "westeurope"

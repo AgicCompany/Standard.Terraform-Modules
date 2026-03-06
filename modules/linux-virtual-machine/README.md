@@ -8,7 +8,7 @@ Creates an Azure Linux Virtual Machine with network interface, optional public I
 
 ```hcl
 module "virtual_machine" {
-  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//linux-virtual-machine?ref=linux-virtual-machine/v1.1.0"
+  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/linux-virtual-machine?ref=linux-virtual-machine/v1.1.0"
 
   resource_group_name  = "rg-compute-dev-weu-001"
   location             = "westeurope"

@@ -8,7 +8,7 @@ Creates an Azure API Management service with secure defaults, VNet integration, 
 
 ```hcl
 module "apim" {
-  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//api-management?ref=api-management/v1.0.0"
+  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/api-management?ref=api-management/v1.0.0"
 
   resource_group_name = "rg-apim-dev-weu-001"
   location            = "westeurope"

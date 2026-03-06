@@ -8,7 +8,7 @@ Creates an Azure Application Insights resource backed by a Log Analytics workspa
 
 ```hcl
 module "application_insights" {
-  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//application-insights?ref=application-insights/v1.0.0"
+  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/application-insights?ref=application-insights/v1.0.0"
 
   resource_group_name = azurerm_resource_group.this.name
   location            = azurerm_resource_group.this.location

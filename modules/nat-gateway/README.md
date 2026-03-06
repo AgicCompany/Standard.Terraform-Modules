@@ -8,7 +8,7 @@ Creates an Azure NAT Gateway with a Standard SKU public IP address for outbound 
 
 ```hcl
 module "nat_gateway" {
-  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//nat-gateway?ref=nat-gateway/v1.0.0"
+  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/nat-gateway?ref=nat-gateway/v1.0.0"
 
   resource_group_name = azurerm_resource_group.this.name
   location            = azurerm_resource_group.this.location

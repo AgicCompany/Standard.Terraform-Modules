@@ -8,7 +8,7 @@ Creates an Azure Monitor Action Group for alert notification delivery via email,
 
 ```hcl
 module "action_group" {
-  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//action-group?ref=action-group/v1.0.0"
+  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/action-group?ref=action-group/v1.0.0"
 
   resource_group_name = azurerm_resource_group.example.name
   name                = "ag-platform-dev-weu-001"

@@ -557,7 +557,7 @@ For multi-region scenarios where a module needs a specific provider alias, docum
 
 ```hcl
 module "storage_secondary" {
-  source    = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//storage-account?ref=storage-account/v1.0.0"
+  source    = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/storage-account?ref=storage-account/v1.0.0"
   providers = {
     azurerm = azurerm.secondary
   }

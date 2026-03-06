@@ -8,7 +8,7 @@ Creates an Azure Monitor diagnostic setting to send logs and metrics from any Az
 
 ```hcl
 module "diag" {
-  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//diagnostic-settings?ref=diagnostic-settings/v1.0.0"
+  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/diagnostic-settings?ref=diagnostic-settings/v1.0.0"
 
   name                       = "diag-kv-payments-dev-weu-001"
   target_resource_id         = module.key_vault.id

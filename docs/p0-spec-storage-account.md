@@ -115,7 +115,7 @@ variable "network_rules" {
 ```hcl
 # Private access only (default) - blob endpoint only
 module "storage" {
-  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//storage-account?ref=storage-account/v1.0.0"
+  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/storage-account?ref=storage-account/v1.0.0"
 
   resource_group_name = "rg-payments-dev-weu-001"
   location            = "westeurope"
@@ -130,7 +130,7 @@ module "storage" {
 
 # With all four private endpoints
 module "storage_full" {
-  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//storage-account?ref=storage-account/v1.0.0"
+  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/storage-account?ref=storage-account/v1.0.0"
 
   resource_group_name = "rg-payments-dev-weu-001"
   location            = "westeurope"
@@ -153,7 +153,7 @@ module "storage_full" {
 
 # With public access and network rules (for legacy scenarios)
 module "storage_public" {
-  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//storage-account?ref=storage-account/v1.0.0"
+  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/storage-account?ref=storage-account/v1.0.0"
 
   resource_group_name = "rg-payments-dev-weu-001"
   location            = "westeurope"

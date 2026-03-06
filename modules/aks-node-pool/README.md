@@ -8,7 +8,7 @@ Creates additional (user) node pools for an existing AKS cluster. This module is
 
 ```hcl
 module "aks_node_pool" {
-  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//aks-node-pool?ref=aks-node-pool/v1.0.0"
+  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/aks-node-pool?ref=aks-node-pool/v1.0.0"
 
   kubernetes_cluster_id = module.aks.id
 

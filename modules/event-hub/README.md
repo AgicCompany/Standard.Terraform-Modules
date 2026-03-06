@@ -8,7 +8,7 @@ Creates an Azure Event Hub namespace with event hubs, consumer groups, authoriza
 
 ```hcl
 module "event_hub" {
-  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//event-hub?ref=event-hub/v1.1.0"
+  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/event-hub?ref=event-hub/v1.1.0"
 
   resource_group_name = "rg-evh-dev-weu-001"
   location            = "westeurope"

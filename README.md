@@ -96,7 +96,7 @@ Modules are consumed via Git source references with version tags:
 
 ```hcl
 module "vnet" {
-  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//virtual-network?ref=virtual-network/v1.0.0"
+  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/virtual-network?ref=virtual-network/v1.0.0"
 
   resource_group_name = "rg-payments-dev-weu-001"
   location            = "westeurope"

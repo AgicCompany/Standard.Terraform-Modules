@@ -172,7 +172,7 @@ infrastructures/iac/
 ```hcl
 # Remote (standard)
 module "storage" {
-  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//storage-account?ref=storage-account/v1.2.0"
+  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/storage-account?ref=storage-account/v1.2.0"
 }
 
 # Local (when remote not possible)
@@ -501,11 +501,11 @@ Strict adherence to semantic versioning:
 
 ```hcl
 module "storage" {
-  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//storage-account?ref=storage-account/v1.0.0"
+  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/storage-account?ref=storage-account/v1.0.0"
 }
 
 module "network" {
-  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//virtual-network?ref=virtual-network/v2.3.1"
+  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/virtual-network?ref=virtual-network/v2.3.1"
 }
 ```
 

@@ -86,7 +86,7 @@ variable "network_acls" {
 ```hcl
 # Private access only (default)
 module "key_vault" {
-  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//key-vault?ref=key-vault/v1.0.0"
+  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/key-vault?ref=key-vault/v1.0.0"
 
   resource_group_name = "rg-payments-dev-weu-001"
   location            = "westeurope"
@@ -99,7 +99,7 @@ module "key_vault" {
 
 # With public access and network ACLs
 module "key_vault_public" {
-  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//key-vault?ref=key-vault/v1.0.0"
+  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/key-vault?ref=key-vault/v1.0.0"
 
   resource_group_name = "rg-payments-dev-weu-001"
   location            = "westeurope"
