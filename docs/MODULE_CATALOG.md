@@ -471,7 +471,7 @@ Creates an Azure Storage Account with secure defaults and optional private endpo
 | `location` | string | yes | — | Azure region |
 | `name` | string | yes | — | Storage account name (3-24 chars, lowercase alphanumeric) |
 | `account_tier` | string | no | `"Standard"` | Standard or Premium |
-| `account_replication_type` | string | no | `"GRS"` | LRS, GRS, RAGRS, ZRS |
+| `account_replication_type` | string | no | `"LRS"` | LRS, ZRS, GRS, RAGRS, GZRS, RAGZRS |
 | `access_tier` | string | no | `null` | Hot or Cool |
 | `min_tls_version` | string | no | `"TLS1_2"` | Must be TLS1_2 |
 | `enable_blob_soft_delete` | bool | no | `true` | Enable blob soft delete |
