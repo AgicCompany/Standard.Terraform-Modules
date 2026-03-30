@@ -48,6 +48,7 @@ output "custom_domain_ids" {
 output "custom_domain_validation_tokens" {
   value       = { for k, v in azurerm_cdn_frontdoor_custom_domain.this : k => v.validation_token }
   description = "Map of custom domain keys to their DNS validation tokens"
+  sensitive   = true
 }
 
 output "firewall_policy_id" {
