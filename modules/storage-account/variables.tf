@@ -198,6 +198,40 @@ variable "private_dns_zone_ids" {
   }
 }
 
+# === Optional: Private Endpoint Overrides ===
+variable "private_endpoint_names" {
+  type        = map(string)
+  default     = {}
+  description = "Override PE names per subresource key (blob, file, table, queue). Defaults to pep-{name}-{subresource}."
+
+  validation {
+    condition     = alltrue([for k in keys(var.private_endpoint_names) : contains(["blob", "file", "table", "queue"], k)])
+    error_message = "private_endpoint_names keys must be a subset of: blob, file, table, queue."
+  }
+}
+
+variable "private_service_connection_names" {
+  type        = map(string)
+  default     = {}
+  description = "Override PSC names per subresource key. Defaults to psc-{name}-{subresource}."
+
+  validation {
+    condition     = alltrue([for k in keys(var.private_service_connection_names) : contains(["blob", "file", "table", "queue"], k)])
+    error_message = "private_service_connection_names keys must be a subset of: blob, file, table, queue."
+  }
+}
+
+variable "private_endpoint_nic_names" {
+  type        = map(string)
+  default     = {}
+  description = "Override PE NIC names per subresource key. Defaults to pep-{name}-{subresource}-nic."
+
+  validation {
+    condition     = alltrue([for k in keys(var.private_endpoint_nic_names) : contains(["blob", "file", "table", "queue"], k)])
+    error_message = "private_endpoint_nic_names keys must be a subset of: blob, file, table, queue."
+  }
+}
+
 # === Tags ===
 variable "tags" {
   type        = map(string)

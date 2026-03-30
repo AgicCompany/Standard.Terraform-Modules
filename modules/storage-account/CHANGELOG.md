@@ -4,6 +4,19 @@ All notable changes to this module will be documented in this file.
 
 ## [Unreleased]
 
+## [2.0.0] - 2026-03-30
+
+### Changed
+
+- **BREAKING**: Private endpoint default names changed from `pe-{name}-{sub}` to `pep-{name}-{sub}` (Azure CAF). Pass `private_endpoint_names` map to preserve old behavior.
+- **BREAKING**: Private endpoint NICs now use deterministic names `pep-{name}-{sub}-nic` instead of Azure auto-generated names. Pass `private_endpoint_nic_names` map to override.
+
+### Added
+
+- `private_endpoint_names` map variable to override PE resource names per subresource
+- `private_service_connection_names` map variable to override PSC names per subresource
+- `private_endpoint_nic_names` map variable to override PE NIC names per subresource
+
 ## [1.0.0] - 2026-02-08
 
 ### Added
