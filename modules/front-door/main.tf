@@ -60,6 +60,7 @@ resource "azurerm_cdn_frontdoor_origin" "this" {
     content {
       private_link_target_id = private_link.value.target_id
       location               = private_link.value.location
+      target_type            = private_link.value.target_type
       request_message        = private_link.value.request_message
     }
   }
@@ -75,7 +76,7 @@ resource "azurerm_cdn_frontdoor_origin" "this" {
 resource "azurerm_cdn_frontdoor_custom_domain" "this" {
   for_each = var.custom_domains
 
-  name                     = replace(each.value.hostname, ".", "-")
+  name                     = each.key
   cdn_frontdoor_profile_id = azurerm_cdn_frontdoor_profile.this.id
   host_name                = each.value.hostname
 

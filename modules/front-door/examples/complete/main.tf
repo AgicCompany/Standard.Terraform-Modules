@@ -101,9 +101,9 @@ module "front_door" {
   }
 
   rule_sets = {
-    "security-headers" = {
+    "SecurityHeaders" = {
       rules = {
-        "add-hsts" = {
+        "AddHsts" = {
           order = 1
           actions = {
             response_header_actions = [
@@ -115,7 +115,7 @@ module "front_door" {
             ]
           }
         }
-        "add-csp" = {
+        "AddCsp" = {
           order = 2
           actions = {
             response_header_actions = [
@@ -129,9 +129,9 @@ module "front_door" {
         }
       }
     }
-    "url-rewrites" = {
+    "UrlRewrites" = {
       rules = {
-        "rewrite-api-path" = {
+        "RewriteApiPath" = {
           order = 1
           conditions = {
             url_file_extension = null
@@ -156,7 +156,7 @@ module "front_door" {
       origin_names        = ["web-primary", "web-secondary"]
       patterns_to_match   = ["/*"]
       custom_domain_keys  = ["www"]
-      rule_set_keys       = ["security-headers"]
+      rule_set_keys       = ["SecurityHeaders"]
       compression_enabled = true
       content_types_to_compress = [
         "text/html",
@@ -171,7 +171,7 @@ module "front_door" {
       patterns_to_match   = ["/api/*"]
       forwarding_protocol = "HttpsOnly"
       custom_domain_keys  = ["api"]
-      rule_set_keys       = ["security-headers", "url-rewrites"]
+      rule_set_keys       = ["SecurityHeaders", "UrlRewrites"]
     }
   }
 

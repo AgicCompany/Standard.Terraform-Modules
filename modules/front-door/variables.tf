@@ -74,6 +74,7 @@ variable "origins" {
     private_link = optional(object({
       target_id       = string
       location        = string
+      target_type     = optional(string)
       request_message = optional(string, "AFD Private Link connection")
     }))
   }))
@@ -109,6 +110,11 @@ variable "custom_domains" {
   }))
   default     = {}
   description = "Map of custom domains to attach to the Front Door profile. Key is used as the domain resource name."
+
+  validation {
+    condition     = alltrue([for k, v in var.custom_domains : contains(["ManagedCertificate", "CustomerCertificate"], v.certificate_type)])
+    error_message = "certificate_type must be \"ManagedCertificate\" or \"CustomerCertificate\"."
+  }
 }
 
 # === Optional: WAF ===
