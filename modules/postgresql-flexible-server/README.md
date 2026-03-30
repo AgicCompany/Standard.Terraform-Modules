@@ -8,7 +8,7 @@ Creates an Azure PostgreSQL Flexible Server with configurable databases, firewal
 
 ```hcl
 module "postgresql" {
-  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/postgresql-flexible-server?ref=postgresql-flexible-server/v2.0.0"
+  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/postgresql-flexible-server?ref=postgresql-flexible-server/v3.0.0"
 
   resource_group_name    = "rg-myapp-dev-weu-001"
   location               = "westeurope"

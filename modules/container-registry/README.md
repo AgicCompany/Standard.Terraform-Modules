@@ -8,7 +8,7 @@ Creates an Azure Container Registry with secure defaults and optional private en
 
 ```hcl
 module "container_registry" {
-  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/container-registry?ref=container-registry/v1.0.0"
+  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/container-registry?ref=container-registry/v2.0.0"
 
   resource_group_name = "rg-payments-dev-weu-001"
   location            = "westeurope"

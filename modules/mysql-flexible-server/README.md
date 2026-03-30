@@ -8,7 +8,7 @@ Creates an Azure MySQL Flexible Server with configurable databases, firewall rul
 
 ```hcl
 module "mysql" {
-  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/mysql-flexible-server?ref=mysql-flexible-server/v2.0.0"
+  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/mysql-flexible-server?ref=mysql-flexible-server/v3.0.0"
 
   resource_group_name    = "rg-myapp-dev-weu-001"
   location               = "westeurope"

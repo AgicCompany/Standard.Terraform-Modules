@@ -43,6 +43,7 @@ A library of reusable, production-ready Terraform modules for Microsoft Azure. A
 | [app-service-plan](modules/app-service-plan) | App Service plan (Linux/Windows) |
 | [linux-web-app](modules/linux-web-app) | Linux Web App with VNet integration and private endpoint |
 | [function-app](modules/function-app) | Linux Function App with VNet integration and private endpoint |
+| [function-app-flex](modules/function-app-flex) | Flex Consumption (FC1) Function App with private endpoint |
 | [container-app-environment](modules/container-app-environment) | Container Apps environment with VNet integration |
 | [container-app](modules/container-app) | Container App with ingress, secrets, and scaling rules |
 | [container-registry](modules/container-registry) | Container Registry with geo-replication and private endpoint |

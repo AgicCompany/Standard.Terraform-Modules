@@ -8,7 +8,7 @@ Creates an Azure Redis Cache with secure defaults and optional private endpoint.
 
 ```hcl
 module "redis_cache" {
-  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/redis-cache?ref=redis-cache/v1.1.0"
+  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/redis-cache?ref=redis-cache/v2.0.0"
 
   resource_group_name = "rg-caching-dev-weu-001"
   location            = "westeurope"
