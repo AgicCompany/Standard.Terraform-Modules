@@ -40,6 +40,26 @@ output "route_ids" {
   description = "Map of route names to their resource IDs"
 }
 
+output "custom_domain_ids" {
+  value       = { for k, v in azurerm_cdn_frontdoor_custom_domain.this : k => v.id }
+  description = "Map of custom domain keys to their resource IDs"
+}
+
+output "custom_domain_validation_tokens" {
+  value       = { for k, v in azurerm_cdn_frontdoor_custom_domain.this : k => v.validation_token }
+  description = "Map of custom domain keys to their DNS validation tokens"
+}
+
+output "firewall_policy_id" {
+  value       = var.waf != null ? azurerm_cdn_frontdoor_firewall_policy.this[0].id : null
+  description = "WAF firewall policy resource ID (null if WAF disabled)"
+}
+
+output "rule_set_ids" {
+  value       = { for k, v in azurerm_cdn_frontdoor_rule_set.this : k => v.id }
+  description = "Map of rule set keys to their resource IDs"
+}
+
 # === Public Outputs (Cross-Project Consumption) ===
 output "public_frontdoor_id" {
   value       = azurerm_cdn_frontdoor_profile.this.id
