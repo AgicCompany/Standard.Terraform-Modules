@@ -85,7 +85,7 @@ These outputs are designed for cross-project state consumption:
 
 | Name | Version |
 |------|---------|
-| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | >= 4.0.0 |
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 4.62.0 |
 
 ## Modules
 
@@ -111,9 +111,12 @@ No modules.
 | <a name="input_identity_type"></a> [identity\_type](#input\_identity\_type) | Type of managed identity | `string` | `"SystemAssigned"` | no |
 | <a name="input_location"></a> [location](#input\_location) | Azure region | `string` | n/a | yes |
 | <a name="input_min_api_version"></a> [min\_api\_version](#input\_min\_api\_version) | Minimum API version to enforce | `string` | `null` | no |
-| <a name="input_name"></a> [name](#input\_name) | API Management service name | `string` | n/a | yes |
+| <a name="input_name"></a> [name](#input\_name) | API Management service name (full CAF-compliant name, provided by consumer) | `string` | n/a | yes |
 | <a name="input_notification_sender_email"></a> [notification\_sender\_email](#input\_notification\_sender\_email) | Email address for sending notifications | `string` | `null` | no |
 | <a name="input_private_dns_zone_id"></a> [private\_dns\_zone\_id](#input\_private\_dns\_zone\_id) | Private DNS zone ID for privatelink.azure-api.net. Required when enable\_private\_endpoint = true. | `string` | `null` | no |
+| <a name="input_private_endpoint_name"></a> [private\_endpoint\_name](#input\_private\_endpoint\_name) | Override the private endpoint resource name. Defaults to pep-{name}. | `string` | `null` | no |
+| <a name="input_private_endpoint_nic_name"></a> [private\_endpoint\_nic\_name](#input\_private\_endpoint\_nic\_name) | Override the PE network interface name. Defaults to pep-{name}-nic. | `string` | `null` | no |
+| <a name="input_private_service_connection_name"></a> [private\_service\_connection\_name](#input\_private\_service\_connection\_name) | Override the private service connection name. Defaults to psc-{name}. | `string` | `null` | no |
 | <a name="input_publisher_email"></a> [publisher\_email](#input\_publisher\_email) | Publisher email (for notifications) | `string` | n/a | yes |
 | <a name="input_publisher_name"></a> [publisher\_name](#input\_publisher\_name) | Publisher name (shown in developer portal) | `string` | n/a | yes |
 | <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name) | Name of the resource group | `string` | n/a | yes |

@@ -82,7 +82,7 @@ These outputs are designed for cross-project state consumption:
 
 | Name | Version |
 |------|---------|
-| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | >= 4.0.0 |
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 4.62.0 |
 
 ## Modules
 
@@ -110,6 +110,9 @@ No modules.
 | <a name="input_minimum_tls_version"></a> [minimum\_tls\_version](#input\_minimum\_tls\_version) | Minimum TLS version | `string` | `"1.2"` | no |
 | <a name="input_name"></a> [name](#input\_name) | Service Bus namespace name (full CAF-compliant name, provided by consumer) | `string` | n/a | yes |
 | <a name="input_private_dns_zone_id"></a> [private\_dns\_zone\_id](#input\_private\_dns\_zone\_id) | Private DNS zone ID for privatelink.servicebus.windows.net. Required when enable\_private\_endpoint = true. | `string` | `null` | no |
+| <a name="input_private_endpoint_name"></a> [private\_endpoint\_name](#input\_private\_endpoint\_name) | Override the private endpoint resource name. Defaults to pep-{name}. | `string` | `null` | no |
+| <a name="input_private_endpoint_nic_name"></a> [private\_endpoint\_nic\_name](#input\_private\_endpoint\_nic\_name) | Override the PE network interface name. Defaults to pep-{name}-nic. | `string` | `null` | no |
+| <a name="input_private_service_connection_name"></a> [private\_service\_connection\_name](#input\_private\_service\_connection\_name) | Override the private service connection name. Defaults to psc-{name}. | `string` | `null` | no |
 | <a name="input_queues"></a> [queues](#input\_queues) | Map of queues to create. Key is the queue name. | <pre>map(object({<br/>    max_size_in_megabytes                   = optional(number, 1024)<br/>    default_message_ttl                     = optional(string)<br/>    lock_duration                           = optional(string)<br/>    max_delivery_count                      = optional(number, 10)<br/>    dead_lettering_on_message_expiration    = optional(bool, false)<br/>    enable_partitioning                     = optional(bool, false)<br/>    enable_batched_operations               = optional(bool, true)<br/>    requires_session                        = optional(bool, false)<br/>    requires_duplicate_detection            = optional(bool, false)<br/>    duplicate_detection_history_time_window = optional(string)<br/>  }))</pre> | `{}` | no |
 | <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name) | Name of the resource group | `string` | n/a | yes |
 | <a name="input_sku"></a> [sku](#input\_sku) | SKU tier: Basic, Standard, or Premium | `string` | `"Standard"` | no |

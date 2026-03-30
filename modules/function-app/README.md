@@ -110,7 +110,7 @@ No modules.
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_app_settings"></a> [app\_settings](#input\_app\_settings) | Application settings | `map(string)` | `{}` | no |
-| <a name="input_application_insights_connection_string"></a> [application\_insights\_connection\_string](#input\_application\_insights\_connection\_string) | Application Insights connection string. Required when enable\_application\_insights = true. (sensitive) | `string` | `null` | no |
+| <a name="input_application_insights_connection_string"></a> [application\_insights\_connection\_string](#input\_application\_insights\_connection\_string) | Application Insights connection string. Required when enable\_application\_insights = true. | `string` | `null` | no |
 | <a name="input_application_stack"></a> [application\_stack](#input\_application\_stack) | Application stack configuration. Set one runtime only. | <pre>object({<br/>    dotnet_version              = optional(string)<br/>    use_dotnet_isolated_runtime = optional(bool)<br/>    java_version                = optional(string)<br/>    node_version                = optional(string)<br/>    python_version              = optional(string)<br/>    powershell_core_version     = optional(string)<br/>    use_custom_runtime          = optional(bool)<br/>    docker = optional(object({<br/>      image_name        = string<br/>      image_tag         = string<br/>      registry_url      = optional(string)<br/>      registry_username = optional(string)<br/>      registry_password = optional(string)<br/>    }))<br/>  })</pre> | `null` | no |
 | <a name="input_enable_application_insights"></a> [enable\_application\_insights](#input\_enable\_application\_insights) | Connect to Application Insights for monitoring | `bool` | `true` | no |
 | <a name="input_enable_private_endpoint"></a> [enable\_private\_endpoint](#input\_enable\_private\_endpoint) | Create a private endpoint for this function app | `bool` | `true` | no |
@@ -121,6 +121,9 @@ No modules.
 | <a name="input_location"></a> [location](#input\_location) | Azure region | `string` | n/a | yes |
 | <a name="input_name"></a> [name](#input\_name) | Function App name (full CAF-compliant name, provided by consumer) | `string` | n/a | yes |
 | <a name="input_private_dns_zone_id"></a> [private\_dns\_zone\_id](#input\_private\_dns\_zone\_id) | Private DNS zone ID for privatelink.azurewebsites.net. Required when enable\_private\_endpoint = true. | `string` | `null` | no |
+| <a name="input_private_endpoint_name"></a> [private\_endpoint\_name](#input\_private\_endpoint\_name) | Override the private endpoint resource name. Defaults to pep-{name}. | `string` | `null` | no |
+| <a name="input_private_endpoint_nic_name"></a> [private\_endpoint\_nic\_name](#input\_private\_endpoint\_nic\_name) | Override the PE network interface name. Defaults to pep-{name}-nic. | `string` | `null` | no |
+| <a name="input_private_service_connection_name"></a> [private\_service\_connection\_name](#input\_private\_service\_connection\_name) | Override the private service connection name. Defaults to psc-{name}. | `string` | `null` | no |
 | <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name) | Name of the resource group | `string` | n/a | yes |
 | <a name="input_service_plan_id"></a> [service\_plan\_id](#input\_service\_plan\_id) | ID of the App Service Plan to host this function app | `string` | n/a | yes |
 | <a name="input_storage_account_access_key"></a> [storage\_account\_access\_key](#input\_storage\_account\_access\_key) | Access key for the storage account | `string` | n/a | yes |
@@ -137,6 +140,7 @@ No modules.
 | <a name="output_default_hostname"></a> [default\_hostname](#output\_default\_hostname) | Default hostname of the function app |
 | <a name="output_id"></a> [id](#output\_id) | Linux Function App resource ID |
 | <a name="output_name"></a> [name](#output\_name) | Linux Function App name |
+| <a name="output_outbound_ip_addresses"></a> [outbound\_ip\_addresses](#output\_outbound\_ip\_addresses) | Outbound IP addresses (comma-separated) |
 | <a name="output_principal_id"></a> [principal\_id](#output\_principal\_id) | System-assigned managed identity principal ID (when enabled) |
 | <a name="output_private_endpoint_id"></a> [private\_endpoint\_id](#output\_private\_endpoint\_id) | Private endpoint resource ID (when enabled) |
 | <a name="output_private_ip_address"></a> [private\_ip\_address](#output\_private\_ip\_address) | Private IP address of the private endpoint (when enabled) |

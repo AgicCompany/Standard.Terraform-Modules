@@ -108,6 +108,9 @@ No modules.
 | <a name="input_maintenance_window"></a> [maintenance\_window](#input\_maintenance\_window) | Custom maintenance window | <pre>object({<br/>    day_of_week  = optional(number, 0)<br/>    start_hour   = optional(number, 0)<br/>    start_minute = optional(number, 0)<br/>  })</pre> | `null` | no |
 | <a name="input_name"></a> [name](#input\_name) | MySQL Flexible Server name (full CAF-compliant name, provided by consumer) | `string` | n/a | yes |
 | <a name="input_private_dns_zone_id"></a> [private\_dns\_zone\_id](#input\_private\_dns\_zone\_id) | Private DNS zone ID (privatelink.mysql.database.azure.com). Required when using delegation or private endpoint. | `string` | `null` | no |
+| <a name="input_private_endpoint_name"></a> [private\_endpoint\_name](#input\_private\_endpoint\_name) | Override the private endpoint resource name. Defaults to pep-{name}. | `string` | `null` | no |
+| <a name="input_private_endpoint_nic_name"></a> [private\_endpoint\_nic\_name](#input\_private\_endpoint\_nic\_name) | Override the PE network interface name. Defaults to pep-{name}-nic. | `string` | `null` | no |
+| <a name="input_private_service_connection_name"></a> [private\_service\_connection\_name](#input\_private\_service\_connection\_name) | Override the private service connection name. Defaults to psc-{name}. | `string` | `null` | no |
 | <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name) | Name of the resource group | `string` | n/a | yes |
 | <a name="input_server_configurations"></a> [server\_configurations](#input\_server\_configurations) | Map of server configuration parameters. Key is the parameter name, value is the parameter value. | `map(string)` | `{}` | no |
 | <a name="input_sku_name"></a> [sku\_name](#input\_sku\_name) | SKU name for the MySQL Flexible Server (e.g., B\_Standard\_B1ms, GP\_Standard\_D2ds\_v4, MO\_Standard\_E4s\_v3) | `string` | `"B_Standard_B1ms"` | no |
