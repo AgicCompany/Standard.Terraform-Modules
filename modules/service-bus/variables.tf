@@ -105,26 +105,6 @@ variable "enable_local_auth" {
   description = "Enable local authentication (SAS keys). Disabled by default — use managed identity."
 }
 
-
-# === Optional: Private Endpoint Overrides ===
-variable "private_endpoint_name" {
-  type        = string
-  default     = null
-  description = "Override the private endpoint resource name. Defaults to pep-{name}."
-}
-
-variable "private_service_connection_name" {
-  type        = string
-  default     = null
-  description = "Override the private service connection name. Defaults to psc-{name}."
-}
-
-variable "private_endpoint_nic_name" {
-  type        = string
-  default     = null
-  description = "Override the PE network interface name. Defaults to pep-{name}-nic."
-}
-
 # === Private Endpoint ===
 variable "subnet_id" {
   type        = string
@@ -146,6 +126,25 @@ variable "private_dns_zone_id" {
     condition     = var.private_dns_zone_id != null || !var.enable_private_endpoint
     error_message = "private_dns_zone_id is required when enable_private_endpoint is true."
   }
+}
+
+# === Optional: Private Endpoint Overrides ===
+variable "private_endpoint_name" {
+  type        = string
+  default     = null
+  description = "Override the private endpoint resource name. Defaults to pep-{name}."
+}
+
+variable "private_service_connection_name" {
+  type        = string
+  default     = null
+  description = "Override the private service connection name. Defaults to psc-{name}."
+}
+
+variable "private_endpoint_nic_name" {
+  type        = string
+  default     = null
+  description = "Override the PE network interface name. Defaults to pep-{name}-nic."
 }
 
 # === Tags ===
