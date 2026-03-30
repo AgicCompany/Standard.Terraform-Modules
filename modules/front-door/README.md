@@ -8,7 +8,7 @@ Creates an Azure Front Door profile with endpoints, origin groups, origins, and 
 
 ```hcl
 module "front_door" {
-  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/front-door?ref=front-door/v1.0.0"
+  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/front-door?ref=front-door/v1.1.0"
 
   resource_group_name = "rg-cdn-dev-weu-001"
   name                = "afd-web-dev-001"
@@ -91,7 +91,7 @@ These outputs are designed for cross-project state consumption:
 
 | Name | Version |
 |------|---------|
-| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | >= 4.0.0 |
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 4.62.0 |
 
 ## Modules
 
@@ -101,32 +101,43 @@ No modules.
 
 | Name | Type |
 |------|------|
+| [azurerm_cdn_frontdoor_custom_domain.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/cdn_frontdoor_custom_domain) | resource |
 | [azurerm_cdn_frontdoor_endpoint.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/cdn_frontdoor_endpoint) | resource |
+| [azurerm_cdn_frontdoor_firewall_policy.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/cdn_frontdoor_firewall_policy) | resource |
 | [azurerm_cdn_frontdoor_origin.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/cdn_frontdoor_origin) | resource |
 | [azurerm_cdn_frontdoor_origin_group.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/cdn_frontdoor_origin_group) | resource |
 | [azurerm_cdn_frontdoor_profile.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/cdn_frontdoor_profile) | resource |
 | [azurerm_cdn_frontdoor_route.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/cdn_frontdoor_route) | resource |
+| [azurerm_cdn_frontdoor_rule.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/cdn_frontdoor_rule) | resource |
+| [azurerm_cdn_frontdoor_rule_set.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/cdn_frontdoor_rule_set) | resource |
+| [azurerm_cdn_frontdoor_security_policy.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/cdn_frontdoor_security_policy) | resource |
 
 ## Inputs
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
+| <a name="input_custom_domains"></a> [custom\_domains](#input\_custom\_domains) | Map of custom domains to attach to the Front Door profile. Key is used as the domain resource name. | <pre>map(object({<br/>    hostname         = string<br/>    certificate_type = optional(string, "ManagedCertificate")<br/>  }))</pre> | `{}` | no |
 | <a name="input_endpoints"></a> [endpoints](#input\_endpoints) | Map of Front Door endpoints. Key is used as the endpoint name. | <pre>map(object({<br/>    enabled = optional(bool, true)<br/>  }))</pre> | `{}` | no |
 | <a name="input_name"></a> [name](#input\_name) | Front Door profile name (full CAF-compliant name, provided by consumer) | `string` | n/a | yes |
 | <a name="input_origin_groups"></a> [origin\_groups](#input\_origin\_groups) | Map of origin groups with health probe and load balancing settings. | <pre>map(object({<br/>    session_affinity_enabled                                  = optional(bool, false)<br/>    restore_traffic_time_to_healed_or_new_endpoint_in_minutes = optional(number, 10)<br/>    health_probe = optional(object({<br/>      interval_in_seconds = optional(number, 100)<br/>      path                = optional(string, "/")<br/>      protocol            = optional(string, "Https")<br/>      request_type        = optional(string, "HEAD")<br/>    }))<br/>    load_balancing = optional(object({<br/>      additional_latency_in_milliseconds = optional(number, 50)<br/>      sample_size                        = optional(number, 4)<br/>      successful_samples_required        = optional(number, 3)<br/>    }), {})<br/>  }))</pre> | `{}` | no |
-| <a name="input_origins"></a> [origins](#input\_origins) | Map of origins. Each origin references an origin\_group by key name. | <pre>map(object({<br/>    origin_group_name              = string<br/>    host_name                      = string<br/>    origin_host_header             = optional(string)<br/>    http_port                      = optional(number, 80)<br/>    https_port                     = optional(number, 443)<br/>    priority                       = optional(number, 1)<br/>    weight                         = optional(number, 1000)<br/>    certificate_name_check_enabled = optional(bool, true)<br/>    enabled                        = optional(bool, true)<br/>  }))</pre> | `{}` | no |
+| <a name="input_origins"></a> [origins](#input\_origins) | Map of origins. Each origin references an origin\_group by key name. Optional private\_link block for Private Link Service connectivity. | <pre>map(object({<br/>    origin_group_name              = string<br/>    host_name                      = string<br/>    origin_host_header             = optional(string)<br/>    http_port                      = optional(number, 80)<br/>    https_port                     = optional(number, 443)<br/>    priority                       = optional(number, 1)<br/>    weight                         = optional(number, 1000)<br/>    certificate_name_check_enabled = optional(bool, true)<br/>    enabled                        = optional(bool, true)<br/>    private_link = optional(object({<br/>      target_id       = string<br/>      location        = string<br/>      target_type     = optional(string)<br/>      request_message = optional(string, "AFD Private Link connection")<br/>    }))<br/>  }))</pre> | `{}` | no |
 | <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name) | Name of the resource group | `string` | n/a | yes |
 | <a name="input_response_timeout_seconds"></a> [response\_timeout\_seconds](#input\_response\_timeout\_seconds) | Response timeout in seconds (16-240) | `number` | `60` | no |
-| <a name="input_routes"></a> [routes](#input\_routes) | Map of routes. Each route references an endpoint and origin\_group by key name. | <pre>map(object({<br/>    endpoint_name          = string<br/>    origin_group_name      = string<br/>    origin_names           = optional(list(string))<br/>    patterns_to_match      = optional(list(string), ["/*"])<br/>    supported_protocols    = optional(list(string), ["Http", "Https"])<br/>    forwarding_protocol    = optional(string, "HttpsOnly")<br/>    https_redirect_enabled = optional(bool, true)<br/>    link_to_default_domain = optional(bool, true)<br/>    enabled                = optional(bool, true)<br/>  }))</pre> | `{}` | no |
+| <a name="input_routes"></a> [routes](#input\_routes) | Map of routes. References endpoints, origin\_groups, rule\_sets, and custom\_domains by key name. | <pre>map(object({<br/>    endpoint_name             = string<br/>    origin_group_name         = string<br/>    origin_names              = optional(list(string))<br/>    patterns_to_match         = optional(list(string), ["/*"])<br/>    supported_protocols       = optional(list(string), ["Http", "Https"])<br/>    forwarding_protocol       = optional(string, "HttpsOnly")<br/>    https_redirect_enabled    = optional(bool, true)<br/>    link_to_default_domain    = optional(bool, true)<br/>    enabled                   = optional(bool, true)<br/>    rule_set_keys             = optional(list(string), [])<br/>    custom_domain_keys        = optional(list(string), [])<br/>    compression_enabled       = optional(bool, false)<br/>    content_types_to_compress = optional(list(string), [])<br/>  }))</pre> | `{}` | no |
+| <a name="input_rule_sets"></a> [rule\_sets](#input\_rule\_sets) | Map of rule sets. Each rule set contains a map of rules with conditions and actions. | <pre>map(object({<br/>    rules = map(object({<br/>      order = number<br/>      conditions = optional(object({<br/>        url_file_extension = optional(object({<br/>          operator     = string<br/>          match_values = list(string)<br/>        }))<br/>        request_header = optional(object({<br/>          operator     = string<br/>          header_name  = string<br/>          match_values = list(string)<br/>        }))<br/>      }))<br/>      actions = object({<br/>        request_header_actions = optional(list(object({<br/>          header_action = string<br/>          header_name   = string<br/>          value         = optional(string)<br/>        })), [])<br/>        response_header_actions = optional(list(object({<br/>          header_action = string<br/>          header_name   = string<br/>          value         = optional(string)<br/>        })), [])<br/>        url_rewrite = optional(object({<br/>          source_pattern          = string<br/>          destination             = string<br/>          preserve_unmatched_path = optional(bool, true)<br/>        }))<br/>        url_redirect = optional(object({<br/>          redirect_type        = string<br/>          redirect_protocol    = optional(string, "Https")<br/>          destination_hostname = optional(string)<br/>          destination_path     = optional(string)<br/>        }))<br/>      })<br/>    }))<br/>  }))</pre> | `{}` | no |
 | <a name="input_sku_name"></a> [sku\_name](#input\_sku\_name) | SKU: Standard\_AzureFrontDoor or Premium\_AzureFrontDoor | `string` | `"Standard_AzureFrontDoor"` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | Tags to apply to the resource | `map(string)` | `{}` | no |
+| <a name="input_waf"></a> [waf](#input\_waf) | WAF firewall policy configuration. Null disables WAF. Custom rules deferred to v1.2.0+. | <pre>object({<br/>    name = string<br/>    mode = optional(string, "Detection")<br/>    managed_rules = optional(list(object({<br/>      type    = string<br/>      version = string<br/>      action  = string<br/>    })), [])<br/>  })</pre> | `null` | no |
 
 ## Outputs
 
 | Name | Description |
 |------|-------------|
+| <a name="output_custom_domain_ids"></a> [custom\_domain\_ids](#output\_custom\_domain\_ids) | Map of custom domain keys to their resource IDs |
+| <a name="output_custom_domain_validation_tokens"></a> [custom\_domain\_validation\_tokens](#output\_custom\_domain\_validation\_tokens) | Map of custom domain keys to their DNS validation tokens |
 | <a name="output_endpoint_host_names"></a> [endpoint\_host\_names](#output\_endpoint\_host\_names) | Map of endpoint names to their host names |
 | <a name="output_endpoint_ids"></a> [endpoint\_ids](#output\_endpoint\_ids) | Map of endpoint names to their resource IDs |
+| <a name="output_firewall_policy_id"></a> [firewall\_policy\_id](#output\_firewall\_policy\_id) | WAF firewall policy resource ID (null if WAF disabled) |
 | <a name="output_id"></a> [id](#output\_id) | Front Door profile resource ID |
 | <a name="output_name"></a> [name](#output\_name) | Front Door profile name |
 | <a name="output_origin_group_ids"></a> [origin\_group\_ids](#output\_origin\_group\_ids) | Map of origin group names to their resource IDs |
@@ -136,12 +147,12 @@ No modules.
 | <a name="output_public_frontdoor_name"></a> [public\_frontdoor\_name](#output\_public\_frontdoor\_name) | Front Door profile name (for cross-project consumption) |
 | <a name="output_resource_guid"></a> [resource\_guid](#output\_resource\_guid) | Front Door profile resource GUID |
 | <a name="output_route_ids"></a> [route\_ids](#output\_route\_ids) | Map of route names to their resource IDs |
+| <a name="output_rule_set_ids"></a> [rule\_set\_ids](#output\_rule\_set\_ids) | Map of rule set keys to their resource IDs |
 <!-- END_TF_DOCS -->
 
 ## Notes
 
 - **No location variable:** Front Door is a global resource. The profile is created in the resource group's region but serves traffic globally.
-- **No private endpoint:** Front Door is a global edge service. Origin Private Link (connecting Front Door to private origins) is deferred to a future version.
 - **Endpoint names must be globally unique:** Front Door endpoint names become part of the FQDN (`<name>.azurefd.net`). Choose unique names.
 - **Tags on profile and endpoints only:** Origin groups, origins, and routes do not support tags in the AzureRM provider.
 - **Cross-referencing:** Origins reference origin groups by key name. Routes reference endpoints and origin groups by key name. This enables declarative configuration without hardcoded IDs.

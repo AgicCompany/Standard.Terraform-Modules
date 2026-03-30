@@ -61,17 +61,19 @@ resource "azurerm_storage_account" "this" {
 resource "azurerm_private_endpoint" "this" {
   for_each = local.private_endpoints
 
-  name                = "pe-${var.name}-${each.key}"
+  name                = lookup(var.private_endpoint_names, each.key, "pep-${var.name}-${each.key}")
   location            = var.location
   resource_group_name = var.resource_group_name
   subnet_id           = var.subnet_id
 
   private_service_connection {
-    name                           = "psc-${var.name}-${each.key}"
+    name                           = lookup(var.private_service_connection_names, each.key, "psc-${var.name}-${each.key}")
     private_connection_resource_id = azurerm_storage_account.this.id
     subresource_names              = [each.key]
     is_manual_connection           = false
   }
+
+  custom_network_interface_name = lookup(var.private_endpoint_nic_names, each.key, "pep-${var.name}-${each.key}-nic")
 
   dynamic "private_dns_zone_group" {
     for_each = each.value.dns_zone_id != null ? [1] : []

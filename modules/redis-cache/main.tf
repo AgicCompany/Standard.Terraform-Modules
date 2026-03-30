@@ -65,13 +65,14 @@ resource "azurerm_redis_firewall_rule" "this" {
 resource "azurerm_private_endpoint" "this" {
   count = var.enable_private_endpoint ? 1 : 0
 
-  name                = "pe-${var.name}"
-  location            = var.location
-  resource_group_name = var.resource_group_name
-  subnet_id           = var.subnet_id
+  name                          = coalesce(var.private_endpoint_name, "pep-${var.name}")
+  location                      = var.location
+  resource_group_name           = var.resource_group_name
+  subnet_id                     = var.subnet_id
+  custom_network_interface_name = coalesce(var.private_endpoint_nic_name, "pep-${var.name}-nic")
 
   private_service_connection {
-    name                           = "psc-${var.name}"
+    name                           = coalesce(var.private_service_connection_name, "psc-${var.name}")
     private_connection_resource_id = azurerm_redis_cache.this.id
     subresource_names              = ["redisCache"]
     is_manual_connection           = false

@@ -71,25 +71,115 @@ variable "origins" {
     weight                         = optional(number, 1000)
     certificate_name_check_enabled = optional(bool, true)
     enabled                        = optional(bool, true)
+    private_link = optional(object({
+      target_id       = string
+      location        = string
+      target_type     = optional(string)
+      request_message = optional(string, "AFD Private Link connection")
+    }))
   }))
   default     = {}
-  description = "Map of origins. Each origin references an origin_group by key name."
+  description = "Map of origins. Each origin references an origin_group by key name. Optional private_link block for Private Link Service connectivity."
 }
 
 variable "routes" {
   type = map(object({
-    endpoint_name          = string
-    origin_group_name      = string
-    origin_names           = optional(list(string))
-    patterns_to_match      = optional(list(string), ["/*"])
-    supported_protocols    = optional(list(string), ["Http", "Https"])
-    forwarding_protocol    = optional(string, "HttpsOnly")
-    https_redirect_enabled = optional(bool, true)
-    link_to_default_domain = optional(bool, true)
-    enabled                = optional(bool, true)
+    endpoint_name             = string
+    origin_group_name         = string
+    origin_names              = optional(list(string))
+    patterns_to_match         = optional(list(string), ["/*"])
+    supported_protocols       = optional(list(string), ["Http", "Https"])
+    forwarding_protocol       = optional(string, "HttpsOnly")
+    https_redirect_enabled    = optional(bool, true)
+    link_to_default_domain    = optional(bool, true)
+    enabled                   = optional(bool, true)
+    rule_set_keys             = optional(list(string), [])
+    custom_domain_keys        = optional(list(string), [])
+    compression_enabled       = optional(bool, false)
+    content_types_to_compress = optional(list(string), [])
   }))
   default     = {}
-  description = "Map of routes. Each route references an endpoint and origin_group by key name."
+  description = "Map of routes. References endpoints, origin_groups, rule_sets, and custom_domains by key name."
+}
+
+# === Optional: Custom Domains ===
+variable "custom_domains" {
+  type = map(object({
+    hostname         = string
+    certificate_type = optional(string, "ManagedCertificate")
+  }))
+  default     = {}
+  description = "Map of custom domains to attach to the Front Door profile. Key is used as the domain resource name."
+
+  validation {
+    condition     = alltrue([for k, v in var.custom_domains : contains(["ManagedCertificate", "CustomerCertificate"], v.certificate_type)])
+    error_message = "certificate_type must be \"ManagedCertificate\" or \"CustomerCertificate\"."
+  }
+}
+
+# === Optional: WAF ===
+variable "waf" {
+  type = object({
+    name = string
+    mode = optional(string, "Detection")
+    managed_rules = optional(list(object({
+      type    = string
+      version = string
+      action  = string
+    })), [])
+  })
+  default     = null
+  description = "WAF firewall policy configuration. Null disables WAF. Custom rules deferred to v1.2.0+."
+
+  validation {
+    condition     = var.waf == null || contains(["Detection", "Prevention"], var.waf.mode)
+    error_message = "waf.mode must be \"Detection\" or \"Prevention\"."
+  }
+}
+
+# === Optional: Rule Sets ===
+variable "rule_sets" {
+  type = map(object({
+    rules = map(object({
+      order = number
+      conditions = optional(object({
+        url_file_extension = optional(object({
+          operator     = string
+          match_values = list(string)
+        }))
+        request_header = optional(object({
+          operator     = string
+          header_name  = string
+          match_values = list(string)
+        }))
+      }))
+      actions = object({
+        request_header_actions = optional(list(object({
+          header_action = string
+          header_name   = string
+          value         = optional(string)
+        })), [])
+        response_header_actions = optional(list(object({
+          header_action = string
+          header_name   = string
+          value         = optional(string)
+        })), [])
+        url_rewrite = optional(object({
+          source_pattern          = string
+          destination             = string
+          preserve_unmatched_path = optional(bool, true)
+        }))
+        url_redirect = optional(object({
+          redirect_type        = string
+          redirect_protocol    = optional(string, "Https")
+          destination_hostname = optional(string)
+          destination_path     = optional(string)
+        }))
+      })
+    }))
+  }))
+  default     = {}
+  description = "Map of rule sets. Each rule set contains a map of rules with conditions and actions."
 }
 
 # === Tags ===

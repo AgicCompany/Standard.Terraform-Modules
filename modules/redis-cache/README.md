@@ -80,7 +80,7 @@ These outputs are designed for cross-project state consumption:
 
 | Name | Version |
 |------|---------|
-| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | >= 4.0.0 |
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 4.62.0 |
 
 ## Modules
 
@@ -109,7 +109,10 @@ No modules.
 | <a name="input_name"></a> [name](#input\_name) | Redis Cache name (full CAF-compliant name, provided by consumer) | `string` | n/a | yes |
 | <a name="input_patch_schedule"></a> [patch\_schedule](#input\_patch\_schedule) | Patch schedule for Redis updates. Premium SKU only. | <pre>object({<br/>    day_of_week    = string<br/>    start_hour_utc = optional(number, 0)<br/>  })</pre> | `null` | no |
 | <a name="input_private_dns_zone_id"></a> [private\_dns\_zone\_id](#input\_private\_dns\_zone\_id) | Private DNS zone ID for privatelink.redis.cache.windows.net. Required when enable\_private\_endpoint = true. | `string` | `null` | no |
-| <a name="input_redis_configuration"></a> [redis\_configuration](#input\_redis\_configuration) | Redis configuration block. Premium-only fields (AOF, RDB) are ignored for lower SKUs. (sensitive) | <pre>object({<br/>    maxmemory_policy                = optional(string, "volatile-lru")<br/>    maxmemory_reserved              = optional(number)<br/>    maxfragmentationmemory_reserved = optional(number)<br/>    notify_keyspace_events          = optional(string)<br/>    aof_backup_enabled              = optional(bool)<br/>    rdb_backup_enabled              = optional(bool)<br/>    rdb_backup_frequency            = optional(number)<br/>    rdb_backup_max_snapshot_count   = optional(number)<br/>    rdb_storage_connection_string   = optional(string)<br/>  })</pre> | `{}` | no |
+| <a name="input_private_endpoint_name"></a> [private\_endpoint\_name](#input\_private\_endpoint\_name) | Override the private endpoint resource name. Defaults to pep-{name}. | `string` | `null` | no |
+| <a name="input_private_endpoint_nic_name"></a> [private\_endpoint\_nic\_name](#input\_private\_endpoint\_nic\_name) | Override the PE network interface name. Defaults to pep-{name}-nic. | `string` | `null` | no |
+| <a name="input_private_service_connection_name"></a> [private\_service\_connection\_name](#input\_private\_service\_connection\_name) | Override the private service connection name. Defaults to psc-{name}. | `string` | `null` | no |
+| <a name="input_redis_configuration"></a> [redis\_configuration](#input\_redis\_configuration) | Redis configuration block. Premium-only fields (AOF, RDB) are ignored for lower SKUs. Marked sensitive due to rdb\_storage\_connection\_string. | <pre>object({<br/>    maxmemory_policy                = optional(string, "volatile-lru")<br/>    maxmemory_reserved              = optional(number)<br/>    maxfragmentationmemory_reserved = optional(number)<br/>    notify_keyspace_events          = optional(string)<br/>    aof_backup_enabled              = optional(bool)<br/>    rdb_backup_enabled              = optional(bool)<br/>    rdb_backup_frequency            = optional(number)<br/>    rdb_backup_max_snapshot_count   = optional(number)<br/>    rdb_storage_connection_string   = optional(string)<br/>  })</pre> | `{}` | no |
 | <a name="input_redis_version"></a> [redis\_version](#input\_redis\_version) | Redis version: 6 | `string` | `"6"` | no |
 | <a name="input_replicas_per_master"></a> [replicas\_per\_master](#input\_replicas\_per\_master) | Number of replicas per master. Premium SKU only. | `number` | `null` | no |
 | <a name="input_replicas_per_primary"></a> [replicas\_per\_primary](#input\_replicas\_per\_primary) | Number of replicas per primary. Premium SKU only. | `number` | `null` | no |
