@@ -68,6 +68,25 @@ variable "enable_public_access" {
   description = "Allow public network access. Disabling requires Standard SKU."
 }
 
+# === Optional: Private Endpoint Overrides ===
+variable "private_endpoint_name" {
+  type        = string
+  default     = null
+  description = "Override the private endpoint resource name. Defaults to pep-{name}."
+}
+
+variable "private_service_connection_name" {
+  type        = string
+  default     = null
+  description = "Override the private service connection name. Defaults to psc-{name}."
+}
+
+variable "private_endpoint_nic_name" {
+  type        = string
+  default     = null
+  description = "Override the PE network interface name. Defaults to pep-{name}-nic."
+}
+
 # === Private Endpoint ===
 variable "subnet_id" {
   type        = string
