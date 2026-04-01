@@ -62,6 +62,7 @@ A library of reusable, production-ready Terraform modules for Microsoft Azure. A
 | [postgresql-flexible-server](modules/postgresql-flexible-server) | PostgreSQL Flexible Server with private endpoint or VNet integration |
 | [cosmosdb](modules/cosmosdb) | Cosmos DB account with SQL databases and private endpoint |
 | [redis-cache](modules/redis-cache) | Azure Cache for Redis with private endpoint |
+| [managed-redis](modules/managed-redis) | Azure Managed Redis (Enterprise) with modules, geo-replication, and private endpoint |
 
 ### Networking
 
