@@ -14,6 +14,7 @@ variable "name" {
   description = "Managed Redis instance name (full CAF-compliant name, provided by consumer). Globally unique."
 }
 
+# === Required: Resource-Specific ===
 variable "sku_name" {
   type        = string
   description = "SKU tier and capacity (e.g. Balanced_B10, ComputeOptimized_X10, MemoryOptimized_M20). See https://learn.microsoft.com/en-us/azure/redis/managed-redis-overview for valid sizes."
@@ -24,7 +25,13 @@ variable "sku_name" {
   }
 }
 
-# === Optional: Database Configuration ===
+# === Optional: Configuration ===
+variable "high_availability_enabled" {
+  type        = bool
+  default     = true
+  description = "Enable high availability. Cannot be changed after creation (forces replacement)."
+}
+
 variable "clustering_policy" {
   type        = string
   default     = "OSSCluster"
@@ -112,12 +119,6 @@ variable "enable_public_access" {
   type        = bool
   default     = false
   description = "Allow public network access"
-}
-
-variable "high_availability_enabled" {
-  type        = bool
-  default     = true
-  description = "Enable high availability. Cannot be changed after creation (forces replacement)."
 }
 
 variable "access_keys_authentication_enabled" {
