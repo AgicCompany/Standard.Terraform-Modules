@@ -157,6 +157,24 @@ variable "enable_public_ip" {
   description = "Create and attach a public IP address"
 }
 
+variable "enable_encryption_at_host" {
+  type        = bool
+  default     = true
+  description = "Enable encryption at host (encrypts temp disks and cached data at rest). Requires Microsoft.Compute/EncryptionAtHost feature registered on the subscription."
+}
+
+variable "enable_secure_boot" {
+  type        = bool
+  default     = true
+  description = "Enable Secure Boot (Trusted Launch). Requires Gen2 VM image."
+}
+
+variable "enable_vtpm" {
+  type        = bool
+  default     = true
+  description = "Enable vTPM (Trusted Launch). Requires Gen2 VM image."
+}
+
 # === Tags ===
 variable "tags" {
   type        = map(string)

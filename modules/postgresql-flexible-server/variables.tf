@@ -149,8 +149,8 @@ variable "enable_password_auth" {
 
 variable "enable_entra_auth" {
   type        = bool
-  default     = false
-  description = "Enable Microsoft Entra (AAD) authentication"
+  default     = true
+  description = "Enable Microsoft Entra (AAD) authentication (default: enabled for security)"
 }
 
 # === Private Networking ===

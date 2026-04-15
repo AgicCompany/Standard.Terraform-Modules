@@ -95,7 +95,7 @@ resource "azurerm_private_endpoint" "this" {
   private_service_connection {
     name                           = coalesce(var.private_service_connection_name, "psc-${var.name}")
     private_connection_resource_id = azurerm_cosmosdb_account.this.id
-    subresource_names              = ["Sql"]
+    subresource_names              = [var.kind == "MongoDB" ? "MongoDB" : "Sql"]
     is_manual_connection           = false
   }
 

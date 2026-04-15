@@ -85,4 +85,11 @@ resource "azurerm_private_endpoint" "this" {
   }
 
   tags = var.tags
+
+  lifecycle {
+    precondition {
+      condition     = var.subnet_id != null
+      error_message = "subnet_id is required when private endpoints are enabled."
+    }
+  }
 }

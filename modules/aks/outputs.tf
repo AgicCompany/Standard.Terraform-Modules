@@ -10,9 +10,11 @@ output "name" {
 }
 
 # === Resource-Specific Outputs ===
+# DEPRECATED: This output contains credentials and will be removed in the next major version.
+# Use Azure AD authentication with `az aks get-credentials` instead.
 output "kube_config_raw" {
   value       = azurerm_kubernetes_cluster.this.kube_config_raw
-  description = "Raw kubeconfig (sensitive). For bootstrapping only — prefer Azure AD auth."
+  description = "DEPRECATED: Raw kubeconfig (contains credentials). Use az aks get-credentials with Azure AD auth instead."
   sensitive   = true
 }
 

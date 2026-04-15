@@ -113,7 +113,7 @@ resource "azurerm_postgresql_flexible_server_firewall_rule" "this" {
 }
 
 resource "azurerm_postgresql_flexible_server_configuration" "this" {
-  for_each = var.server_configurations
+  for_each = local.merged_server_configurations
 
   name      = each.key
   server_id = azurerm_postgresql_flexible_server.this.id

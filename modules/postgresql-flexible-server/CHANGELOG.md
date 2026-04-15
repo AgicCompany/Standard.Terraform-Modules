@@ -4,6 +4,14 @@ All notable changes to this module will be documented in this file.
 
 ## [Unreleased]
 
+### Changed
+
+- **BREAKING:** `enable_entra_auth` now defaults to `true` (was `false`)
+
+### Fixed
+
+- Added default server configuration enforcing `require_secure_transport = on`
+
 ## [3.0.0] - 2026-03-30
 
 ### Changed

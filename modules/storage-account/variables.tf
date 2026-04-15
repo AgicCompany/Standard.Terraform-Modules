@@ -180,11 +180,6 @@ variable "subnet_id" {
   type        = string
   default     = null
   description = "Subnet ID for private endpoints. Required when any private endpoint is enabled."
-
-  validation {
-    condition     = var.subnet_id != null || !var.enable_private_endpoints
-    error_message = "subnet_id is required when enable_private_endpoints is true."
-  }
 }
 
 variable "private_dns_zone_ids" {

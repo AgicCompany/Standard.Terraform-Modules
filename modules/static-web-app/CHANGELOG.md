@@ -4,6 +4,9 @@ All notable changes to this module will be documented in this file.
 
 ## [Unreleased]
 
+### Removed
+- **BREAKING:** Removed `api_key` output. Retrieve deployment keys via `az staticwebapp secrets list` or a data source instead.
+
 ## [2.0.0] - 2026-03-30
 
 ### Changed

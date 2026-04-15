@@ -4,6 +4,9 @@ All notable changes to this module will be documented in this file.
 
 ## [Unreleased]
 
+### Fixed
+- Added `ssl_policy` block using Azure predefined policy `AppGwSslPolicy20220101` enforcing TLS 1.2 minimum
+
 ## [1.0.0] - 2026-02-10
 
 ### Added

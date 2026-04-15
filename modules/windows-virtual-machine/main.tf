@@ -47,6 +47,10 @@ resource "azurerm_windows_virtual_machine" "this" {
   timezone              = var.timezone
   network_interface_ids = [azurerm_network_interface.this.id]
 
+  encryption_at_host_enabled = var.enable_encryption_at_host
+  secure_boot_enabled        = var.enable_secure_boot
+  vtpm_enabled               = var.enable_vtpm
+
   os_disk {
     caching              = var.os_disk.caching
     storage_account_type = var.os_disk.storage_account_type

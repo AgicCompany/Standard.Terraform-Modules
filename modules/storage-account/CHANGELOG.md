@@ -4,6 +4,10 @@ All notable changes to this module will be documented in this file.
 
 ## [Unreleased]
 
+### Fixed
+
+- Moved `subnet_id` validation to a `lifecycle.precondition` on the private endpoint resource (Terraform validation blocks cannot reference other variables)
+
 ## [2.0.0] - 2026-03-30
 
 ### Changed

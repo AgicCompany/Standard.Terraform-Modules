@@ -4,6 +4,10 @@ All notable changes to this module will be documented in this file.
 
 ## [Unreleased]
 
+### Fixed
+
+- Added missing `locals.tf` and `data.tf` files per module file structure standard
+
 ## [1.0.0] - 2026-03-30
 
 ### Added

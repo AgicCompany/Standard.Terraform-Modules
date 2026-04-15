@@ -14,6 +14,7 @@ resource "azurerm_mysql_flexible_server" "this" {
 
   zone = var.zone
 
+
   delegated_subnet_id = var.delegated_subnet_id
   private_dns_zone_id = var.delegated_subnet_id != null ? var.private_dns_zone_id : null
 
@@ -110,7 +111,7 @@ resource "azurerm_mysql_flexible_server_firewall_rule" "this" {
 }
 
 resource "azurerm_mysql_flexible_server_configuration" "this" {
-  for_each = var.server_configurations
+  for_each = local.merged_server_configurations
 
   name                = each.key
   resource_group_name = var.resource_group_name

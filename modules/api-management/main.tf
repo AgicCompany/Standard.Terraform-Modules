@@ -8,6 +8,15 @@ resource "azurerm_api_management" "this" {
 
   sku_name = var.sku_name
 
+  security {
+    enable_backend_ssl30  = false
+    enable_backend_tls10  = false
+    enable_backend_tls11  = false
+    enable_frontend_ssl30 = false
+    enable_frontend_tls10 = false
+    enable_frontend_tls11 = false
+  }
+
   virtual_network_type          = var.virtual_network_type
   public_network_access_enabled = var.enable_public_access
   client_certificate_enabled    = var.client_certificate_enabled

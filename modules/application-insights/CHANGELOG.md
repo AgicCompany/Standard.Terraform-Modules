@@ -4,6 +4,9 @@ All notable changes to this module will be documented in this file.
 
 ## [Unreleased]
 
+### Removed
+- **BREAKING:** Removed `instrumentation_key`, `connection_string`, and `public_connection_string` outputs. Retrieve via `data.azurerm_application_insights` or Key Vault references instead.
+
 ## [1.0.0] - 2026-02-09
 
 ### Added

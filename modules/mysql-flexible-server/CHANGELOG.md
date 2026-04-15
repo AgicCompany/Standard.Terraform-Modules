@@ -4,6 +4,11 @@ All notable changes to this module will be documented in this file.
 
 ## [Unreleased]
 
+### Fixed
+
+- `enable_public_access` variable is now correctly wired to `public_network_access_enabled` on the server resource
+- Added default server configurations enforcing `require_secure_transport = ON` and `tls_version = TLSv1.2`
+
 ## [3.0.0] - 2026-03-30
 
 ### Changed

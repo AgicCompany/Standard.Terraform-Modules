@@ -4,6 +4,10 @@ All notable changes to this module will be documented in this file.
 
 ## [Unreleased]
 
+### Fixed
+
+- Private endpoint `subresource_names` now correctly uses `"MongoDB"` when `kind = "MongoDB"` instead of hardcoded `"Sql"`
+
 ## [2.0.0] - 2026-03-30
 
 ### Changed
