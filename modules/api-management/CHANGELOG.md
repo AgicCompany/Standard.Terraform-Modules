@@ -7,6 +7,7 @@ All notable changes to this module will be documented in this file.
 ### Fixed
 
 - Added `security` block explicitly disabling SSL 3.0, TLS 1.0, and TLS 1.1 on both frontend and backend
+- Migrated deprecated `enable_*` security attributes to `*_enabled` (AzureRM v5.0 compatibility)
 
 ## [2.0.0] - 2026-03-30
 
