@@ -74,6 +74,41 @@ variable "enable_read_scale" {
   description = "Enable read-only replicas for read scale-out"
 }
 
+# === Optional: Diagnostics ===
+variable "diagnostic_settings" {
+  type = object({
+    name                           = optional(string)
+    log_analytics_workspace_id     = optional(string)
+    storage_account_id             = optional(string)
+    eventhub_authorization_rule_id = optional(string)
+    eventhub_name                  = optional(string)
+    log_analytics_destination_type = optional(string)
+    enabled_log_categories         = optional(list(string))
+    enabled_metrics                = optional(list(string))
+  })
+  default     = null
+  description = "Optional diagnostic settings. null disables. Supports multi-sink (Log Analytics, storage account, Event Hub). enabled_log_categories = null -> all categories the resource supports. enabled_metrics = null -> all metrics the resource supports. At least one of log_analytics_workspace_id, storage_account_id, or eventhub_authorization_rule_id is required when the object is non-null."
+
+  validation {
+    condition = (
+      var.diagnostic_settings == null
+      || var.diagnostic_settings.log_analytics_workspace_id != null
+      || var.diagnostic_settings.storage_account_id != null
+      || var.diagnostic_settings.eventhub_authorization_rule_id != null
+    )
+    error_message = "At least one destination (log_analytics_workspace_id, storage_account_id, or eventhub_authorization_rule_id) is required when diagnostic_settings is set."
+  }
+
+  validation {
+    condition = (
+      var.diagnostic_settings == null
+      || var.diagnostic_settings.log_analytics_destination_type == null
+      || contains(["Dedicated", "AzureDiagnostics"], var.diagnostic_settings.log_analytics_destination_type)
+    )
+    error_message = "log_analytics_destination_type must be \"Dedicated\" or \"AzureDiagnostics\" when set."
+  }
+}
+
 # === Tags ===
 variable "tags" {
   type        = map(string)

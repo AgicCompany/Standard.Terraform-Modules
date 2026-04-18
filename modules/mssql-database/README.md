@@ -74,6 +74,7 @@ No modules.
 
 | Name | Type |
 |------|------|
+| [azurerm_monitor_diagnostic_setting.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_diagnostic_setting) | resource |
 | [azurerm_mssql_database.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/mssql_database) | resource |
 
 ## Inputs
@@ -81,6 +82,7 @@ No modules.
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_collation"></a> [collation](#input\_collation) | Database collation | `string` | `"SQL_Latin1_General_CP1_CI_AS"` | no |
+| <a name="input_diagnostic_settings"></a> [diagnostic\_settings](#input\_diagnostic\_settings) | Optional diagnostic settings. null disables. Supports multi-sink (Log Analytics, storage account, Event Hub). enabled\_log\_categories = null -> all categories the resource supports. enabled\_metrics = null -> all metrics the resource supports. At least one of log\_analytics\_workspace\_id, storage\_account\_id, or eventhub\_authorization\_rule\_id is required when the object is non-null. | <pre>object({<br/>    name                           = optional(string)<br/>    log_analytics_workspace_id     = optional(string)<br/>    storage_account_id             = optional(string)<br/>    eventhub_authorization_rule_id = optional(string)<br/>    eventhub_name                  = optional(string)<br/>    log_analytics_destination_type = optional(string)<br/>    enabled_log_categories         = optional(list(string))<br/>    enabled_metrics                = optional(list(string))<br/>  })</pre> | `null` | no |
 | <a name="input_enable_geo_redundant_backup"></a> [enable\_geo\_redundant\_backup](#input\_enable\_geo\_redundant\_backup) | Enable geo-redundant backup storage | `bool` | `true` | no |
 | <a name="input_enable_read_scale"></a> [enable\_read\_scale](#input\_enable\_read\_scale) | Enable read-only replicas for read scale-out | `bool` | `false` | no |
 | <a name="input_enable_zone_redundancy"></a> [enable\_zone\_redundancy](#input\_enable\_zone\_redundancy) | Enable zone redundant deployment | `bool` | `false` | no |
