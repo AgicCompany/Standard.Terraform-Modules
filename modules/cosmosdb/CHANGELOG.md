@@ -4,9 +4,17 @@ All notable changes to this module will be documented in this file.
 
 ## [Unreleased]
 
-### Fixed
+## [3.0.0] - 2026-04-18
 
-- Private endpoint `subresource_names` now correctly uses `"MongoDB"` when `kind = "MongoDB"` instead of hardcoded `"Sql"`
+### Changed
+
+- **BREAKING**: `minimal_tls_version` variable renamed to `min_tls_version` for consistency with the canonical naming across the module library.
+- **BREAKING**: Accepted value changed from `"Tls12"` to `"1.2"`. The module translates internally to the provider's `"Tls12"` format, so the deployed resource is unchanged — only the consumer-facing value is different.
+
+### Migration
+
+- Consumers passing `minimal_tls_version = "Tls12"` must rename the argument AND change the value: `min_tls_version = "1.2"`.
+- The deployed resource is unchanged — translation is internal — so this is purely an API-surface change for consumers.
 
 ## [2.0.0] - 2026-03-30
 
@@ -20,6 +28,10 @@ All notable changes to this module will be documented in this file.
 - `private_endpoint_name` variable to override PE resource name
 - `private_service_connection_name` variable to override PSC name
 - `private_endpoint_nic_name` variable to override PE NIC name
+
+### Fixed
+
+- Private endpoint `subresource_names` now correctly uses `"MongoDB"` when `kind = "MongoDB"` instead of hardcoded `"Sql"`
 
 ## [1.0.0] - 2026-02-09
 

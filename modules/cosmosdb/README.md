@@ -107,7 +107,7 @@ No modules.
 | <a name="input_ip_range_filter"></a> [ip\_range\_filter](#input\_ip\_range\_filter) | Set of CIDR IP ranges to allow through the Cosmos DB firewall | `set(string)` | `[]` | no |
 | <a name="input_kind"></a> [kind](#input\_kind) | Cosmos DB account kind | `string` | `"GlobalDocumentDB"` | no |
 | <a name="input_location"></a> [location](#input\_location) | Azure region | `string` | n/a | yes |
-| <a name="input_minimal_tls_version"></a> [minimal\_tls\_version](#input\_minimal\_tls\_version) | Minimum TLS version | `string` | `"Tls12"` | no |
+| <a name="input_min_tls_version"></a> [min\_tls\_version](#input\_min\_tls\_version) | Minimum TLS version. Only "1.2" is supported; TLS 1.0/1.1 retired by Azure. Translated internally to the provider's "Tls12" format. | `string` | `"1.2"` | no |
 | <a name="input_name"></a> [name](#input\_name) | Cosmos DB account name (full CAF-compliant name, provided by consumer) | `string` | n/a | yes |
 | <a name="input_offer_type"></a> [offer\_type](#input\_offer\_type) | Cosmos DB offer type | `string` | `"Standard"` | no |
 | <a name="input_private_dns_zone_id"></a> [private\_dns\_zone\_id](#input\_private\_dns\_zone\_id) | Private DNS zone ID for privatelink.documents.azure.com. Required when enable\_private\_endpoint = true. | `string` | `null` | no |

@@ -7,7 +7,7 @@ resource "azurerm_cosmosdb_account" "this" {
 
   free_tier_enabled          = var.free_tier_enabled
   automatic_failover_enabled = var.automatic_failover_enabled
-  minimal_tls_version        = var.minimal_tls_version
+  minimal_tls_version        = var.min_tls_version == "1.2" ? "Tls12" : var.min_tls_version
 
   public_network_access_enabled     = var.enable_public_access
   is_virtual_network_filter_enabled = false
