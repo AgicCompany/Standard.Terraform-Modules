@@ -101,7 +101,7 @@ No modules.
 | <a name="input_backup_retention_days"></a> [backup\_retention\_days](#input\_backup\_retention\_days) | Backup retention days (7-35) | `number` | `7` | no |
 | <a name="input_databases"></a> [databases](#input\_databases) | Map of databases to create. Key is used as the database name. | <pre>map(object({<br/>    charset   = optional(string, "UTF8")<br/>    collation = optional(string, "en_US.utf8")<br/>  }))</pre> | `{}` | no |
 | <a name="input_delegated_subnet_id"></a> [delegated\_subnet\_id](#input\_delegated\_subnet\_id) | Subnet ID for VNet integration (requires Microsoft.DBforPostgreSQL/flexibleServers delegation). Mutually exclusive with private endpoint. | `string` | `null` | no |
-| <a name="input_enable_entra_auth"></a> [enable\_entra\_auth](#input\_enable\_entra\_auth) | Enable Microsoft Entra (AAD) authentication | `bool` | `false` | no |
+| <a name="input_enable_entra_auth"></a> [enable\_entra\_auth](#input\_enable\_entra\_auth) | Enable Microsoft Entra (AAD) authentication (default: enabled for security) | `bool` | `true` | no |
 | <a name="input_enable_password_auth"></a> [enable\_password\_auth](#input\_enable\_password\_auth) | Enable password authentication. Disabled by default; use Entra ID where possible. | `bool` | `false` | no |
 | <a name="input_enable_private_endpoint"></a> [enable\_private\_endpoint](#input\_enable\_private\_endpoint) | Create a private endpoint for the PostgreSQL server. Mutually exclusive with VNet delegation (delegated\_subnet\_id). | `bool` | `true` | no |
 | <a name="input_enable_public_access"></a> [enable\_public\_access](#input\_enable\_public\_access) | Allow public network access (default: disabled for security) | `bool` | `false` | no |

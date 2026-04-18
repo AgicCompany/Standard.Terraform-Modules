@@ -151,7 +151,7 @@ No modules.
 |------|-------------|
 | <a name="output_fqdn"></a> [fqdn](#output\_fqdn) | Cluster FQDN |
 | <a name="output_id"></a> [id](#output\_id) | AKS cluster resource ID |
-| <a name="output_kube_config_raw"></a> [kube\_config\_raw](#output\_kube\_config\_raw) | Raw kubeconfig (sensitive). For bootstrapping only — prefer Azure AD auth. |
+| <a name="output_kube_config_raw"></a> [kube\_config\_raw](#output\_kube\_config\_raw) | DEPRECATED: Raw kubeconfig (contains credentials). Use az aks get-credentials with Azure AD auth instead. |
 | <a name="output_kubelet_identity"></a> [kubelet\_identity](#output\_kubelet\_identity) | Kubelet managed identity (client\_id, object\_id, user\_assigned\_identity\_id) |
 | <a name="output_name"></a> [name](#output\_name) | AKS cluster name |
 | <a name="output_node_resource_group"></a> [node\_resource\_group](#output\_node\_resource\_group) | Auto-created resource group for cluster infrastructure |

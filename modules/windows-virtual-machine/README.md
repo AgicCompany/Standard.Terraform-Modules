@@ -100,8 +100,11 @@ No modules.
 | <a name="input_custom_data"></a> [custom\_data](#input\_custom\_data) | Base64-encoded custom data to pass to the VM | `string` | `null` | no |
 | <a name="input_data_disks"></a> [data\_disks](#input\_data\_disks) | Map of data disks to attach. Key is used as disk name suffix. | <pre>map(object({<br/>    lun                  = number<br/>    disk_size_gb         = number<br/>    storage_account_type = optional(string, "Premium_LRS")<br/>    caching              = optional(string, "ReadOnly")<br/>  }))</pre> | `{}` | no |
 | <a name="input_enable_boot_diagnostics"></a> [enable\_boot\_diagnostics](#input\_enable\_boot\_diagnostics) | Enable boot diagnostics | `bool` | `false` | no |
+| <a name="input_enable_encryption_at_host"></a> [enable\_encryption\_at\_host](#input\_enable\_encryption\_at\_host) | Enable encryption at host (encrypts temp disks and cached data at rest). Requires Microsoft.Compute/EncryptionAtHost feature registered on the subscription. | `bool` | `true` | no |
 | <a name="input_enable_public_ip"></a> [enable\_public\_ip](#input\_enable\_public\_ip) | Create and attach a public IP address | `bool` | `false` | no |
+| <a name="input_enable_secure_boot"></a> [enable\_secure\_boot](#input\_enable\_secure\_boot) | Enable Secure Boot (Trusted Launch). Requires Gen2 VM image. | `bool` | `true` | no |
 | <a name="input_enable_system_assigned_identity"></a> [enable\_system\_assigned\_identity](#input\_enable\_system\_assigned\_identity) | Enable system-assigned managed identity | `bool` | `false` | no |
+| <a name="input_enable_vtpm"></a> [enable\_vtpm](#input\_enable\_vtpm) | Enable vTPM (Trusted Launch). Requires Gen2 VM image. | `bool` | `true` | no |
 | <a name="input_license_type"></a> [license\_type](#input\_license\_type) | License type for Azure Hybrid Benefit: None or Windows\_Server | `string` | `null` | no |
 | <a name="input_location"></a> [location](#input\_location) | Azure region | `string` | n/a | yes |
 | <a name="input_name"></a> [name](#input\_name) | Virtual machine name (full CAF-compliant name, provided by consumer) | `string` | n/a | yes |

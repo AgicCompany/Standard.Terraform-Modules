@@ -97,12 +97,9 @@ No modules.
 | Name | Description |
 |------|-------------|
 | <a name="output_app_id"></a> [app\_id](#output\_app\_id) | Application Insights application ID |
-| <a name="output_connection_string"></a> [connection\_string](#output\_connection\_string) | Application Insights connection string |
 | <a name="output_id"></a> [id](#output\_id) | Application Insights resource ID |
-| <a name="output_instrumentation_key"></a> [instrumentation\_key](#output\_instrumentation\_key) | Application Insights instrumentation key |
 | <a name="output_name"></a> [name](#output\_name) | Application Insights name |
 | <a name="output_public_app_insights_id"></a> [public\_app\_insights\_id](#output\_public\_app\_insights\_id) | Application Insights resource ID (for cross-project consumption) |
-| <a name="output_public_connection_string"></a> [public\_connection\_string](#output\_public\_connection\_string) | Application Insights connection string (for cross-project consumption) |
 <!-- END_TF_DOCS -->
 
 ## Notes
