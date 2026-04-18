@@ -89,8 +89,8 @@ A library of reusable, production-ready Terraform modules for Microsoft Azure. A
 ## Documentation
 
 - [Module Standards](docs/MODULE_STANDARDS.md) — Structure, conventions, and defaults
-- [Implementation Plan](docs/IMPLEMENTATION_PLAN.md) — Build order and module specifications
-- [Test Results](docs/TEST_RESULTS.md) — Live deployment test outcomes
+- [Module Catalog](docs/MODULE_CATALOG.md) — Full variable and output reference for all modules
+- [Testing Guide](docs/TESTING.md) — Test environment setup, cost tiers, and known gotchas
 
 ## Usage
 

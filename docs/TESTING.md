@@ -396,3 +396,52 @@ az group list --query "[?starts_with(name, 'rg-tftest')].name" --output tsv | xa
 - **Container App Environment:** Can take 4-6 minutes to provision when VNet-integrated.
 - **SQL Server region restriction:** MPN subscriptions cannot provision SQL Server in westeurope (`ProvisioningDisabled`). Use northeurope for mssql-server and mssql-database tests. The modules are region-agnostic; this is purely a subscription limitation.
 - **Log Analytics free tier:** The free tier allows 5 GB/day ingestion. Sufficient for testing.
+
+---
+
+## 9. Known Issues & Gotchas
+
+### 9.1 MPN Subscription Limitations
+
+These are Azure subscription-level restrictions on the MPN test subscription. Module code is unaffected — adjust test region or SKU accordingly.
+
+| Limitation | Impact | Workaround |
+|-----------|--------|------------|
+| SQL Server blocked in westeurope | `mssql-server`, `mssql-database` examples fail | Test in northeurope |
+| MySQL Flexible Server blocked in westeurope, northeurope, uksouth | `mysql-flexible-server` example fails | Test in swedencentral |
+| PostgreSQL Flexible Server blocked in westeurope | `postgresql-flexible-server` example fails | Test in swedencentral |
+| Zone redundant SQL not available | `mssql-database` complete example fails with Premium SKU | Use Standard SKU (S0) |
+| AKS zones limited in westeurope | Default `zones = ["1","2","3"]` fails for some VM SKUs | Use `zones = ["3"]` or `zones = []` |
+| B-series VMs unavailable in westeurope/northeurope | Standard_B1s/B2s blocked | Test in swedencentral |
+| CosmosDB westeurope capacity | Account creation fails with `ServiceUnavailable` | Use northeurope `geo_locations` override |
+
+### 9.2 Module & Provider Gotchas
+
+Non-obvious behaviors found during live testing. Documented here for future debugging.
+
+**AzureRM 4.x: `optional(bool)` vs `optional(bool, false)`**
+Use `optional(bool)` without a default for mutually exclusive boolean fields (e.g., `use_custom_runtime`, `use_dotnet_isolated_runtime` in function-app). AzureRM 4.x treats any non-null value — including `false` — as "set", triggering mutual exclusivity errors. Null is ignored.
+
+**MySQL Flexible Server: `public_network_access_enabled` is read-only**
+This is a computed attribute in AzureRM 4.x. Do not set it in the resource block — it causes a validation error. Public access is controlled via networking configuration.
+
+**MySQL/PostgreSQL Flexible Server: DNS zone VNet link race condition**
+When creating a flexible server with VNet integration, the DNS zone VNet link must exist before server provisioning starts. Add `depends_on = [module.dns_zone]` to the server module call when the VNet link is created in the same configuration.
+
+**Service Bus: PE requires Premium SKU**
+Standard SKU does not support private endpoints (`PrivateEndpointInvalidSku`). Event Hub Standard does support PE — this limitation is specific to Service Bus.
+
+**Redis Cache: Basic SKU does not support PE**
+`enable_private_endpoint = true` with `sku_name = "Basic"` fails at plan time via lifecycle precondition. Use Standard or Premium SKU.
+
+**AKS: `maintenance_window.not_allowed` spanning full weeks**
+`not_allowed` periods spanning two or more full weeks cause `NeedAtLeastOneHourPerWeekForUpdate`. For holiday blackouts, use `maintenance_window_auto_upgrade.not_allowed` instead — it only blocks auto-upgrades, not all maintenance.
+
+**AKS: ContainerInsights orphan on destroy**
+Destroying an AKS cluster with Container Insights leaves an orphaned `ContainerInsights(<workspace-name>)` solution in the resource group, causing `terraform destroy` to fail on RG deletion. This is expected — use `az group delete` for cleanup (see section 5.4).
+
+**CosmosDB: slow destroy and westeurope capacity**
+Account deletion takes ~8 minutes due to soft-delete. westeurope regularly fails on account creation with `ServiceUnavailable`. Use northeurope for `geo_locations` primary location when working from a westeurope resource group.
+
+**Terraform 1.13: `for_each` filter on unknown values**
+`for_each` with filter conditions on resource attributes unknown at plan time fails with a key set error. Use separate map variables with always-known keys rather than filtering within a complex object variable.
