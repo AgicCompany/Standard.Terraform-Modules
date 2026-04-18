@@ -2,7 +2,13 @@
 
 All notable changes to this module will be documented in this file.
 
-## [Unreleased]
+## [3.0.0] - 2026-04-18
+
+### Changed
+- **BREAKING:** `sku_tier` default changed from `"Free"` to `"Standard"`. Pass `sku_tier = "Free"` to preserve previous behavior.
+- **BREAKING:** `sku_size` default changed from `"Free"` to `"Standard"`. Pass `sku_size = "Free"` to preserve previous behavior.
+- **BREAKING:** `enable_public_access` default changed from `true` to `false`. Standard SKU required; pass `enable_public_access = true` to allow public traffic.
+- **BREAKING:** `enable_private_endpoint` default changed from `false` to `true`. Pass `enable_private_endpoint = false` (and `enable_public_access = true`) to opt out of private networking.
 
 ### Removed
 - **BREAKING:** Removed `api_key` output. Retrieve deployment keys via `az staticwebapp secrets list` or a data source instead.

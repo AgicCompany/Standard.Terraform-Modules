@@ -17,8 +17,8 @@ variable "name" {
 # === Optional: Configuration ===
 variable "sku_tier" {
   type        = string
-  default     = "Free"
-  description = "SKU tier for the Static Web App"
+  default     = "Standard"
+  description = "SKU tier for the Static Web App. Standard enables private endpoints and disabling public access."
 
   validation {
     condition     = contains(["Free", "Standard"], var.sku_tier)
@@ -28,8 +28,8 @@ variable "sku_tier" {
 
 variable "sku_size" {
   type        = string
-  default     = "Free"
-  description = "SKU size for the Static Web App"
+  default     = "Standard"
+  description = "SKU size for the Static Web App. Must match sku_tier."
 
   validation {
     condition     = contains(["Free", "Standard"], var.sku_size)
@@ -58,14 +58,14 @@ variable "preview_environments_enabled" {
 
 variable "enable_private_endpoint" {
   type        = bool
-  default     = false
+  default     = true
   description = "Create a private endpoint for the Static Web App. Requires Standard SKU."
 }
 
 variable "enable_public_access" {
   type        = bool
-  default     = true
-  description = "Allow public network access. Disabling requires Standard SKU."
+  default     = false
+  description = "Allow public network access. Disabling requires Standard SKU. Set to true when not using a private endpoint."
 }
 
 # === Private Endpoint ===

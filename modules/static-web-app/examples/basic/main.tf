@@ -25,8 +25,11 @@ module "static_web_app" {
   location            = azurerm_resource_group.example.location
   name                = "stapp-example-dev-weu-001"
 
-  # Basic example: no PE (Free SKU doesn't support it)
+  # Free SKU: no private endpoint support. Override secure defaults explicitly.
+  sku_tier                = "Free"
+  sku_size                = "Free"
   enable_private_endpoint = false
+  enable_public_access    = true
 
   tags = {
     project     = "example"

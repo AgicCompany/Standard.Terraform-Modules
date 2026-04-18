@@ -55,9 +55,6 @@ module "static_web_app" {
   location            = azurerm_resource_group.example.location
   name                = "stapp-complete-dev-weu-001"
 
-  sku_tier = "Standard"
-  sku_size = "Standard"
-
   app_settings = {
     API_URL      = "https://api.example.com"
     FEATURE_FLAG = "true"
@@ -65,10 +62,9 @@ module "static_web_app" {
 
   preview_environments_enabled = true
 
-  # Private endpoint (requires Standard SKU)
-  enable_private_endpoint = true
-  subnet_id               = azurerm_subnet.pe.id
-  private_dns_zone_id     = azurerm_private_dns_zone.stapp.id
+  # Private endpoint (Standard SKU + PE disabled public access are secure defaults)
+  subnet_id           = azurerm_subnet.pe.id
+  private_dns_zone_id = azurerm_private_dns_zone.stapp.id
 
   tags = {
     project     = "complete-example"
