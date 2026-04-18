@@ -74,6 +74,7 @@ No modules.
 | Name | Type |
 |------|------|
 | [azurerm_managed_redis.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/managed_redis) | resource |
+| [azurerm_monitor_diagnostic_setting.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_diagnostic_setting) | resource |
 | [azurerm_private_endpoint.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_endpoint) | resource |
 
 ## Inputs
@@ -84,6 +85,7 @@ No modules.
 | <a name="input_client_protocol"></a> [client\_protocol](#input\_client\_protocol) | Client protocol: Encrypted (TLS) or Plaintext | `string` | `"Encrypted"` | no |
 | <a name="input_clustering_policy"></a> [clustering\_policy](#input\_clustering\_policy) | Clustering policy: OSSCluster, EnterpriseCluster, or NoCluster. Cannot be changed after creation (forces replacement). | `string` | `"OSSCluster"` | no |
 | <a name="input_customer_managed_key"></a> [customer\_managed\_key](#input\_customer\_managed\_key) | Customer-managed key for encryption. Requires an identity block with UserAssigned. | <pre>object({<br/>    key_vault_key_id = string<br/>    identity_id      = string<br/>  })</pre> | `null` | no |
+| <a name="input_diagnostic_settings"></a> [diagnostic\_settings](#input\_diagnostic\_settings) | Optional diagnostic settings. null disables. Supports multi-sink (Log Analytics, storage account, Event Hub). enabled\_log\_categories = null -> all categories the resource supports. enabled\_metrics = null -> all metrics the resource supports. At least one of log\_analytics\_workspace\_id, storage\_account\_id, or eventhub\_authorization\_rule\_id is required when the object is non-null. | <pre>object({<br/>    name                           = optional(string)<br/>    log_analytics_workspace_id     = optional(string)<br/>    storage_account_id             = optional(string)<br/>    eventhub_authorization_rule_id = optional(string)<br/>    eventhub_name                  = optional(string)<br/>    log_analytics_destination_type = optional(string)<br/>    enabled_log_categories         = optional(list(string))<br/>    enabled_metrics                = optional(list(string))<br/>  })</pre> | `null` | no |
 | <a name="input_enable_private_endpoint"></a> [enable\_private\_endpoint](#input\_enable\_private\_endpoint) | Create a private endpoint for this instance | `bool` | `true` | no |
 | <a name="input_enable_public_access"></a> [enable\_public\_access](#input\_enable\_public\_access) | Allow public network access | `bool` | `false` | no |
 | <a name="input_eviction_policy"></a> [eviction\_policy](#input\_eviction\_policy) | Eviction policy for the default database | `string` | `"VolatileLRU"` | no |
