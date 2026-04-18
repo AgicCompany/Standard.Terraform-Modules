@@ -1,10 +1,66 @@
-# Function App Flex Consumption Module
+# function-app-flex
 
-Terraform module for Azure Function App on Flex Consumption (FC1) hosting plan.
+**Complexity:** Medium
+
+Creates an Azure Function App on the Flex Consumption (FC1) hosting plan (`azurerm_function_app_flex_consumption`). Supports configurable runtimes, per-instance memory, always-ready instances, flexible storage authentication, VNet integration, and private endpoint.
 
 ## Usage
 
-See `examples/basic/` for minimum viable usage and `examples/complete/` for all features.
+```hcl
+module "function_app_flex" {
+  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/function-app-flex?ref=function-app-flex/v1.0.0"
+
+  resource_group_name = "rg-myapp-dev-weu-001"
+  location            = "westeurope"
+  name                = "func-myapp-dev-weu-001"
+
+  service_plan_id            = module.app_service_plan.id  # must be FC1 SKU
+  runtime_name               = "dotnet-isolated"
+  runtime_version            = "8.0"
+  storage_container_endpoint = "https://${module.storage.name}.blob.core.windows.net/deployments"
+
+  # PE is enabled by default — provide subnet and DNS zone
+  private_endpoint_subnet_id = module.vnet.subnet_ids["snet-pe"]
+  private_dns_zone_ids       = [module.dns.zone_ids["privatelink.azurewebsites.net"]]
+
+  tags = var.tags
+}
+```
+
+## Features
+
+- Flex Consumption (FC1) Function App via `azurerm_function_app_flex_consumption`
+- Configurable runtime: dotnet-isolated, python, node, java, powershell, custom
+- Per-instance memory: 512, 2048 (default), or 4096 MB
+- Maximum instance count and always-ready instance configuration
+- Flexible storage authentication: connection string, SystemAssigned, or UserAssigned identity
+- Managed identity: None (default), SystemAssigned, or UserAssigned
+- VNet integration for outbound traffic (`virtual_network_subnet_id`)
+- Private endpoint with CAF-compliant naming (`pep-{name}`) and override variables
+- `lifecycle { ignore_changes }` on `app_settings` and `site_config` — infra shell pattern; settings managed by dev teams via CI/CD
+
+## Security Defaults
+
+| Setting | Default |
+|---------|---------|
+| HTTPS only | `true` |
+| Client certificate mode | `Required` |
+| WebDeploy basic auth | `false` |
+| Private endpoint | `true` |
+
+## Public Outputs
+
+These outputs are designed for cross-project state consumption:
+
+| Output | Description |
+|--------|-------------|
+| `public_function_app_flex_id` | Function App resource ID (for cross-project consumption) |
+| `public_function_app_flex_name` | Function App name (for cross-project consumption) |
+
+## Examples
+
+- [basic](./examples/basic)
+- [complete](./examples/complete)
 
 <!-- BEGIN_TF_DOCS -->
 ## Requirements
@@ -75,3 +131,11 @@ No modules.
 | <a name="output_public_function_app_flex_id"></a> [public\_function\_app\_flex\_id](#output\_public\_function\_app\_flex\_id) | Function App resource ID (for cross-project consumption). |
 | <a name="output_public_function_app_flex_name"></a> [public\_function\_app\_flex\_name](#output\_public\_function\_app\_flex\_name) | Function App name (for cross-project consumption). |
 <!-- END_TF_DOCS -->
+
+## Notes
+
+- **FC1 plan required:** `service_plan_id` must reference an App Service Plan with `sku_name = "FC1"`. Use the `app-service-plan` module.
+- **Storage container:** The blob container at `storage_container_endpoint` must exist before apply. Create it via the `storage-account` module with blob PE enabled.
+- **App settings lifecycle:** `app_settings` has `ignore_changes` — values set at creation are not tracked on subsequent applies. Dev teams manage settings via CI/CD pipeline or the portal.
+- **Private endpoint DNS:** Use `privatelink.azurewebsites.net` as the private DNS zone for the PE DNS group.
+- **VNet integration vs PE:** `virtual_network_subnet_id` controls outbound traffic (VNet integration). `private_endpoint_subnet_id` controls inbound traffic (PE). Both can be set simultaneously.

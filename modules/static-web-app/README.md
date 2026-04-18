@@ -8,7 +8,7 @@ Creates an Azure Static Web App with configurable SKU, app settings, and preview
 
 ```hcl
 module "static_web_app" {
-  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/static-web-app?ref=static-web-app/v2.0.0"
+  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/static-web-app?ref=static-web-app/v3.0.0"
 
   resource_group_name = "rg-stapp-dev-weu-001"
   location            = "westeurope"
@@ -121,6 +121,6 @@ No modules.
 
 ## Notes
 
-- **GitHub/Azure DevOps integration:** CI/CD pipeline integration is handled outside this module using the `api_key` output.
+- **GitHub/Azure DevOps integration:** CI/CD pipeline integration is handled outside this module. Retrieve the deployment token via `az staticwebapp secrets list --name <name>`.
 - **Private endpoints:** Require Standard SKU. The module enforces this with a lifecycle precondition. The consumer provides the PE subnet and private DNS zone (`privatelink.azurestaticapps.net`).
 - **Limited region availability:** Static Web Apps are available in limited regions (westus2, centralus, eastus2, westeurope, eastasia, eastasiaapac).

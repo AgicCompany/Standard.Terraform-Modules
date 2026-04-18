@@ -26,7 +26,7 @@ module "application_insights" {
 - Data retention and daily cap configuration
 - Sampling percentage control
 - Local authentication toggle
-- Connection string and instrumentation key outputs (sensitive)
+- App ID output for cross-project consumption
 
 ## Security Defaults
 
@@ -41,7 +41,6 @@ These outputs are designed for cross-project state consumption:
 | Output | Description |
 |--------|-------------|
 | `public_app_insights_id` | Application Insights resource ID (for cross-project consumption) |
-| `public_connection_string` | Application Insights connection string (for cross-project consumption) |
 
 ## Examples
 
@@ -105,6 +104,5 @@ No modules.
 ## Notes
 
 - **Workspace-based only:** This module requires a Log Analytics workspace ID. Classic (standalone) Application Insights is deprecated by Microsoft.
-- **Instrumentation key deprecation:** Microsoft recommends using the connection string instead of the instrumentation key. Both are exposed as sensitive outputs.
 - **Sampling:** Set `sampling_percentage` below 100 to reduce data volume and costs for high-traffic applications.
-- **Function App / Web App integration:** Pass `output.connection_string` to the function-app or linux-web-app module's `app_settings` as `APPLICATIONINSIGHTS_CONNECTION_STRING`.
+- **Function App / Web App integration:** Pass `output.app_id` to reference this resource from downstream modules. Configure `APPLICATIONINSIGHTS_CONNECTION_STRING` in app settings via the Azure portal or CI/CD pipeline using `az monitor app-insights component show`.
