@@ -4,6 +4,12 @@ All notable changes to this module will be documented in this file.
 
 ## [Unreleased]
 
+## [2.2.0] - 2026-04-18
+
+### Added
+
+- Optional `diagnostic_settings` variable enabling multi-sink `azurerm_monitor_diagnostic_setting` creation (Log Analytics Workspace, Storage Account, Event Hub). Defaults to `null` (disabled) for backward compatibility. When set, all resource-supported log categories and metrics are enabled by default; `enabled_log_categories` and `enabled_metrics` let consumers narrow the selection.
+
 ## [2.1.0] - 2026-04-15
 
 ### Fixed
