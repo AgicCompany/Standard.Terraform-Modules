@@ -57,7 +57,21 @@ variable "administrator_password" {
   type        = string
   default     = null
   sensitive   = true
-  description = "Administrator password"
+  description = "Administrator password. When non-null: min 12 chars; must include upper, lower, digit, and symbol."
+
+  validation {
+    condition = (
+      var.administrator_password == null
+      || (
+        length(var.administrator_password) >= 12
+        && can(regex("[A-Z]", var.administrator_password))
+        && can(regex("[a-z]", var.administrator_password))
+        && can(regex("[0-9]", var.administrator_password))
+        && can(regex("[^A-Za-z0-9]", var.administrator_password))
+      )
+    )
+    error_message = "When provided, password must be at least 12 characters and include upper, lower, digit, and symbol."
+  }
 }
 
 variable "backup_retention_days" {
