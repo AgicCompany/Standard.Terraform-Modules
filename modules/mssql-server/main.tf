@@ -7,7 +7,7 @@ resource "azurerm_mssql_server" "this" {
   administrator_login          = var.enable_aad_only_auth ? null : var.administrator_login
   administrator_login_password = var.enable_aad_only_auth ? null : var.administrator_login_password
 
-  minimum_tls_version                  = var.minimum_tls_version
+  minimum_tls_version                  = var.min_tls_version
   public_network_access_enabled        = var.enable_public_access
   outbound_network_restriction_enabled = var.enable_outbound_networking_restriction
   connection_policy                    = var.connection_policy

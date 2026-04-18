@@ -104,7 +104,7 @@ No modules.
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_administrator_login"></a> [administrator\_login](#input\_administrator\_login) | SQL admin username. Required when enable\_aad\_only\_auth = false. | `string` | `null` | no |
-| <a name="input_administrator_login_password"></a> [administrator\_login\_password](#input\_administrator\_login\_password) | SQL admin password. Required when enable\_aad\_only\_auth = false. | `string` | `null` | no |
+| <a name="input_administrator_login_password"></a> [administrator\_login\_password](#input\_administrator\_login\_password) | SQL admin password. Required when enable\_aad\_only\_auth = false. When non-null: min 12 chars; must include upper, lower, digit, and symbol. | `string` | `null` | no |
 | <a name="input_azuread_administrator"></a> [azuread\_administrator](#input\_azuread\_administrator) | Azure AD administrator configuration | <pre>object({<br/>    login_username = string<br/>    object_id      = string<br/>  })</pre> | n/a | yes |
 | <a name="input_connection_policy"></a> [connection\_policy](#input\_connection\_policy) | Connection policy: Default, Proxy, or Redirect | `string` | `"Default"` | no |
 | <a name="input_enable_aad_only_auth"></a> [enable\_aad\_only\_auth](#input\_enable\_aad\_only\_auth) | Restrict authentication to Azure AD only | `bool` | `true` | no |
@@ -112,7 +112,7 @@ No modules.
 | <a name="input_enable_private_endpoint"></a> [enable\_private\_endpoint](#input\_enable\_private\_endpoint) | Create a private endpoint for this SQL server | `bool` | `true` | no |
 | <a name="input_enable_public_access"></a> [enable\_public\_access](#input\_enable\_public\_access) | Allow public network access | `bool` | `false` | no |
 | <a name="input_location"></a> [location](#input\_location) | Azure region | `string` | n/a | yes |
-| <a name="input_minimum_tls_version"></a> [minimum\_tls\_version](#input\_minimum\_tls\_version) | Minimum TLS version | `string` | `"1.2"` | no |
+| <a name="input_min_tls_version"></a> [min\_tls\_version](#input\_min\_tls\_version) | Minimum TLS version. Only "1.2" is supported; TLS 1.0/1.1 retired by Azure. | `string` | `"1.2"` | no |
 | <a name="input_name"></a> [name](#input\_name) | SQL Server name (full CAF-compliant name, provided by consumer) | `string` | n/a | yes |
 | <a name="input_private_dns_zone_id"></a> [private\_dns\_zone\_id](#input\_private\_dns\_zone\_id) | Private DNS zone ID for privatelink.database.windows.net. Required when enable\_private\_endpoint = true. | `string` | `null` | no |
 | <a name="input_private_endpoint_name"></a> [private\_endpoint\_name](#input\_private\_endpoint\_name) | Override the private endpoint resource name. Defaults to pep-{name}. | `string` | `null` | no |

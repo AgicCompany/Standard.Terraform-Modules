@@ -40,17 +40,31 @@ variable "administrator_login_password" {
   type        = string
   default     = null
   sensitive   = true
-  description = "SQL admin password. Required when enable_aad_only_auth = false."
-}
-
-variable "minimum_tls_version" {
-  type        = string
-  default     = "1.2"
-  description = "Minimum TLS version"
+  description = "SQL admin password. Required when enable_aad_only_auth = false. When non-null: min 12 chars; must include upper, lower, digit, and symbol."
 
   validation {
-    condition     = var.minimum_tls_version == "1.2"
-    error_message = "minimum_tls_version must be \"1.2\". TLS 1.0 and 1.1 were retired by Azure on 2025-08-31."
+    condition = (
+      var.administrator_login_password == null
+      || (
+        length(var.administrator_login_password) >= 12
+        && can(regex("[A-Z]", var.administrator_login_password))
+        && can(regex("[a-z]", var.administrator_login_password))
+        && can(regex("[0-9]", var.administrator_login_password))
+        && can(regex("[^A-Za-z0-9]", var.administrator_login_password))
+      )
+    )
+    error_message = "When provided, password must be at least 12 characters and include upper, lower, digit, and symbol."
+  }
+}
+
+variable "min_tls_version" {
+  type        = string
+  default     = "1.2"
+  description = "Minimum TLS version. Only \"1.2\" is supported; TLS 1.0/1.1 retired by Azure."
+
+  validation {
+    condition     = contains(["1.2"], var.min_tls_version)
+    error_message = "Only TLS 1.2 is supported; TLS 1.0 and 1.1 were retired by Azure on 2025-08-31."
   }
 }
 
