@@ -90,12 +90,14 @@ No modules.
 | Name | Type |
 |------|------|
 | [azurerm_container_registry.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/container_registry) | resource |
+| [azurerm_monitor_diagnostic_setting.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_diagnostic_setting) | resource |
 | [azurerm_private_endpoint.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_endpoint) | resource |
 
 ## Inputs
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
+| <a name="input_diagnostic_settings"></a> [diagnostic\_settings](#input\_diagnostic\_settings) | Optional diagnostic settings. null disables. Supports multi-sink (Log Analytics, storage account, Event Hub). enabled\_log\_categories = null -> all categories the resource supports. enabled\_metrics = null -> all metrics the resource supports. At least one of log\_analytics\_workspace\_id, storage\_account\_id, or eventhub\_authorization\_rule\_id is required when the object is non-null. | <pre>object({<br/>    name                           = optional(string)<br/>    log_analytics_workspace_id     = optional(string)<br/>    storage_account_id             = optional(string)<br/>    eventhub_authorization_rule_id = optional(string)<br/>    eventhub_name                  = optional(string)<br/>    log_analytics_destination_type = optional(string)<br/>    enabled_log_categories         = optional(list(string))<br/>    enabled_metrics                = optional(list(string))<br/>  })</pre> | `null` | no |
 | <a name="input_enable_admin"></a> [enable\_admin](#input\_enable\_admin) | Enable admin account. Not recommended — use managed identity instead. | `bool` | `false` | no |
 | <a name="input_enable_content_trust"></a> [enable\_content\_trust](#input\_enable\_content\_trust) | Enable content trust (image signing). Premium SKU only. | `bool` | `false` | no |
 | <a name="input_enable_geo_replication"></a> [enable\_geo\_replication](#input\_enable\_geo\_replication) | Enable geo-replication. Premium SKU only. | `bool` | `false` | no |
