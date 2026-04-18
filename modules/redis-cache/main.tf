@@ -5,7 +5,7 @@ resource "azurerm_redis_cache" "this" {
   sku_name                      = var.sku_name
   family                        = var.family
   capacity                      = var.capacity
-  minimum_tls_version           = var.minimum_tls_version
+  minimum_tls_version           = var.min_tls_version
   non_ssl_port_enabled          = var.enable_non_ssl_port
   public_network_access_enabled = var.enable_public_access
   redis_version                 = var.redis_version

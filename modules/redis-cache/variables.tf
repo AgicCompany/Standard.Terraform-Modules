@@ -43,14 +43,14 @@ variable "capacity" {
   description = "Cache size: 0-6 for C family, 1-5 for P family"
 }
 
-variable "minimum_tls_version" {
+variable "min_tls_version" {
   type        = string
   default     = "1.2"
-  description = "Minimum TLS version"
+  description = "Minimum TLS version. Only \"1.2\" is supported; TLS 1.0/1.1 retired by Azure."
 
   validation {
-    condition     = var.minimum_tls_version == "1.2"
-    error_message = "minimum_tls_version must be \"1.2\". TLS 1.0 and 1.1 were retired by Azure on 2025-04-01."
+    condition     = contains(["1.2"], var.min_tls_version)
+    error_message = "Only TLS 1.2 is supported; TLS 1.0 and 1.1 were retired by Azure on 2025-04-01."
   }
 }
 

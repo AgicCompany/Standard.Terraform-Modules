@@ -4,6 +4,16 @@ All notable changes to this module will be documented in this file.
 
 ## [Unreleased]
 
+## [3.0.0] - 2026-04-18
+
+### Changed
+
+- **BREAKING**: `minimum_tls_version` variable renamed to `min_tls_version` for consistency with the canonical naming across the module library. Value format (`"1.2"`) is unchanged. The module continues to set the provider's `minimum_tls_version` field internally; only the consumer-facing variable name changed.
+
+### Migration
+
+- Consumers passing `minimum_tls_version = ...` must rename the argument to `min_tls_version = ...`. No value change needed.
+
 ## [2.0.0] - 2026-03-30
 
 ### Changed
