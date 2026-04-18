@@ -63,7 +63,7 @@ These outputs are designed for cross-project state consumption:
 
 | Name | Version |
 |------|---------|
-| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | >= 4.0.0 |
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 4.62.0 |
 
 ## Modules
 
@@ -84,7 +84,7 @@ No modules.
 | <a name="input_file_copy_enabled"></a> [file\_copy\_enabled](#input\_file\_copy\_enabled) | Enable file copy (Standard SKU only) | `bool` | `false` | no |
 | <a name="input_ip_connect_enabled"></a> [ip\_connect\_enabled](#input\_ip\_connect\_enabled) | Enable IP-based connection (Standard SKU only) | `bool` | `false` | no |
 | <a name="input_location"></a> [location](#input\_location) | Azure region | `string` | n/a | yes |
-| <a name="input_name"></a> [name](#input\_name) | Azure Bastion host name | `string` | n/a | yes |
+| <a name="input_name"></a> [name](#input\_name) | Azure Bastion host name (full CAF-compliant name, provided by consumer) | `string` | n/a | yes |
 | <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name) | Name of the resource group | `string` | n/a | yes |
 | <a name="input_scale_units"></a> [scale\_units](#input\_scale\_units) | Number of scale units (2-50, Standard SKU only) | `number` | `2` | no |
 | <a name="input_shareable_link_enabled"></a> [shareable\_link\_enabled](#input\_shareable\_link\_enabled) | Enable shareable links (Standard SKU only) | `bool` | `false` | no |

@@ -54,7 +54,7 @@ These outputs are designed for cross-project state consumption:
 
 | Name | Version |
 |------|---------|
-| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | >= 4.0.0 |
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 4.62.0 |
 
 ## Modules
 
@@ -77,7 +77,7 @@ No modules.
 | <a name="input_name"></a> [name](#input\_name) | NAT gateway name (full CAF-compliant name, provided by consumer) | `string` | n/a | yes |
 | <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name) | Name of the resource group | `string` | n/a | yes |
 | <a name="input_sku_name"></a> [sku\_name](#input\_sku\_name) | SKU name for the NAT gateway | `string` | `"Standard"` | no |
-| <a name="input_tags"></a> [tags](#input\_tags) | Tags to apply to all resources | `map(string)` | `{}` | no |
+| <a name="input_tags"></a> [tags](#input\_tags) | Tags to apply to the resource | `map(string)` | `{}` | no |
 | <a name="input_zones"></a> [zones](#input\_zones) | Availability zones for the NAT gateway | `list(string)` | `[]` | no |
 
 ## Outputs

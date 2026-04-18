@@ -65,7 +65,7 @@ These outputs are designed for cross-project state consumption:
 
 | Name | Version |
 |------|---------|
-| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | >= 4.0.0 |
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 4.62.0 |
 
 ## Modules
 
@@ -87,7 +87,7 @@ No modules.
 | <a name="input_name"></a> [name](#input\_name) | Route table name (full CAF-compliant name, provided by consumer) | `string` | n/a | yes |
 | <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name) | Name of the resource group | `string` | n/a | yes |
 | <a name="input_routes"></a> [routes](#input\_routes) | Map of routes. Key is used as the route name. | <pre>map(object({<br/>    address_prefix         = string<br/>    next_hop_type          = string<br/>    next_hop_in_ip_address = optional(string)<br/>  }))</pre> | `{}` | no |
-| <a name="input_tags"></a> [tags](#input\_tags) | Tags to apply to all resources | `map(string)` | `{}` | no |
+| <a name="input_tags"></a> [tags](#input\_tags) | Tags to apply to the resource | `map(string)` | `{}` | no |
 
 ## Outputs
 
