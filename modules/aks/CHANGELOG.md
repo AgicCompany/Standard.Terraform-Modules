@@ -4,7 +4,10 @@ All notable changes to this module will be documented in this file.
 
 ## [Unreleased]
 
+## [1.5.0] - 2026-04-15
+
 ### Deprecated
+
 - `kube_config_raw` output is deprecated and will be removed in the next major version. Use `az aks get-credentials` with Azure AD authentication instead.
 
 ## [1.4.0] - 2026-02-20

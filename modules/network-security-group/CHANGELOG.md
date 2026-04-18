@@ -4,6 +4,13 @@ All notable changes to this module will be documented in this file.
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-02-19
+
+### Added
+
+- Enum validations on `security_rules[*]`: `direction` (Inbound, Outbound), `access` (Allow, Deny), `protocol` (Tcp, Udp, Icmp, Esp, Ah, *)
+- Priority range validation (100–4096)
+
 ## [1.0.0] - 2026-02-08
 
 ### Added

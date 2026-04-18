@@ -4,6 +4,8 @@ All notable changes to this module will be documented in this file.
 
 ## [Unreleased]
 
+## [2.1.0] - 2026-04-15
+
 ### Fixed
 
 - Added `security` block explicitly disabling SSL 3.0, TLS 1.0, and TLS 1.1 on both frontend and backend

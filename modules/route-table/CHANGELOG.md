@@ -4,6 +4,12 @@ All notable changes to this module will be documented in this file.
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-02-19
+
+### Added
+
+- Enum validation on `routes[*].next_hop_type` (VirtualNetworkGateway, VnetLocal, Internet, VirtualAppliance, None)
+
 ## [1.0.0] - 2026-02-09
 
 ### Added

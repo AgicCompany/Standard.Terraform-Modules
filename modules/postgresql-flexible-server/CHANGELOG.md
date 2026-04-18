@@ -4,9 +4,11 @@ All notable changes to this module will be documented in this file.
 
 ## [Unreleased]
 
+## [4.0.0] - 2026-04-15
+
 ### Changed
 
-- **BREAKING:** `enable_entra_auth` now defaults to `true` (was `false`)
+- **BREAKING:** `enable_entra_auth` now defaults to `true` (was `false`). Pass `enable_entra_auth = false` to preserve previous behavior.
 
 ### Fixed
 

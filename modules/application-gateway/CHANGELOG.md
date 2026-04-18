@@ -4,7 +4,15 @@ All notable changes to this module will be documented in this file.
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-02-19
+
+### Added
+
+- Enum validations on `http_settings[*].protocol` (Http, Https), `cookie_based_affinity` (Enabled, Disabled), `routing_rules[*].rule_type` (Basic, PathBasedRouting), `redirect_configurations[*].redirect_type` (Permanent, Found, SeeOther, Temporary)
+- Lifecycle preconditions for SSL certificate and authentication certificate constraints
+
 ### Fixed
+
 - Added `ssl_policy` block using Azure predefined policy `AppGwSslPolicy20220101` enforcing TLS 1.2 minimum
 
 ## [1.0.0] - 2026-02-10

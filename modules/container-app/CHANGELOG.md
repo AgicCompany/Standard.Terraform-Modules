@@ -4,6 +4,13 @@ All notable changes to this module will be documented in this file.
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-02-19
+
+### Added
+
+- Enum validation on `ingress.transport` (auto, http, http2, tcp)
+- Lifecycle preconditions for ingress and traffic-weight constraints
+
 ## [1.0.0] - 2026-02-08
 
 ### Added
