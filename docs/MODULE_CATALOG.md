@@ -15,6 +15,52 @@ module "<name>" {
 
 ---
 
+## Recent Module Enhancements
+
+### Phase 1 Module Enhancements (2026-03-31)
+
+12 modules received a `v2.0.0` or `v3.0.0` major bump with private endpoint naming override support:
+
+- `api-management`, `container-registry`, `cosmosdb`, `event-hub`, `function-app`, `key-vault`, `linux-web-app`, `mssql-server`, `redis-cache`, `service-bus`, `static-web-app`, `storage-account` → `v2.0.0`
+- `mysql-flexible-server`, `postgresql-flexible-server` → `v3.0.0` (PE naming override)
+
+See `docs/specs/2026-04-18-module-library-enhancements-design.md` (Phase 1) for design details.
+
+### Phase 2 Module Enhancements (2026-04-18)
+
+20 modules gained an optional `diagnostic_settings` variable (MINOR version bump). This enables `azurerm_monitor_diagnostic_setting` creation inline, with multi-sink support (Log Analytics Workspace, storage account, Event Hub).
+
+**Default is `null` — zero resource changes on upgrade for existing consumers. This is a fully additive, non-breaking change.**
+
+Updated modules and versions:
+
+| Module | Phase 2 Version |
+|--------|----------------|
+| `aks` | `v2.1.0` |
+| `linux-web-app` | `v2.1.0` |
+| `function-app` | `v2.1.0` |
+| `function-app-flex` | `v1.1.0` |
+| `container-app` | `v1.2.0` |
+| `application-gateway` | `v1.2.0` |
+| `mssql-server` | `v3.1.0` |
+| `mssql-database` | `v1.1.0` |
+| `mysql-flexible-server` | `v3.1.0` |
+| `postgresql-flexible-server` | `v4.1.0` |
+| `cosmosdb` | `v3.1.0` |
+| `redis-cache` | `v3.1.0` |
+| `managed-redis` | `v1.1.0` |
+| `event-hub` | `v3.1.0` |
+| `service-bus` | `v3.1.0` |
+| `api-management` | `v2.2.0` |
+| `front-door` | `v1.2.0` |
+| `storage-account` | `v3.1.0` |
+| `key-vault` | `v2.1.0` |
+| `container-registry` | `v2.1.0` |
+
+See `docs/specs/2026-04-18-module-library-enhancements-design.md` (Phase 2) for design details and the `diagnostic_settings` variable contract.
+
+---
+
 ## Foundation
 
 ### virtual-network `v1.0.0`
@@ -118,7 +164,7 @@ Creates bidirectional Azure Virtual Network peering between two VNets.
 
 ---
 
-### storage-account `v2.0.0`
+### storage-account `v3.1.0`
 Creates an Azure Storage Account with secure defaults and optional private endpoints per subresource.
 
 | Variable | Type | Required | Default | Description |
@@ -147,7 +193,7 @@ Creates an Azure Storage Account with secure defaults and optional private endpo
 
 ---
 
-### key-vault `v2.0.0`
+### key-vault `v2.1.0`
 Creates an Azure Key Vault with RBAC authorization and optional private endpoint.
 
 | Variable | Type | Required | Default | Description |
@@ -224,7 +270,7 @@ Creates an Azure Monitor diagnostic setting to route logs and metrics to Log Ana
 
 ## Compute
 
-### aks `v1.5.0`
+### aks `v2.1.0`
 Creates an Azure Kubernetes Service cluster with private-by-default config, Azure AD auth, RBAC, and Container Insights.
 
 | Variable | Type | Required | Default | Description |
@@ -291,7 +337,7 @@ Creates an Azure App Service Plan with configurable OS, SKU, and optional zone r
 
 ---
 
-### linux-web-app `v2.0.0`
+### linux-web-app `v2.1.0`
 Creates an Azure Linux Web App with secure defaults and optional private endpoint.
 
 | Variable | Type | Required | Default | Description |
@@ -319,7 +365,7 @@ Creates an Azure Linux Web App with secure defaults and optional private endpoin
 
 ---
 
-### function-app `v2.0.0`
+### function-app `v2.1.0`
 Creates an Azure Linux Function App with secure defaults and optional private endpoint.
 
 | Variable | Type | Required | Default | Description |
@@ -348,7 +394,7 @@ Creates an Azure Linux Function App with secure defaults and optional private en
 
 ---
 
-### function-app-flex `v1.0.0`
+### function-app-flex `v1.1.0`
 Creates an Azure Flex Consumption (FC1) Function App with private endpoint. Requires a dedicated FC1 App Service Plan (`sku_name = "FC1"`).
 
 | Variable | Type | Required | Default | Description |
@@ -398,7 +444,7 @@ Creates an Azure Container Apps Environment with VNet integration and workload p
 
 ---
 
-### container-app `v1.1.0`
+### container-app `v1.2.0`
 Creates an Azure Container App in an existing Container Apps Environment.
 
 | Variable | Type | Required | Default | Description |
@@ -423,7 +469,7 @@ Creates an Azure Container App in an existing Container Apps Environment.
 
 ---
 
-### container-registry `v2.0.0`
+### container-registry `v2.1.0`
 Creates an Azure Container Registry with secure defaults and optional private endpoint.
 
 | Variable | Type | Required | Default | Description |
@@ -545,7 +591,7 @@ Creates an Azure Static Web App with Standard SKU and private endpoint by defaul
 
 ## Data
 
-### mssql-server `v2.0.0`
+### mssql-server `v3.1.0`
 Creates an Azure SQL logical server with Azure AD auth and optional private endpoint.
 
 | Variable | Type | Required | Default | Description |
@@ -570,7 +616,7 @@ Creates an Azure SQL logical server with Azure AD auth and optional private endp
 
 ---
 
-### mssql-database `v1.0.0`
+### mssql-database `v1.1.0`
 Creates an Azure SQL Database on an existing SQL server.
 
 | Variable | Type | Required | Default | Description |
@@ -589,7 +635,7 @@ Creates an Azure SQL Database on an existing SQL server.
 
 ---
 
-### mysql-flexible-server `v3.0.0`
+### mysql-flexible-server `v3.1.0`
 Creates an Azure MySQL Flexible Server with configurable databases and server parameters.
 
 | Variable | Type | Required | Default | Description |
@@ -615,7 +661,7 @@ Creates an Azure MySQL Flexible Server with configurable databases and server pa
 
 ---
 
-### postgresql-flexible-server `v3.0.0`
+### postgresql-flexible-server `v4.1.0`
 Creates an Azure PostgreSQL Flexible Server with configurable databases and server parameters.
 
 | Variable | Type | Required | Default | Description |
@@ -641,7 +687,7 @@ Creates an Azure PostgreSQL Flexible Server with configurable databases and serv
 
 ---
 
-### cosmosdb `v2.0.0`
+### cosmosdb `v3.1.0`
 Creates an Azure Cosmos DB account with SQL API databases and optional private endpoint.
 
 | Variable | Type | Required | Default | Description |
@@ -669,7 +715,7 @@ Creates an Azure Cosmos DB account with SQL API databases and optional private e
 
 ---
 
-### redis-cache `v2.0.0`
+### redis-cache `v3.1.0`
 Creates an Azure Cache for Redis with secure defaults and optional private endpoint.
 
 | Variable | Type | Required | Default | Description |
@@ -696,7 +742,7 @@ Creates an Azure Cache for Redis with secure defaults and optional private endpo
 
 ---
 
-### managed-redis `v1.0.0`
+### managed-redis `v1.1.0`
 Creates an Azure Managed Redis (Enterprise) instance with modules, geo-replication, and private endpoint. Requires AzureRM >= 4.54.0.
 
 | Variable | Type | Required | Default | Description |
@@ -728,7 +774,7 @@ Creates an Azure Managed Redis (Enterprise) instance with modules, geo-replicati
 
 ## Networking
 
-### application-gateway `v1.1.0`
+### application-gateway `v1.2.0`
 Creates an Azure Application Gateway (v2) with public IP, L7 load balancing, SSL termination, and optional WAF.
 
 | Variable | Type | Required | Default | Description |
@@ -758,7 +804,7 @@ Creates an Azure Application Gateway (v2) with public IP, L7 load balancing, SSL
 
 ---
 
-### front-door `v1.1.0`
+### front-door `v1.2.0`
 Creates an Azure Front Door profile with endpoints, origins, custom domains, WAF, and rule sets.
 
 | Variable | Type | Required | Default | Description |
@@ -780,7 +826,7 @@ Creates an Azure Front Door profile with endpoints, origins, custom domains, WAF
 
 ---
 
-### api-management `v2.0.0`
+### api-management `v2.2.0`
 Creates an Azure API Management service with VNet integration, multi-region support, and optional private endpoint.
 
 | Variable | Type | Required | Default | Description |
@@ -809,7 +855,7 @@ Creates an Azure API Management service with VNet integration, multi-region supp
 
 ## Messaging
 
-### service-bus `v2.0.0`
+### service-bus `v3.1.0`
 Creates an Azure Service Bus namespace with queues, topics, and optional private endpoint.
 
 | Variable | Type | Required | Default | Description |
@@ -832,7 +878,7 @@ Creates an Azure Service Bus namespace with queues, topics, and optional private
 
 ---
 
-### event-hub `v2.0.0`
+### event-hub `v3.1.0`
 Creates an Azure Event Hub namespace with event hubs, consumer groups, and optional private endpoint.
 
 | Variable | Type | Required | Default | Description |
