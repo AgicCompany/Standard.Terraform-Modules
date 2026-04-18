@@ -84,3 +84,41 @@ resource "azurerm_private_endpoint" "this" {
 
   tags = var.tags
 }
+
+data "azurerm_monitor_diagnostic_categories" "this" {
+  count       = var.diagnostic_settings == null ? 0 : 1
+  resource_id = azurerm_function_app_flex_consumption.this.id
+}
+
+resource "azurerm_monitor_diagnostic_setting" "this" {
+  count = var.diagnostic_settings == null ? 0 : 1
+
+  name               = coalesce(var.diagnostic_settings.name, "diag-${var.name}")
+  target_resource_id = azurerm_function_app_flex_consumption.this.id
+
+  log_analytics_workspace_id     = var.diagnostic_settings.log_analytics_workspace_id
+  storage_account_id             = var.diagnostic_settings.storage_account_id
+  eventhub_authorization_rule_id = var.diagnostic_settings.eventhub_authorization_rule_id
+  eventhub_name                  = var.diagnostic_settings.eventhub_name
+  log_analytics_destination_type = var.diagnostic_settings.log_analytics_destination_type
+
+  dynamic "enabled_log" {
+    for_each = coalesce(
+      var.diagnostic_settings.enabled_log_categories,
+      try(data.azurerm_monitor_diagnostic_categories.this[0].log_category_types, [])
+    )
+    content {
+      category = enabled_log.value
+    }
+  }
+
+  dynamic "enabled_metric" {
+    for_each = coalesce(
+      var.diagnostic_settings.enabled_metrics,
+      try(data.azurerm_monitor_diagnostic_categories.this[0].metrics, [])
+    )
+    content {
+      category = enabled_metric.value
+    }
+  }
+}
