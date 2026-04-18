@@ -197,7 +197,7 @@ variable "private_dns_zone_ids" {
 variable "private_endpoint_name_prefix" {
   type        = string
   default     = null
-  description = "Prefix for PE resource names. Suffixed with subresource (e.g., \"pep-storage\" -> \"pep-storage-blob\"). null -> pep-{name}."
+  description = "Prefix for private endpoint and NIC resource names. Suffixed with subresource (e.g., \"pep-storage\" -> \"pep-storage-blob\", \"pep-storage-blob-nic\"). null defaults to \"pep-<var.name>\". Does NOT affect the private_service_connection name, which always uses \"psc-<var.name>-<subresource>\"."
 }
 
 # === Tags ===

@@ -10,7 +10,7 @@ All notable changes to this module will be documented in this file.
 
 - **BREAKING**: `min_tls_version` accepted value changed from `"TLS1_2"` to `"1.2"` (internal translation maps to provider's `"TLS1_2"` format). Aligns with the canonical `min_tls_version = "1.2"` convention across the module library.
 - **BREAKING**: `enable_private_endpoints` renamed to `enable_private_endpoint` (singular). All other PE-creating modules already use singular; storage-account was the outlier.
-- **BREAKING**: Private endpoint name overrides consolidated. Removed `private_endpoint_names`, `private_service_connection_names`, and `private_endpoint_nic_names` (maps). Use the new single variable `private_endpoint_name_prefix` (string) to change the prefix; per-subresource suffixes are auto-generated.
+- **BREAKING**: Private endpoint name overrides consolidated. Removed `private_endpoint_names`, `private_service_connection_names`, and `private_endpoint_nic_names` (maps). Use the new single variable `private_endpoint_name_prefix` (string) to change the PE and NIC stem; per-subresource suffixes are auto-generated. PSC names intentionally stay on `"psc-${var.name}-${subresource}"` regardless of the prefix (PSC names are not user-facing and remain anchored to the storage account name).
 
 ### Added
 
@@ -19,6 +19,12 @@ All notable changes to this module will be documented in this file.
 ### Fixed
 
 - Moved `subnet_id` validation to a `lifecycle.precondition` on the private endpoint resource (Terraform validation blocks cannot reference other variables)
+
+### Migration
+
+- Consumers passing any of the removed map variables (`private_endpoint_names`, `private_service_connection_names`, `private_endpoint_nic_names`) must drop those arguments. Use `private_endpoint_name_prefix` (string) to change the PE/NIC stem; PSC names remain anchored to `var.name`.
+- Consumers passing `min_tls_version = "TLS1_2"` must change the value to `"1.2"` (internal translation preserves the deployed resource).
+- Consumers passing `enable_private_endpoints = ...` (plural) must rename to `enable_private_endpoint` (singular).
 
 ## [2.0.0] - 2026-03-30
 
