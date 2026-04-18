@@ -66,12 +66,12 @@ variable "access_tier" {
 
 variable "min_tls_version" {
   type        = string
-  default     = "TLS1_2"
-  description = "Minimum TLS version"
+  default     = "1.2"
+  description = "Minimum TLS version. Only \"1.2\" is supported; TLS 1.0/1.1 retired by Azure."
 
   validation {
-    condition     = var.min_tls_version == "TLS1_2"
-    error_message = "min_tls_version must be \"TLS1_2\". TLS 1.0 and 1.1 were retired by Azure on 2026-02-03."
+    condition     = contains(["1.2"], var.min_tls_version)
+    error_message = "Only TLS 1.2 is supported; TLS 1.0 and 1.1 were retired by Azure on 2026-02-03."
   }
 }
 
@@ -121,10 +121,10 @@ variable "network_rules" {
 }
 
 # === Optional: Feature Flags ===
-variable "enable_private_endpoints" {
+variable "enable_private_endpoint" {
   type        = bool
   default     = true
-  description = "Create private endpoints for enabled subresources"
+  description = "Create private endpoints for enabled subresources (blob, file, queue, table)."
 }
 
 variable "enable_public_access" {
@@ -193,38 +193,11 @@ variable "private_dns_zone_ids" {
   }
 }
 
-# === Optional: Private Endpoint Overrides ===
-variable "private_endpoint_names" {
-  type        = map(string)
-  default     = {}
-  description = "Override PE names per subresource key (blob, file, table, queue). Defaults to pep-{name}-{subresource}."
-
-  validation {
-    condition     = alltrue([for k in keys(var.private_endpoint_names) : contains(["blob", "file", "table", "queue"], k)])
-    error_message = "private_endpoint_names keys must be a subset of: blob, file, table, queue."
-  }
-}
-
-variable "private_service_connection_names" {
-  type        = map(string)
-  default     = {}
-  description = "Override PSC names per subresource key. Defaults to psc-{name}-{subresource}."
-
-  validation {
-    condition     = alltrue([for k in keys(var.private_service_connection_names) : contains(["blob", "file", "table", "queue"], k)])
-    error_message = "private_service_connection_names keys must be a subset of: blob, file, table, queue."
-  }
-}
-
-variable "private_endpoint_nic_names" {
-  type        = map(string)
-  default     = {}
-  description = "Override PE NIC names per subresource key. Defaults to pep-{name}-{subresource}-nic."
-
-  validation {
-    condition     = alltrue([for k in keys(var.private_endpoint_nic_names) : contains(["blob", "file", "table", "queue"], k)])
-    error_message = "private_endpoint_nic_names keys must be a subset of: blob, file, table, queue."
-  }
+# === Optional: Private Endpoint Naming ===
+variable "private_endpoint_name_prefix" {
+  type        = string
+  default     = null
+  description = "Prefix for PE resource names. Suffixed with subresource (e.g., \"pep-storage\" -> \"pep-storage-blob\"). null -> pep-{name}."
 }
 
 # === Tags ===

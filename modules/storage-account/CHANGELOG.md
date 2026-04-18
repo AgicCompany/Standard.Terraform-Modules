@@ -4,6 +4,18 @@ All notable changes to this module will be documented in this file.
 
 ## [Unreleased]
 
+## [3.0.0] - 2026-04-18
+
+### Changed
+
+- **BREAKING**: `min_tls_version` accepted value changed from `"TLS1_2"` to `"1.2"` (internal translation maps to provider's `"TLS1_2"` format). Aligns with the canonical `min_tls_version = "1.2"` convention across the module library.
+- **BREAKING**: `enable_private_endpoints` renamed to `enable_private_endpoint` (singular). All other PE-creating modules already use singular; storage-account was the outlier.
+- **BREAKING**: Private endpoint name overrides consolidated. Removed `private_endpoint_names`, `private_service_connection_names`, and `private_endpoint_nic_names` (maps). Use the new single variable `private_endpoint_name_prefix` (string) to change the prefix; per-subresource suffixes are auto-generated.
+
+### Added
+
+- `private_endpoint_name_prefix` variable. Default `null` → `pep-${var.name}`.
+
 ### Fixed
 
 - Moved `subnet_id` validation to a `lifecycle.precondition` on the private endpoint resource (Terraform validation blocks cannot reference other variables)

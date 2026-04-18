@@ -136,19 +136,17 @@ No modules.
 | <a name="input_enable_blob_soft_delete"></a> [enable\_blob\_soft\_delete](#input\_enable\_blob\_soft\_delete) | Enable blob soft delete | `bool` | `true` | no |
 | <a name="input_enable_container_soft_delete"></a> [enable\_container\_soft\_delete](#input\_enable\_container\_soft\_delete) | Enable container soft delete | `bool` | `true` | no |
 | <a name="input_enable_file_private_endpoint"></a> [enable\_file\_private\_endpoint](#input\_enable\_file\_private\_endpoint) | Create private endpoint for file subresource | `bool` | `false` | no |
-| <a name="input_enable_private_endpoints"></a> [enable\_private\_endpoints](#input\_enable\_private\_endpoints) | Create private endpoints for enabled subresources | `bool` | `true` | no |
+| <a name="input_enable_private_endpoint"></a> [enable\_private\_endpoint](#input\_enable\_private\_endpoint) | Create private endpoints for enabled subresources (blob, file, queue, table). | `bool` | `true` | no |
 | <a name="input_enable_public_access"></a> [enable\_public\_access](#input\_enable\_public\_access) | Allow public network access to the storage account | `bool` | `false` | no |
 | <a name="input_enable_queue_private_endpoint"></a> [enable\_queue\_private\_endpoint](#input\_enable\_queue\_private\_endpoint) | Create private endpoint for queue subresource | `bool` | `false` | no |
 | <a name="input_enable_table_private_endpoint"></a> [enable\_table\_private\_endpoint](#input\_enable\_table\_private\_endpoint) | Create private endpoint for table subresource | `bool` | `false` | no |
 | <a name="input_enable_versioning"></a> [enable\_versioning](#input\_enable\_versioning) | Enable blob versioning | `bool` | `false` | no |
 | <a name="input_location"></a> [location](#input\_location) | Azure region | `string` | n/a | yes |
-| <a name="input_min_tls_version"></a> [min\_tls\_version](#input\_min\_tls\_version) | Minimum TLS version | `string` | `"TLS1_2"` | no |
+| <a name="input_min_tls_version"></a> [min\_tls\_version](#input\_min\_tls\_version) | Minimum TLS version. Only "1.2" is supported; TLS 1.0/1.1 retired by Azure. | `string` | `"1.2"` | no |
 | <a name="input_name"></a> [name](#input\_name) | Storage account name (full CAF-compliant name, provided by consumer) | `string` | n/a | yes |
 | <a name="input_network_rules"></a> [network\_rules](#input\_network\_rules) | Network rules for the storage account. Only applies when enable\_public\_access = true. | <pre>object({<br/>    bypass                     = optional(list(string), ["AzureServices"])<br/>    default_action             = optional(string, "Deny")<br/>    ip_rules                   = optional(list(string), [])<br/>    virtual_network_subnet_ids = optional(list(string), [])<br/>  })</pre> | `null` | no |
 | <a name="input_private_dns_zone_ids"></a> [private\_dns\_zone\_ids](#input\_private\_dns\_zone\_ids) | Map of subresource name (blob, file, table, queue) to private DNS zone ID. | `map(string)` | `{}` | no |
-| <a name="input_private_endpoint_names"></a> [private\_endpoint\_names](#input\_private\_endpoint\_names) | Override PE names per subresource key (blob, file, table, queue). Defaults to pep-{name}-{subresource}. | `map(string)` | `{}` | no |
-| <a name="input_private_endpoint_nic_names"></a> [private\_endpoint\_nic\_names](#input\_private\_endpoint\_nic\_names) | Override PE NIC names per subresource key. Defaults to pep-{name}-{subresource}-nic. | `map(string)` | `{}` | no |
-| <a name="input_private_service_connection_names"></a> [private\_service\_connection\_names](#input\_private\_service\_connection\_names) | Override PSC names per subresource key. Defaults to psc-{name}-{subresource}. | `map(string)` | `{}` | no |
+| <a name="input_private_endpoint_name_prefix"></a> [private\_endpoint\_name\_prefix](#input\_private\_endpoint\_name\_prefix) | Prefix for PE resource names. Suffixed with subresource (e.g., "pep-storage" -> "pep-storage-blob"). null -> pep-{name}. | `string` | `null` | no |
 | <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name) | Name of the resource group | `string` | n/a | yes |
 | <a name="input_shared_access_key_enabled"></a> [shared\_access\_key\_enabled](#input\_shared\_access\_key\_enabled) | Enable shared key authorization. Disabled by default; use managed identity where possible. | `bool` | `false` | no |
 | <a name="input_subnet_id"></a> [subnet\_id](#input\_subnet\_id) | Subnet ID for private endpoints. Required when any private endpoint is enabled. | `string` | `null` | no |
