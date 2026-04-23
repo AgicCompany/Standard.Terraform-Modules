@@ -95,7 +95,7 @@ No modules.
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_administrator_login"></a> [administrator\_login](#input\_administrator\_login) | Administrator login name | `string` | `null` | no |
-| <a name="input_administrator_password"></a> [administrator\_password](#input\_administrator\_password) | Administrator password | `string` | `null` | no |
+| <a name="input_administrator_password"></a> [administrator\_password](#input\_administrator\_password) | Administrator password. When non-null: min 12 chars; must include upper, lower, digit, and symbol. | `string` | `null` | no |
 | <a name="input_backup_retention_days"></a> [backup\_retention\_days](#input\_backup\_retention\_days) | Backup retention days (1-35) | `number` | `7` | no |
 | <a name="input_databases"></a> [databases](#input\_databases) | Map of databases to create. Key is used as the database name. | <pre>map(object({<br/>    charset   = optional(string, "utf8mb4")<br/>    collation = optional(string, "utf8mb4_unicode_ci")<br/>  }))</pre> | `{}` | no |
 | <a name="input_delegated_subnet_id"></a> [delegated\_subnet\_id](#input\_delegated\_subnet\_id) | Subnet ID for VNet integration (requires Microsoft.DBforMySQL/flexibleServers delegation). Mutually exclusive with private endpoint. | `string` | `null` | no |

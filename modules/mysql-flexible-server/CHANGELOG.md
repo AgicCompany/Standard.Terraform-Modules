@@ -4,6 +4,16 @@ All notable changes to this module will be documented in this file.
 
 ## [Unreleased]
 
+## [3.0.1] - 2026-04-18
+
+### Added
+
+- Null-safe password complexity validation on `administrator_password`: min 12 chars; must include upper, lower, digit, and symbol. Existing deployments with null passwords or already-compliant passwords are unaffected. Weak passwords now rejected at validate time instead of forwarded to Azure.
+
+### Security
+
+- Password complexity validation aligns with Azure's built-in MySQL Flexible Server complexity rules.
+
 ### Fixed
 
 - `enable_public_access` variable is now correctly wired to `public_network_access_enabled` on the server resource
