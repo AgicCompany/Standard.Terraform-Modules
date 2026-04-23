@@ -97,7 +97,7 @@ No modules.
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_administrator_login"></a> [administrator\_login](#input\_administrator\_login) | Administrator login name. Required when authentication.password\_auth\_enabled = true. | `string` | `null` | no |
-| <a name="input_administrator_password"></a> [administrator\_password](#input\_administrator\_password) | Administrator password. Required when authentication.password\_auth\_enabled = true. | `string` | `null` | no |
+| <a name="input_administrator_password"></a> [administrator\_password](#input\_administrator\_password) | Administrator password. Required when authentication.password\_auth\_enabled = true. When non-null: min 12 chars; must include upper, lower, digit, and symbol. | `string` | `null` | no |
 | <a name="input_backup_retention_days"></a> [backup\_retention\_days](#input\_backup\_retention\_days) | Backup retention days (7-35) | `number` | `7` | no |
 | <a name="input_databases"></a> [databases](#input\_databases) | Map of databases to create. Key is used as the database name. | <pre>map(object({<br/>    charset   = optional(string, "UTF8")<br/>    collation = optional(string, "en_US.utf8")<br/>  }))</pre> | `{}` | no |
 | <a name="input_delegated_subnet_id"></a> [delegated\_subnet\_id](#input\_delegated\_subnet\_id) | Subnet ID for VNet integration (requires Microsoft.DBforPostgreSQL/flexibleServers delegation). Mutually exclusive with private endpoint. | `string` | `null` | no |
