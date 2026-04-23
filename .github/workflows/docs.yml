@@ -12,4 +12,7 @@ jobs:
       - uses: terraform-docs/gh-actions@v1
         with:
           find-dir: modules
+          config-file: .terraform-docs.yml
+          output-file: README.md
+          output-method: inject
           fail-on-diff: true
