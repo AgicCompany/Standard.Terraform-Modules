@@ -105,7 +105,7 @@ No modules.
 | <a name="input_family"></a> [family](#input\_family) | SKU family: C (Basic/Standard) or P (Premium) | `string` | `"C"` | no |
 | <a name="input_firewall_rules"></a> [firewall\_rules](#input\_firewall\_rules) | Map of firewall rules. Key is the rule name. | <pre>map(object({<br/>    start_ip = string<br/>    end_ip   = string<br/>  }))</pre> | `{}` | no |
 | <a name="input_location"></a> [location](#input\_location) | Azure region | `string` | n/a | yes |
-| <a name="input_minimum_tls_version"></a> [minimum\_tls\_version](#input\_minimum\_tls\_version) | Minimum TLS version | `string` | `"1.2"` | no |
+| <a name="input_min_tls_version"></a> [min\_tls\_version](#input\_min\_tls\_version) | Minimum TLS version. Only "1.2" is supported; TLS 1.0/1.1 retired by Azure. | `string` | `"1.2"` | no |
 | <a name="input_name"></a> [name](#input\_name) | Redis Cache name (full CAF-compliant name, provided by consumer) | `string` | n/a | yes |
 | <a name="input_patch_schedule"></a> [patch\_schedule](#input\_patch\_schedule) | Patch schedule for Redis updates. Premium SKU only. | <pre>object({<br/>    day_of_week    = string<br/>    start_hour_utc = optional(number, 0)<br/>  })</pre> | `null` | no |
 | <a name="input_private_dns_zone_id"></a> [private\_dns\_zone\_id](#input\_private\_dns\_zone\_id) | Private DNS zone ID for privatelink.redis.cache.windows.net. Required when enable\_private\_endpoint = true. | `string` | `null` | no |
