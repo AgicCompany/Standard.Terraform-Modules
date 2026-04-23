@@ -71,14 +71,14 @@ variable "automatic_failover_enabled" {
   description = "Enable automatic failover for the account"
 }
 
-variable "minimal_tls_version" {
+variable "min_tls_version" {
   type        = string
-  default     = "Tls12"
-  description = "Minimum TLS version"
+  default     = "1.2"
+  description = "Minimum TLS version. Only \"1.2\" is supported; TLS 1.0/1.1 retired by Azure. Translated internally to the provider's \"Tls12\" format."
 
   validation {
-    condition     = var.minimal_tls_version == "Tls12"
-    error_message = "minimal_tls_version must be \"Tls12\". TLS 1.0 and 1.1 were retired by Azure on 2025-08-31."
+    condition     = contains(["1.2"], var.min_tls_version)
+    error_message = "Only TLS 1.2 is supported; TLS 1.0 and 1.1 were retired by Azure on 2025-08-31."
   }
 }
 

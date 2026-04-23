@@ -4,6 +4,18 @@ All notable changes to this module will be documented in this file.
 
 ## [Unreleased]
 
+## [3.0.0] - 2026-04-18
+
+### Changed
+
+- **BREAKING**: `minimal_tls_version` variable renamed to `min_tls_version` for consistency with the canonical naming across the module library.
+- **BREAKING**: Accepted value changed from `"Tls12"` to `"1.2"`. The module translates internally to the provider's `"Tls12"` format, so the deployed resource is unchanged — only the consumer-facing value is different.
+
+### Migration
+
+- Consumers passing `minimal_tls_version = "Tls12"` must rename the argument AND change the value: `min_tls_version = "1.2"`.
+- The deployed resource is unchanged — translation is internal — so this is purely an API-surface change for consumers.
+
 ### Fixed
 
 - Private endpoint `subresource_names` now correctly uses `"MongoDB"` when `kind = "MongoDB"` instead of hardcoded `"Sql"`
