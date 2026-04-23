@@ -4,7 +4,7 @@ resource "azurerm_servicebus_namespace" "this" {
   resource_group_name           = var.resource_group_name
   sku                           = var.sku
   capacity                      = var.sku == "Premium" ? var.capacity : 0
-  minimum_tls_version           = var.minimum_tls_version
+  minimum_tls_version           = var.min_tls_version
   local_auth_enabled            = var.enable_local_auth
   public_network_access_enabled = var.enable_public_access
   premium_messaging_partitions  = var.sku == "Premium" ? min(4, var.capacity > 0 ? var.capacity : 1) : 0
