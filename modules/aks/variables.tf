@@ -48,7 +48,7 @@ variable "default_node_pool" {
     os_disk_size_gb             = optional(number, 128)
     os_disk_type                = optional(string, "Managed")
     os_sku                      = optional(string, "AzureLinux")
-    zones                       = optional(list(string), ["1", "2", "3"])
+    zones                       = optional(list(string), [])
     max_pods                    = optional(number, 30)
     temporary_name_for_rotation = optional(string, "tmpnodepool")
     upgrade_settings = optional(object({

@@ -4,6 +4,16 @@ All notable changes to this module will be documented in this file.
 
 ## [Unreleased]
 
+## [2.0.0] - 2026-04-18
+
+### Changed
+
+- **BREAKING**: `default_node_pool.zones` default changed from `["1","2","3"]` to `[]`. Rationale: the previous default failed on MPN, sandbox, and many dev-tier subscriptions where not all zones are available. Multi-zone consumers must now set `zones` explicitly.
+
+### Migration
+
+- Consumers who want multi-zone node pools must pass `default_node_pool = { zones = ["1","2","3"] }` (or whichever zones their subscription supports). Consumers on zone-constrained subscriptions now deploy cleanly on the default.
+
 ## [1.5.0] - 2026-04-15
 
 ### Deprecated
