@@ -25,6 +25,6 @@ jobs:
         run: |
           if ! git diff --quiet; then
             echo "::error::terraform-docs output is stale. Run ./scripts/generate-docs.sh and commit the changes."
-            git diff --stat
+            git diff | head -60
             exit 1
           fi
