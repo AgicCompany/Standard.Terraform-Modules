@@ -119,7 +119,7 @@ No modules.
 | <a name="input_event_hubs"></a> [event\_hubs](#input\_event\_hubs) | Map of Event Hubs to create within the namespace | <pre>map(object({<br/>    partition_count   = optional(number, 2)<br/>    message_retention = optional(number, 1)<br/>    consumer_groups = optional(map(object({<br/>      user_metadata = optional(string)<br/>    })), {})<br/>  }))</pre> | `{}` | no |
 | <a name="input_location"></a> [location](#input\_location) | Azure region | `string` | n/a | yes |
 | <a name="input_maximum_throughput_units"></a> [maximum\_throughput\_units](#input\_maximum\_throughput\_units) | Maximum throughput units when auto-inflate is enabled (1-40) | `number` | `null` | no |
-| <a name="input_minimum_tls_version"></a> [minimum\_tls\_version](#input\_minimum\_tls\_version) | Minimum TLS version | `string` | `"1.2"` | no |
+| <a name="input_min_tls_version"></a> [min\_tls\_version](#input\_min\_tls\_version) | Minimum TLS version. Only "1.2" is supported; TLS 1.0/1.1 retired by Azure. | `string` | `"1.2"` | no |
 | <a name="input_name"></a> [name](#input\_name) | Event Hub namespace name (full CAF-compliant name, provided by consumer) | `string` | n/a | yes |
 | <a name="input_private_dns_zone_id"></a> [private\_dns\_zone\_id](#input\_private\_dns\_zone\_id) | Private DNS zone ID for privatelink.servicebus.windows.net. Required when enable\_private\_endpoint = true. | `string` | `null` | no |
 | <a name="input_private_endpoint_name"></a> [private\_endpoint\_name](#input\_private\_endpoint\_name) | Override the private endpoint resource name. Defaults to pep-{name}. | `string` | `null` | no |

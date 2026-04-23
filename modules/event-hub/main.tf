@@ -6,7 +6,7 @@ resource "azurerm_eventhub_namespace" "this" {
   sku      = var.sku
   capacity = var.capacity
 
-  minimum_tls_version      = var.minimum_tls_version
+  minimum_tls_version      = var.min_tls_version
   auto_inflate_enabled     = var.auto_inflate_enabled
   maximum_throughput_units = var.auto_inflate_enabled ? var.maximum_throughput_units : null
 
