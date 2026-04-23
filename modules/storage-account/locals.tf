@@ -1,8 +1,10 @@
 # locals.tf - Local values
 
 locals {
+  pe_name_prefix = coalesce(var.private_endpoint_name_prefix, "pep-${var.name}")
+
   # Determine which private endpoints to create
-  private_endpoints = var.enable_private_endpoints ? {
+  private_endpoints = var.enable_private_endpoint ? {
     for subresource in ["blob", "file", "table", "queue"] :
     subresource => {
       dns_zone_id = lookup(var.private_dns_zone_ids, subresource, null)

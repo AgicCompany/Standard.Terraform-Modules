@@ -142,8 +142,8 @@ module "storage_public" {
   name                = "stpublicdevweu001"
 
   # Disable private endpoints, enable public access
-  enable_private_endpoints = false
-  enable_public_access     = true
+  enable_private_endpoint = false
+  enable_public_access    = true
 
   # Allow specific IPs/VNets
   network_rules = {
