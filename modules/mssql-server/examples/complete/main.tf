@@ -67,7 +67,7 @@ module "sql_server" {
   connection_policy = "Redirect"
 
   # Security settings
-  minimum_tls_version                    = "1.2"
+  min_tls_version                        = "1.2"
   enable_outbound_networking_restriction = true
 
   # Private endpoint (default: enabled)
