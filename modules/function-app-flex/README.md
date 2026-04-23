@@ -85,6 +85,7 @@ No modules.
 | Name | Type |
 |------|------|
 | [azurerm_function_app_flex_consumption.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/function_app_flex_consumption) | resource |
+| [azurerm_monitor_diagnostic_setting.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_diagnostic_setting) | resource |
 | [azurerm_private_endpoint.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_endpoint) | resource |
 
 ## Inputs
@@ -94,6 +95,7 @@ No modules.
 | <a name="input_always_ready_instances"></a> [always\_ready\_instances](#input\_always\_ready\_instances) | Map of always-ready instance configurations keyed by function name. | <pre>map(object({<br/>    instance_count = number<br/>  }))</pre> | `{}` | no |
 | <a name="input_app_settings"></a> [app\_settings](#input\_app\_settings) | Application settings. Ignored on subsequent applies (managed by dev teams via CI/CD). | `map(string)` | `{}` | no |
 | <a name="input_client_certificate_mode"></a> [client\_certificate\_mode](#input\_client\_certificate\_mode) | Client certificate mode: Required, Optional, or OptionalInteractiveUser. | `string` | `"Required"` | no |
+| <a name="input_diagnostic_settings"></a> [diagnostic\_settings](#input\_diagnostic\_settings) | Optional diagnostic settings. null disables. Supports multi-sink (Log Analytics, storage account, Event Hub). enabled\_log\_categories = null -> all categories the resource supports. enabled\_metrics = null -> all metrics the resource supports. At least one of log\_analytics\_workspace\_id, storage\_account\_id, or eventhub\_authorization\_rule\_id is required when the object is non-null. | <pre>object({<br/>    name                           = optional(string)<br/>    log_analytics_workspace_id     = optional(string)<br/>    storage_account_id             = optional(string)<br/>    eventhub_authorization_rule_id = optional(string)<br/>    eventhub_name                  = optional(string)<br/>    log_analytics_destination_type = optional(string)<br/>    enabled_log_categories         = optional(list(string))<br/>    enabled_metrics                = optional(list(string))<br/>  })</pre> | `null` | no |
 | <a name="input_enable_private_endpoint"></a> [enable\_private\_endpoint](#input\_enable\_private\_endpoint) | Create a private endpoint for the Function App. | `bool` | `true` | no |
 | <a name="input_https_only"></a> [https\_only](#input\_https\_only) | Require HTTPS connections. | `bool` | `true` | no |
 | <a name="input_identity_ids"></a> [identity\_ids](#input\_identity\_ids) | List of user-assigned identity resource IDs. Required when identity\_type = UserAssigned. | `list(string)` | `[]` | no |
