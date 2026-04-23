@@ -15,8 +15,8 @@ Deploys a PostgreSQL Flexible Server with VNet integration, multiple databases, 
 
 | Name | Version |
 |------|---------|
-| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 4.69.0 |
-| <a name="provider_random"></a> [random](#provider\_random) | 3.8.1 |
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | >= 4.0.0 |
+| <a name="provider_random"></a> [random](#provider\_random) | >= 3.5.0 |
 
 ## Modules
 
