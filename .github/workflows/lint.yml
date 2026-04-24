@@ -1,0 +1,46 @@
+name: Lint
+
+on:
+  pull_request:
+    paths: ['modules/**']
+
+jobs:
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      modules: ${{ steps.changes.outputs.modules }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Detect changed modules
+        id: changes
+        run: |
+          MODULES=$(git diff --name-only origin/main...HEAD -- modules/ \
+            | cut -d'/' -f2 | sort -u | jq -R -s -c 'split("\n") | map(select(. != ""))')
+          echo "modules=$MODULES" >> "$GITHUB_OUTPUT"
+          echo "Changed modules: $MODULES"
+
+  lint:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.modules != '[]'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        module: ${{ fromJson(needs.detect-changes.outputs.modules) }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: terraform-linters/setup-tflint@v6
+        with:
+          tflint_version: "v0.62.0"
+
+      - name: Init tflint
+        run: tflint --init
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+
+      - name: Lint module
+        run: tflint --chdir="modules/${{ matrix.module }}"
