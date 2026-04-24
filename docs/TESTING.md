@@ -48,6 +48,25 @@ Claude Code runs from inside the `framework-terraform` repo. Tests execute from 
 
 ---
 
+### 1.5 CI Pipeline
+
+Pull requests touching `modules/**` trigger automated validation via GitHub Actions:
+
+- **`validate` workflow** — checks formatting (`terraform fmt -check`), runs `terraform validate` on the module, and validates all examples. Runs only on changed modules (detected via git diff). This is a required check.
+- **`lint` workflow** — runs `tflint` with the AzureRM ruleset. Advisory only (not a required check initially).
+- **`docs` workflow** — existing; checks that `terraform-docs` output is fresh.
+
+For local validation before pushing, use the Makefile:
+
+```bash
+make validate MODULE=<name>    # Validate a single module + examples
+make validate-all              # Validate all modules
+make lint MODULE=<name>        # Lint a single module (requires tflint)
+make fmt MODULE=<name>         # Fix formatting in a module
+```
+
+---
+
 ## 2. Naming Convention
 
 All test resources use `tftest` as the project name, making them instantly identifiable as disposable.
