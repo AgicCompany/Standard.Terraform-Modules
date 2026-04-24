@@ -1,6 +1,6 @@
 # user-assigned-identity
 
-**Complexity:** Low
+**Complexity:** Low | **CI:** Verified
 
 Creates an Azure User-Assigned Managed Identity for workload authentication.
 
