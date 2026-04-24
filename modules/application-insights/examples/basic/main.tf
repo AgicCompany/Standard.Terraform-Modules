@@ -45,8 +45,3 @@ module "application_insights" {
 output "id" {
   value = module.application_insights.id
 }
-
-output "connection_string" {
-  value     = module.application_insights.connection_string
-  sensitive = true
-}

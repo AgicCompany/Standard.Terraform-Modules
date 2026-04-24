@@ -37,6 +37,5 @@ No inputs.
 
 | Name | Description |
 |------|-------------|
-| <a name="output_connection_string"></a> [connection\_string](#output\_connection\_string) | n/a |
 | <a name="output_id"></a> [id](#output\_id) | n/a |
 <!-- END_TF_DOCS -->
