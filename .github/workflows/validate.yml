@@ -1,0 +1,69 @@
+name: Validate
+
+on:
+  pull_request:
+    paths: ['modules/**']
+
+jobs:
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      modules: ${{ steps.changes.outputs.modules }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Detect changed modules
+        id: changes
+        run: |
+          MODULES=$(git diff --name-only origin/main...HEAD -- modules/ \
+            | cut -d'/' -f2 | sort -u | jq -R -s -c 'split("\n") | map(select(. != ""))')
+          echo "modules=$MODULES" >> "$GITHUB_OUTPUT"
+          echo "Changed modules: $MODULES"
+
+  validate:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.modules != '[]'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        module: ${{ fromJson(needs.detect-changes.outputs.modules) }}
+    env:
+      TF_PLUGIN_CACHE_DIR: ${{ github.workspace }}/.terraform.d/plugin-cache
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "~> 1.9.0"
+
+      - name: Create plugin cache dir
+        run: mkdir -p "$TF_PLUGIN_CACHE_DIR"
+
+      - name: Cache Terraform providers
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.TF_PLUGIN_CACHE_DIR }}
+          key: terraform-plugins-${{ matrix.module }}-${{ hashFiles(format('modules/{0}/**/.terraform.lock.hcl', matrix.module)) }}
+          restore-keys: |
+            terraform-plugins-${{ matrix.module }}-
+
+      - name: Format check
+        run: terraform fmt -check -recursive "modules/${{ matrix.module }}"
+
+      - name: Validate module
+        run: |
+          terraform -chdir="modules/${{ matrix.module }}" init -backend=false -input=false
+          terraform -chdir="modules/${{ matrix.module }}" validate
+
+      - name: Validate examples
+        run: |
+          for example in modules/${{ matrix.module }}/examples/*/; do
+            [ -d "$example" ] || continue
+            echo "::group::Validating $(basename "$example")"
+            terraform -chdir="$example" init -backend=false -input=false
+            terraform -chdir="$example" validate
+            echo "::endgroup::"
+          done
