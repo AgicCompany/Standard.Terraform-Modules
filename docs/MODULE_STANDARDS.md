@@ -543,6 +543,19 @@ All modules accept a consistent set of common variables (defined in the Terrafor
 |----------|------|---------|-------------|
 | `tags` | map(string) | `{}` | Tags to apply |
 
+### Canonical Variable Names
+
+Certain variables appear across many modules with a fixed name, type, and semantics. Always use these exact names — do not invent synonyms.
+
+| Variable | Type | Purpose | Notes |
+|----------|------|---------|-------|
+| `min_tls_version` | string | Minimum TLS version | Default `"TLS1_2"`. Validated to reject older values. |
+| `enable_private_endpoint` | bool | Enable `azurerm_private_endpoint` creation | Security flag — defaults `true`. |
+| `administrator_password` | string (sensitive) | Admin credential for database modules | Required on MySQL/PostgreSQL/MSSQL flex servers. |
+| `diagnostic_settings` | object | Optional. Enables `azurerm_monitor_diagnostic_setting` creation with multi-sink support (Log Analytics Workspace, storage account, Event Hub). | Default `null` (disabled). When non-null, at least one destination must be set. `enabled_log_categories` / `enabled_metrics` default to "all supported by the resource" via the `azurerm_monitor_diagnostic_categories` data source. |
+
+The `diagnostic_settings` variable is REQUIRED on every new compute, data, messaging, or storage module built after Phase 2 (2026-04-18). Pure-networking or pure-identity modules (e.g., `virtual-network`, `user-assigned-identity`, `private-dns-zone`) do not need it — consumers can use the standalone `diagnostic-settings` module when they want to attach diagnostics to those resource types.
+
 ### Naming Responsibility
 
 Modules do **not** generate resource names. The consuming project generates CAF-compliant names in `locals.tf` and passes the full name to the module.
