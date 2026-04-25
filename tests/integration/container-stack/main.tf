@@ -109,7 +109,7 @@ module "container_app_environment" {
   log_analytics_workspace_id = module.log_analytics.id
 
   enable_internal_load_balancer = true
-  infrastructure_subnet_id     = module.virtual_network.subnet_ids["snet-cae"]
+  infrastructure_subnet_id      = module.virtual_network.subnet_ids["snet-cae"]
 
   tags = { environment = "test", project = "tftest" }
 }

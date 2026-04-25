@@ -60,8 +60,8 @@ module "private_dns_zone" {
 
   virtual_network_links = {
     vnet-webapp = {
-      virtual_network_id    = module.virtual_network.id
-      registration_enabled  = false
+      virtual_network_id   = module.virtual_network.id
+      registration_enabled = false
     }
   }
 
