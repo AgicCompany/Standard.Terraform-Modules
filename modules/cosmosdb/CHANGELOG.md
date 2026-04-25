@@ -39,6 +39,18 @@ All notable changes to this module will be documented in this file.
 - `private_service_connection_name` variable to override PSC name
 - `private_endpoint_nic_name` variable to override PE NIC name
 
+## [1.1.0] - 2026-03-03
+
+### Added
+
+- Lifecycle preconditions and DNS zone group configuration for private endpoints
+- `min_tls_version` validation enforcing `"1.2"` as minimum
+
+### Fixed
+
+- Private endpoint `subresource_names` consistency improvements
+- Example and output cleanup for cross-module consistency
+
 ## [1.0.0] - 2026-02-09
 
 ### Added

@@ -49,6 +49,17 @@ All notable changes to this module will be documented in this file.
 - `private_service_connection_names` map variable to override PSC names per subresource
 - `private_endpoint_nic_names` map variable to override PE NIC names per subresource
 
+## [1.1.0] - 2026-03-03
+
+### Added
+
+- Lifecycle preconditions for private endpoint configuration
+- `min_tls_version` validation enforcing `"1.2"` as minimum
+
+### Fixed
+
+- Variable and validation consistency improvements
+
 ## [1.0.0] - 2026-02-08
 
 ### Added
