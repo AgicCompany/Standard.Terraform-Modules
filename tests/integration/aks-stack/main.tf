@@ -104,7 +104,7 @@ module "aks" {
     zones      = []
   }
 
-  enable_auto_scaling      = false
+  enable_auto_scaling       = false
   enable_container_insights = true
 
   tags = { environment = "test", project = "tftest" }

@@ -1,4 +1,4 @@
-.PHONY: validate validate-all lint lint-all fmt fmt-all docs
+.PHONY: validate validate-all lint lint-all fmt fmt-all docs install-hooks
 
 # ─── Single module targets (require MODULE=<name>) ───────────────────────────
 
@@ -73,3 +73,12 @@ fmt-all:
 
 docs:
 	./scripts/generate-docs.sh
+
+# ─── Setup ───────────────────────────────────────────────────────────────────
+
+install-hooks:
+	@command -v pre-commit >/dev/null 2>&1 || { echo "Error: pre-commit is not installed. Install with: pip install pre-commit"; exit 1; }
+	@command -v tflint >/dev/null 2>&1 || { echo "Error: tflint is not installed. Install from https://github.com/terraform-linters/tflint"; exit 1; }
+	tflint --init
+	pre-commit install
+	@echo "Pre-commit hooks installed. They will run automatically on git commit."
