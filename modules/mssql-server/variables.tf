@@ -44,8 +44,8 @@ variable "administrator_login_password" {
 
   validation {
     condition = (
-      var.administrator_login_password == null
-      || (
+      var.administrator_login_password == null ? true
+      : (
         length(var.administrator_login_password) >= 12
         && can(regex("[A-Z]", var.administrator_login_password))
         && can(regex("[a-z]", var.administrator_login_password))
@@ -163,19 +163,19 @@ variable "diagnostic_settings" {
 
   validation {
     condition = (
-      var.diagnostic_settings == null
-      || var.diagnostic_settings.log_analytics_workspace_id != null
-      || var.diagnostic_settings.storage_account_id != null
-      || var.diagnostic_settings.eventhub_authorization_rule_id != null
+      var.diagnostic_settings == null ? true
+      : (var.diagnostic_settings.log_analytics_workspace_id != null
+        || var.diagnostic_settings.storage_account_id != null
+      || var.diagnostic_settings.eventhub_authorization_rule_id != null)
     )
     error_message = "At least one destination (log_analytics_workspace_id, storage_account_id, or eventhub_authorization_rule_id) is required when diagnostic_settings is set."
   }
 
   validation {
     condition = (
-      var.diagnostic_settings == null
-      || var.diagnostic_settings.log_analytics_destination_type == null
-      || contains(["Dedicated", "AzureDiagnostics"], var.diagnostic_settings.log_analytics_destination_type)
+      var.diagnostic_settings == null ? true
+      : (var.diagnostic_settings.log_analytics_destination_type == null
+      || contains(["Dedicated", "AzureDiagnostics"], var.diagnostic_settings.log_analytics_destination_type))
     )
     error_message = "log_analytics_destination_type must be \"Dedicated\" or \"AzureDiagnostics\" when set."
   }

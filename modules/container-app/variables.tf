@@ -77,7 +77,7 @@ variable "ingress" {
   description = "Ingress configuration. Only used when enable_ingress = true."
 
   validation {
-    condition     = var.ingress == null || contains(["auto", "http", "http2", "tcp"], var.ingress.transport)
+    condition     = var.ingress == null ? true : contains(["auto", "http", "http2", "tcp"], var.ingress.transport)
     error_message = "ingress.transport must be \"auto\", \"http\", \"http2\", or \"tcp\"."
   }
 }
@@ -174,19 +174,19 @@ variable "diagnostic_settings" {
 
   validation {
     condition = (
-      var.diagnostic_settings == null
-      || var.diagnostic_settings.log_analytics_workspace_id != null
-      || var.diagnostic_settings.storage_account_id != null
-      || var.diagnostic_settings.eventhub_authorization_rule_id != null
+      var.diagnostic_settings == null ? true
+      : (var.diagnostic_settings.log_analytics_workspace_id != null
+        || var.diagnostic_settings.storage_account_id != null
+      || var.diagnostic_settings.eventhub_authorization_rule_id != null)
     )
     error_message = "At least one destination (log_analytics_workspace_id, storage_account_id, or eventhub_authorization_rule_id) is required when diagnostic_settings is set."
   }
 
   validation {
     condition = (
-      var.diagnostic_settings == null
-      || var.diagnostic_settings.log_analytics_destination_type == null
-      || contains(["Dedicated", "AzureDiagnostics"], var.diagnostic_settings.log_analytics_destination_type)
+      var.diagnostic_settings == null ? true
+      : (var.diagnostic_settings.log_analytics_destination_type == null
+      || contains(["Dedicated", "AzureDiagnostics"], var.diagnostic_settings.log_analytics_destination_type))
     )
     error_message = "log_analytics_destination_type must be \"Dedicated\" or \"AzureDiagnostics\" when set."
   }

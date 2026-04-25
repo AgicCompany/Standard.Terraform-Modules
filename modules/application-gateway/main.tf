@@ -129,7 +129,7 @@ resource "azurerm_application_gateway" "this" {
   }
 
   dynamic "ssl_certificate" {
-    for_each = var.ssl_certificates
+    for_each = nonsensitive(var.ssl_certificates)
 
     content {
       name                = ssl_certificate.key
