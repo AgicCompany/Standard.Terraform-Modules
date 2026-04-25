@@ -92,7 +92,7 @@ variable "persistence_aof_frequency" {
   description = "AOF persistence backup frequency. Only valid value is \"1s\". Mutually exclusive with RDB persistence and geo-replication."
 
   validation {
-    condition     = var.persistence_aof_frequency == null || var.persistence_aof_frequency == "1s"
+    condition     = var.persistence_aof_frequency == null ? true : var.persistence_aof_frequency == "1s"
     error_message = "persistence_aof_frequency must be null or \"1s\"."
   }
 }
@@ -103,7 +103,7 @@ variable "persistence_rdb_frequency" {
   description = "RDB persistence backup frequency: \"1h\", \"6h\", or \"12h\". Mutually exclusive with AOF persistence and geo-replication."
 
   validation {
-    condition     = var.persistence_rdb_frequency == null || contains(["1h", "6h", "12h"], var.persistence_rdb_frequency)
+    condition     = var.persistence_rdb_frequency == null ? true : contains(["1h", "6h", "12h"], var.persistence_rdb_frequency)
     error_message = "persistence_rdb_frequency must be null or one of: \"1h\", \"6h\", \"12h\"."
   }
 }
@@ -205,19 +205,19 @@ variable "diagnostic_settings" {
 
   validation {
     condition = (
-      var.diagnostic_settings == null
-      || var.diagnostic_settings.log_analytics_workspace_id != null
-      || var.diagnostic_settings.storage_account_id != null
-      || var.diagnostic_settings.eventhub_authorization_rule_id != null
+      var.diagnostic_settings == null ? true
+      : (var.diagnostic_settings.log_analytics_workspace_id != null
+        || var.diagnostic_settings.storage_account_id != null
+      || var.diagnostic_settings.eventhub_authorization_rule_id != null)
     )
     error_message = "At least one destination (log_analytics_workspace_id, storage_account_id, or eventhub_authorization_rule_id) is required when diagnostic_settings is set."
   }
 
   validation {
     condition = (
-      var.diagnostic_settings == null
-      || var.diagnostic_settings.log_analytics_destination_type == null
-      || contains(["Dedicated", "AzureDiagnostics"], var.diagnostic_settings.log_analytics_destination_type)
+      var.diagnostic_settings == null ? true
+      : (var.diagnostic_settings.log_analytics_destination_type == null
+      || contains(["Dedicated", "AzureDiagnostics"], var.diagnostic_settings.log_analytics_destination_type))
     )
     error_message = "log_analytics_destination_type must be \"Dedicated\" or \"AzureDiagnostics\" when set."
   }

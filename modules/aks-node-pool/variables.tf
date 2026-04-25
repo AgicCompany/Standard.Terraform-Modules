@@ -62,7 +62,7 @@ variable "node_pools" {
   }
 
   validation {
-    condition     = alltrue([for k, v in var.node_pools : v.priority != "Spot" || contains(["Delete", "Deallocate"], coalesce(v.eviction_policy, ""))])
+    condition     = alltrue([for k, v in var.node_pools : v.priority != "Spot" ? true : contains(["Delete", "Deallocate"], coalesce(v.eviction_policy, ""))])
     error_message = "eviction_policy is required when priority is \"Spot\" and must be \"Delete\" or \"Deallocate\"."
   }
 

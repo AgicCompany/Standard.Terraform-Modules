@@ -42,7 +42,7 @@ variable "computer_name" {
   description = "Windows computer name (max 15 characters). Defaults to var.name truncated to 15 characters."
 
   validation {
-    condition     = var.computer_name == null || length(var.computer_name) <= 15
+    condition     = var.computer_name == null ? true : length(var.computer_name) <= 15
     error_message = "Windows computer name must be 15 characters or fewer."
   }
 }
@@ -120,7 +120,7 @@ variable "license_type" {
   description = "License type for Azure Hybrid Benefit: None or Windows_Server"
 
   validation {
-    condition     = var.license_type == null || contains(["None", "Windows_Server"], var.license_type)
+    condition     = var.license_type == null ? true : contains(["None", "Windows_Server"], var.license_type)
     error_message = "license_type must be null, \"None\", or \"Windows_Server\"."
   }
 }
