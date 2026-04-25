@@ -70,6 +70,11 @@ resource "azurerm_cdn_frontdoor_origin" "this" {
       condition     = contains(keys(var.origin_groups), each.value.origin_group_name)
       error_message = "Origin '${each.key}' references origin_group_name '${each.value.origin_group_name}' which does not exist in origin_groups."
     }
+
+    precondition {
+      condition     = each.value.private_link == null || var.sku_name == "Premium_AzureFrontDoor"
+      error_message = "Origin Private Link requires Premium_AzureFrontDoor SKU. Set sku_name to Premium_AzureFrontDoor or remove the private_link block from origin '${each.key}'."
+    }
   }
 }
 
@@ -81,7 +86,8 @@ resource "azurerm_cdn_frontdoor_custom_domain" "this" {
   host_name                = each.value.hostname
 
   tls {
-    certificate_type = each.value.certificate_type
+    certificate_type        = each.value.certificate_type
+    cdn_frontdoor_secret_id = each.value.secret_id
   }
 }
 

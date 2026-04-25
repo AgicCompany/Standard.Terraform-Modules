@@ -76,6 +76,7 @@ module "node_pools" {
       vm_size        = "Standard_D4s_v3"
       min_count      = 2
       max_count      = 10
+      zones          = ["1", "2", "3"]
       vnet_subnet_id = azurerm_subnet.user.id
       node_labels = {
         "workload" = "general"
@@ -94,6 +95,7 @@ module "node_pools" {
       vm_size        = "Standard_NC6s_v3"
       min_count      = 0
       max_count      = 4
+      zones          = ["1", "2", "3"]
       vnet_subnet_id = azurerm_subnet.user.id
       node_labels = {
         "accelerator" = "nvidia"
@@ -108,6 +110,7 @@ module "node_pools" {
       vm_size         = "Standard_D4s_v3"
       min_count       = 0
       max_count       = 20
+      zones           = ["1", "2", "3"]
       priority        = "Spot"
       eviction_policy = "Delete"
       spot_max_price  = -1

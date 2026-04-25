@@ -47,6 +47,14 @@ variable "routes" {
     ])
     error_message = "next_hop_in_ip_address must be set when next_hop_type is VirtualAppliance."
   }
+
+  validation {
+    condition = alltrue([
+      for k, v in var.routes :
+      v.next_hop_type == "VirtualAppliance" || v.next_hop_in_ip_address == null
+    ])
+    error_message = "next_hop_in_ip_address must only be set when next_hop_type is VirtualAppliance."
+  }
 }
 
 # === Tags ===

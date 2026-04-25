@@ -14,7 +14,6 @@ resource "azurerm_mysql_flexible_server" "this" {
 
   zone = var.zone
 
-
   delegated_subnet_id = var.delegated_subnet_id
   private_dns_zone_id = var.delegated_subnet_id != null ? var.private_dns_zone_id : null
 

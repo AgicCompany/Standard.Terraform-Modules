@@ -4,6 +4,11 @@ All notable changes to this module will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- Precondition: UserAssigned storage auth requires storage_user_assigned_identity_id.
+- Precondition: UserAssigned identity type requires at least one identity_ids entry.
+
 ## [1.1.0] - 2026-04-18
 
 ### Added

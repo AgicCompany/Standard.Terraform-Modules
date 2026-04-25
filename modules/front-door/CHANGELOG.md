@@ -4,6 +4,12 @@ All notable changes to this module will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- Precondition: origin Private Link now requires Premium SKU.
+- `secret_id` field on `custom_domains` for CustomerCertificate support.
+- Validation: CustomerCertificate requires secret_id.
+
 ## [1.2.0] - 2026-04-18
 
 ### Added

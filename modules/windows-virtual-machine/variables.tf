@@ -40,6 +40,11 @@ variable "computer_name" {
   type        = string
   default     = null
   description = "Windows computer name (max 15 characters). Defaults to var.name truncated to 15 characters."
+
+  validation {
+    condition     = var.computer_name == null || length(var.computer_name) <= 15
+    error_message = "Windows computer name must be 15 characters or fewer."
+  }
 }
 
 variable "source_image_reference" {

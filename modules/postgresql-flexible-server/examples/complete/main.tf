@@ -68,6 +68,9 @@ module "postgresql" {
   administrator_password = random_password.admin.result
   enable_password_auth   = true
 
+  entra_admin_object_id      = "00000000-0000-0000-0000-000000000000"
+  entra_admin_principal_name = "DBA Team"
+
   sku_name              = "GP_Standard_D2s_v3"
   version_number        = "16"
   storage_mb            = 65536

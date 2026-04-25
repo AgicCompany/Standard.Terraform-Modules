@@ -71,6 +71,16 @@ resource "azurerm_api_management" "this" {
       condition     = !contains(["UserAssigned", "SystemAssigned, UserAssigned"], var.identity_type) || length(var.identity_ids) > 0
       error_message = "identity_ids must contain at least one identity when identity_type is \"UserAssigned\" or \"SystemAssigned, UserAssigned\"."
     }
+
+    precondition {
+      condition     = var.virtual_network_type == "None" || can(regex("^Premium_", var.sku_name))
+      error_message = "VNet integration (External or Internal) requires a Premium SKU. Set sku_name to a Premium tier or set virtual_network_type to None."
+    }
+
+    precondition {
+      condition     = var.virtual_network_type == "None" || !var.enable_private_endpoint
+      error_message = "VNet integration and private endpoint are mutually exclusive. Use virtual_network_type for classic VNet injection OR enable_private_endpoint for Private Link, not both."
+    }
   }
 }
 

@@ -6,6 +6,7 @@ All notable changes to this module will be documented in this file.
 
 ### Added
 
+- Validation: custom computer_name must be 15 characters or fewer.
 - `enable_encryption_at_host` variable (default `true`) -- encrypts temp disks and cached data at rest
 - `enable_secure_boot` variable (default `true`) -- enables Secure Boot for Trusted Launch
 - `enable_vtpm` variable (default `true`) -- enables vTPM for Trusted Launch

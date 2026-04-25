@@ -22,6 +22,11 @@ resource "azurerm_mssql_database" "this" {
       condition     = !can(regex("^HS_", var.sku_name)) || !var.enable_geo_redundant_backup
       error_message = "geo_backup_enabled is not supported for Hyperscale (HS_*) SKUs. Set enable_geo_redundant_backup = false."
     }
+
+    precondition {
+      condition     = !var.enable_read_scale || can(regex("^(P|BC_|HS_)", var.sku_name))
+      error_message = "Read scale-out requires Premium (P*), Business Critical (BC_*), or Hyperscale (HS_*) SKU. Current sku_name: ${var.sku_name}."
+    }
   }
 }
 

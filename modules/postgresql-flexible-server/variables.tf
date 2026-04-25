@@ -167,6 +167,29 @@ variable "enable_entra_auth" {
   description = "Enable Microsoft Entra (AAD) authentication (default: enabled for security)"
 }
 
+variable "entra_admin_object_id" {
+  type        = string
+  description = "Object ID of the Entra principal to set as PostgreSQL AD administrator. Required when enable_entra_auth is true."
+  default     = null
+}
+
+variable "entra_admin_principal_name" {
+  type        = string
+  description = "Display name of the Entra principal (user or group) for the PostgreSQL AD administrator."
+  default     = null
+}
+
+variable "entra_admin_principal_type" {
+  type        = string
+  description = "Type of Entra principal: User, Group, or ServicePrincipal."
+  default     = "Group"
+
+  validation {
+    condition     = contains(["User", "Group", "ServicePrincipal"], var.entra_admin_principal_type)
+    error_message = "entra_admin_principal_type must be User, Group, or ServicePrincipal."
+  }
+}
+
 # === Private Networking ===
 variable "subnet_id" {
   type        = string

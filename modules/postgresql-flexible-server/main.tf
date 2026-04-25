@@ -63,7 +63,23 @@ resource "azurerm_postgresql_flexible_server" "this" {
       condition     = (var.enable_entra_auth && !var.enable_password_auth) || (var.administrator_login != null && var.administrator_password != null)
       error_message = "administrator_login and administrator_password are required unless using Entra-only authentication (enable_entra_auth = true and enable_password_auth = false)."
     }
+
+    precondition {
+      condition     = !var.enable_entra_auth || (var.entra_admin_object_id != null && var.entra_admin_principal_name != null)
+      error_message = "When enable_entra_auth is true, entra_admin_object_id and entra_admin_principal_name are required."
+    }
   }
+}
+
+resource "azurerm_postgresql_flexible_server_active_directory_administrator" "this" {
+  count = var.enable_entra_auth ? 1 : 0
+
+  server_name         = azurerm_postgresql_flexible_server.this.name
+  resource_group_name = var.resource_group_name
+  tenant_id           = data.azurerm_client_config.current.tenant_id
+  object_id           = var.entra_admin_object_id
+  principal_name      = var.entra_admin_principal_name
+  principal_type      = var.entra_admin_principal_type
 }
 
 resource "azurerm_private_endpoint" "this" {

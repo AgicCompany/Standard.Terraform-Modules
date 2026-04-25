@@ -4,6 +4,10 @@ All notable changes to this module will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- Precondition: read scale-out now validates SKU compatibility (Premium, Business Critical, or Hyperscale only).
+
 ## [1.1.0] - 2026-04-18
 
 ### Added

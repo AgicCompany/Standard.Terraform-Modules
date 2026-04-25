@@ -4,6 +4,10 @@ All notable changes to this module will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- Precondition: private endpoint now requires Premium SKU.
+
 ## [2.1.0] - 2026-04-18
 
 ### Added

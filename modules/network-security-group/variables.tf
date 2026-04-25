@@ -99,6 +99,31 @@ variable "security_rules" {
     ])
     error_message = "Each rule must specify either destination_address_prefix or destination_address_prefixes, not both."
   }
+
+  validation {
+    condition = alltrue([
+      for k, v in var.security_rules :
+      v.source_address_prefix == null || length(coalesce(v.source_application_security_group_ids, [])) == 0
+    ])
+    error_message = "source_address_prefix and source_application_security_group_ids are mutually exclusive. Use one or the other per rule."
+  }
+
+  validation {
+    condition = alltrue([
+      for k, v in var.security_rules :
+      v.destination_address_prefix == null || length(coalesce(v.destination_application_security_group_ids, [])) == 0
+    ])
+    error_message = "destination_address_prefix and destination_application_security_group_ids are mutually exclusive. Use one or the other per rule."
+  }
+
+  validation {
+    condition = length([
+      for k, v in var.security_rules : "${v.direction}-${v.priority}"
+      ]) == length(distinct([
+        for k, v in var.security_rules : "${v.direction}-${v.priority}"
+    ]))
+    error_message = "Security rule priorities must be unique within each direction (Inbound/Outbound)."
+  }
 }
 
 # === Tags ===

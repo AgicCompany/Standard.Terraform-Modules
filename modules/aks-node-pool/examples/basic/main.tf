@@ -51,6 +51,7 @@ module "node_pools" {
       vm_size   = "Standard_D2s_v3"
       min_count = 1
       max_count = 5
+      zones     = ["1", "2", "3"]
     }
   }
 }

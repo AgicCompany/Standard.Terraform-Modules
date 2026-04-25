@@ -89,6 +89,12 @@ resource "azurerm_managed_redis" "this" {
       condition     = var.persistence_aof_frequency == null || var.persistence_rdb_frequency == null
       error_message = "AOF and RDB persistence are mutually exclusive. Set one or the other, not both."
     }
+
+    # CMK requires UserAssigned identity
+    precondition {
+      condition     = var.customer_managed_key == null || (var.identity != null && contains(split(",", replace(var.identity.type, " ", "")), "UserAssigned") && length(coalesce(var.identity.identity_ids, [])) > 0)
+      error_message = "customer_managed_key requires identity with type containing 'UserAssigned' and at least one identity_ids entry."
+    }
   }
 }
 

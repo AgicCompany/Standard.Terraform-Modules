@@ -15,23 +15,27 @@ resource "azurerm_storage_account" "this" {
   shared_access_key_enabled       = var.shared_access_key_enabled
   public_network_access_enabled   = var.enable_public_access
 
-  # Blob properties
-  blob_properties {
-    versioning_enabled = var.enable_versioning
+  # Blob properties (not supported for FileStorage account kind)
+  dynamic "blob_properties" {
+    for_each = var.account_kind != "FileStorage" ? [1] : []
 
-    dynamic "delete_retention_policy" {
-      for_each = var.enable_blob_soft_delete ? [1] : []
+    content {
+      versioning_enabled = var.enable_versioning
 
-      content {
-        days = var.blob_soft_delete_retention_days
+      dynamic "delete_retention_policy" {
+        for_each = var.enable_blob_soft_delete ? [1] : []
+
+        content {
+          days = var.blob_soft_delete_retention_days
+        }
       }
-    }
 
-    dynamic "container_delete_retention_policy" {
-      for_each = var.enable_container_soft_delete ? [1] : []
+      dynamic "container_delete_retention_policy" {
+        for_each = var.enable_container_soft_delete ? [1] : []
 
-      content {
-        days = var.container_soft_delete_retention_days
+        content {
+          days = var.container_soft_delete_retention_days
+        }
       }
     }
   }

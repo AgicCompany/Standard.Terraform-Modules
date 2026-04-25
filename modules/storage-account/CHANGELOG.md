@@ -4,6 +4,10 @@ All notable changes to this module will be documented in this file.
 
 ## [Unreleased]
 
+### Fixed
+
+- `blob_properties` block is now conditional and excluded for `FileStorage` account kind (which only supports file shares).
+
 ## [3.1.0] - 2026-04-18
 
 ### Added
