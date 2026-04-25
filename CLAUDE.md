@@ -28,7 +28,7 @@ Every module outputs at minimum: `id`, `name`. Never output secrets (keys, conne
 
 ```
 modules/<name>/
-├── versions.tf      # Terraform >= 1.10.0, AzureRM >= 4.0.0
+├── versions.tf      # Terraform >= 1.9.0, AzureRM >= 4.0.0
 ├── variables.tf     # Grouped with comment headers (=== Required ===, etc.)
 ├── locals.tf        # Computed values
 ├── data.tf          # Data sources
