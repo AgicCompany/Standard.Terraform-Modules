@@ -18,7 +18,7 @@ variable "log_analytics_workspace_id" {
 variable "enabled_log_categories" {
   type        = list(string)
   default     = null
-  description = "List of log categories to enable. Null sends all logs via the allLogs category group."
+  description = "Log categories to enable. When null, uses the 'allLogs' category group which may not be supported by all resource types. Specify explicit categories for resources that don't support category groups."
 
   validation {
     condition     = var.enabled_log_categories == null || length(var.enabled_log_categories) > 0
@@ -29,7 +29,7 @@ variable "enabled_log_categories" {
 variable "metric_categories" {
   type        = list(string)
   default     = null
-  description = "List of metric categories to enable. Null sends all metrics via the AllMetrics category group."
+  description = "Metric categories to enable. When null, uses 'AllMetrics' which may not be supported by all resource types. Specify explicit categories if the target resource uses named metric categories."
 
   validation {
     condition     = var.metric_categories == null || length(var.metric_categories) > 0

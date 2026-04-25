@@ -54,6 +54,16 @@ resource "azurerm_function_app_flex_consumption" "this" {
       condition     = !var.enable_private_endpoint || var.private_endpoint_subnet_id != null
       error_message = "private_endpoint_subnet_id is required when enable_private_endpoint is true."
     }
+
+    precondition {
+      condition     = var.storage_authentication_type != "UserAssignedIdentity" || var.storage_user_assigned_identity_id != null
+      error_message = "storage_authentication_type = \"UserAssignedIdentity\" requires storage_user_assigned_identity_id."
+    }
+
+    precondition {
+      condition     = !contains(["UserAssigned", "SystemAssigned, UserAssigned"], var.identity_type) || length(var.identity_ids) > 0
+      error_message = "identity_type containing \"UserAssigned\" requires at least one identity in identity_ids."
+    }
   }
 }
 

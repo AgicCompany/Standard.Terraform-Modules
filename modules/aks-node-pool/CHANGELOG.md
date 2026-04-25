@@ -4,6 +4,10 @@ All notable changes to this module will be documented in this file.
 
 ## [Unreleased]
 
+### Changed
+
+- **BREAKING:** Default `zones` changed from `["1", "2", "3"]` to `null`. Consumers must explicitly set zones appropriate for their region.
+
 ## [1.0.0] - 2026-02-11
 
 ### Added

@@ -1,2 +1,1 @@
-# data.tf - Data sources
-# (No data sources defined for this module)
+data "azurerm_client_config" "current" {}

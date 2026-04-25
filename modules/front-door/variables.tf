@@ -107,6 +107,7 @@ variable "custom_domains" {
   type = map(object({
     hostname         = string
     certificate_type = optional(string, "ManagedCertificate")
+    secret_id        = optional(string)
   }))
   default     = {}
   description = "Map of custom domains to attach to the Front Door profile. Key is used as the domain resource name."
@@ -114,6 +115,14 @@ variable "custom_domains" {
   validation {
     condition     = alltrue([for k, v in var.custom_domains : contains(["ManagedCertificate", "CustomerCertificate"], v.certificate_type)])
     error_message = "certificate_type must be \"ManagedCertificate\" or \"CustomerCertificate\"."
+  }
+
+  validation {
+    condition = alltrue([
+      for k, v in var.custom_domains :
+      v.certificate_type != "CustomerCertificate" || v.secret_id != null
+    ])
+    error_message = "custom_domains with certificate_type = \"CustomerCertificate\" require a secret_id referencing the azurerm_cdn_frontdoor_secret resource."
   }
 }
 

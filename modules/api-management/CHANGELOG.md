@@ -4,6 +4,11 @@ All notable changes to this module will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- Precondition: VNet integration (External/Internal) now requires Premium SKU.
+- Precondition: VNet integration and private endpoint are mutually exclusive.
+
 ## [2.2.0] - 2026-04-18
 
 ### Added

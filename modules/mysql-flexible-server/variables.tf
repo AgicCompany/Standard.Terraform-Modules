@@ -144,7 +144,7 @@ variable "firewall_rules" {
 variable "enable_public_access" {
   type        = bool
   default     = false
-  description = "Allow public network access (default: disabled for security)"
+  description = "DEPRECATED: Not configurable in AzureRM provider v4+. MySQL Flexible Server computes public_network_access_enabled automatically based on whether delegated_subnet_id is set. This variable is retained for interface compatibility but has no effect."
 }
 
 variable "enable_private_endpoint" {

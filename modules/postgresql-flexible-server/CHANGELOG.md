@@ -4,6 +4,11 @@ All notable changes to this module will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- Entra AD administrator support via `entra_admin_object_id`, `entra_admin_principal_name`, and `entra_admin_principal_type` variables.
+- Precondition: `enable_entra_auth = true` now requires `entra_admin_object_id` and `entra_admin_principal_name`.
+
 ## [4.1.0] - 2026-04-18
 
 ### Added

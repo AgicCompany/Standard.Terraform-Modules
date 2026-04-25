@@ -4,6 +4,11 @@ All notable changes to this module will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- Validation: source/destination address prefix and ASG IDs are now mutually exclusive per rule.
+- Validation: rule priorities must be unique within each direction.
+
 ## [1.1.0] - 2026-02-19
 
 ### Added

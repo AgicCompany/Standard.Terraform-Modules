@@ -4,6 +4,10 @@ All notable changes to this module will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- Precondition: password auth now requires admin_password.
+
 ## [1.1.0] - 2026-02-19
 
 ### Added

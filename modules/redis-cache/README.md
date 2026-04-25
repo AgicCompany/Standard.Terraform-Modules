@@ -119,7 +119,7 @@ No modules.
 | <a name="input_replicas_per_master"></a> [replicas\_per\_master](#input\_replicas\_per\_master) | Number of replicas per master. Premium SKU only. | `number` | `null` | no |
 | <a name="input_replicas_per_primary"></a> [replicas\_per\_primary](#input\_replicas\_per\_primary) | Number of replicas per primary. Premium SKU only. | `number` | `null` | no |
 | <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name) | Name of the resource group | `string` | n/a | yes |
-| <a name="input_sku_name"></a> [sku\_name](#input\_sku\_name) | SKU tier: Basic, Standard, or Premium | `string` | `"Basic"` | no |
+| <a name="input_sku_name"></a> [sku\_name](#input\_sku\_name) | SKU tier: Basic, Standard, or Premium | `string` | `"Standard"` | no |
 | <a name="input_subnet_id"></a> [subnet\_id](#input\_subnet\_id) | Subnet ID for the private endpoint. Required when enable\_private\_endpoint = true. | `string` | `null` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | Tags to apply to the resource | `map(string)` | `{}` | no |
 | <a name="input_zones"></a> [zones](#input\_zones) | Availability zones. Premium SKU only. | `list(string)` | `[]` | no |

@@ -18,7 +18,7 @@ variable "node_pools" {
     os_disk_size_gb             = optional(number, 128)
     os_disk_type                = optional(string, "Managed")
     vnet_subnet_id              = optional(string)
-    zones                       = optional(list(string), ["1", "2", "3"])
+    zones                       = optional(list(string))
     max_pods                    = optional(number, 30)
     node_labels                 = optional(map(string), {})
     node_taints                 = optional(list(string), [])

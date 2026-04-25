@@ -16,6 +16,11 @@ resource "azurerm_static_web_app" "this" {
 
   lifecycle {
     precondition {
+      condition     = var.sku_tier == var.sku_size
+      error_message = "sku_tier and sku_size must match. Got tier=\"${var.sku_tier}\" and size=\"${var.sku_size}\"."
+    }
+
+    precondition {
       condition     = !var.enable_private_endpoint || var.sku_tier == "Standard"
       error_message = "Private endpoints require Standard SKU. Set sku_tier = \"Standard\" or disable PE."
     }

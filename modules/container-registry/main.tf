@@ -35,6 +35,11 @@ resource "azurerm_container_registry" "this" {
       condition     = !var.enable_content_trust || var.sku == "Premium"
       error_message = "Content trust requires Premium SKU. Set sku = \"Premium\" or disable content trust."
     }
+
+    precondition {
+      condition     = !var.enable_private_endpoint || var.sku == "Premium"
+      error_message = "Private endpoint requires Premium SKU. Set sku to \"Premium\" or disable the private endpoint."
+    }
   }
 }
 

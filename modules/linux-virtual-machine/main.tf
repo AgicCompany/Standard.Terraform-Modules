@@ -91,6 +91,11 @@ resource "azurerm_linux_virtual_machine" "this" {
       condition     = var.admin_ssh_public_key != null || var.enable_password_auth
       error_message = "At least one authentication method required: provide admin_ssh_public_key or set enable_password_auth = true."
     }
+
+    precondition {
+      condition     = !var.enable_password_auth || var.admin_password != null
+      error_message = "enable_password_auth = true requires admin_password to be set."
+    }
   }
 }
 

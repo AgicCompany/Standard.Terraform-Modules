@@ -71,10 +71,10 @@ No modules.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_enabled_log_categories"></a> [enabled\_log\_categories](#input\_enabled\_log\_categories) | List of log categories to enable. Null sends all logs via the allLogs category group. | `list(string)` | `null` | no |
+| <a name="input_enabled_log_categories"></a> [enabled\_log\_categories](#input\_enabled\_log\_categories) | Log categories to enable. When null, uses the 'allLogs' category group which may not be supported by all resource types. Specify explicit categories for resources that don't support category groups. | `list(string)` | `null` | no |
 | <a name="input_log_analytics_destination_type"></a> [log\_analytics\_destination\_type](#input\_log\_analytics\_destination\_type) | Log Analytics destination type. Use "Dedicated" for resource-specific tables or "AzureDiagnostics" for legacy single table. | `string` | `null` | no |
 | <a name="input_log_analytics_workspace_id"></a> [log\_analytics\_workspace\_id](#input\_log\_analytics\_workspace\_id) | Log Analytics workspace resource ID for log destination | `string` | n/a | yes |
-| <a name="input_metric_categories"></a> [metric\_categories](#input\_metric\_categories) | List of metric categories to enable. Null sends all metrics via the AllMetrics category group. | `list(string)` | `null` | no |
+| <a name="input_metric_categories"></a> [metric\_categories](#input\_metric\_categories) | Metric categories to enable. When null, uses 'AllMetrics' which may not be supported by all resource types. Specify explicit categories if the target resource uses named metric categories. | `list(string)` | `null` | no |
 | <a name="input_name"></a> [name](#input\_name) | Diagnostic setting name | `string` | n/a | yes |
 | <a name="input_target_resource_id"></a> [target\_resource\_id](#input\_target\_resource\_id) | Resource ID of the target resource to monitor | `string` | n/a | yes |
 

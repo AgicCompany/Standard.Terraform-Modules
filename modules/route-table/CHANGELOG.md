@@ -4,6 +4,10 @@ All notable changes to this module will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- Validation: next_hop_in_ip_address is now forbidden for non-VirtualAppliance hop types.
+
 ## [1.1.0] - 2026-02-19
 
 ### Added

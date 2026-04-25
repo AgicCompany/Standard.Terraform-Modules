@@ -17,7 +17,7 @@ variable "name" {
 # === Optional: Configuration ===
 variable "sku_name" {
   type        = string
-  default     = "Basic"
+  default     = "Standard"
   description = "SKU tier: Basic, Standard, or Premium"
 
   validation {
