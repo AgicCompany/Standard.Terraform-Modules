@@ -162,7 +162,7 @@ module "storage_account" {
   name                = "sttftestslsweu001"
 
   shared_access_key_enabled    = true # Required for function app access key pattern
-  enable_private_endpoints     = true
+  enable_private_endpoint      = true
   enable_blob_private_endpoint = true
   subnet_id                    = module.virtual_network.subnet_ids["snet-pe"]
   private_dns_zone_ids = {
