@@ -57,6 +57,7 @@ variable "use_remote_gateways" {
   description = "Use remote VNet's gateway"
 }
 
+# tflint-ignore: terraform_unused_declarations
 variable "tags" {
   type        = map(string)
   default     = {}
