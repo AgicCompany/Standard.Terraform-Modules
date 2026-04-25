@@ -141,6 +141,7 @@ variable "firewall_rules" {
 }
 
 # === Optional: Feature Flags ===
+# tflint-ignore: terraform_unused_declarations
 variable "enable_public_access" {
   type        = bool
   default     = false

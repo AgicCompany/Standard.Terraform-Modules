@@ -44,8 +44,8 @@ variable "administrator_login_password" {
 
   validation {
     condition = (
-      var.administrator_login_password == null
-      || (
+      var.administrator_login_password == null ? true
+      : (
         length(var.administrator_login_password) >= 12
         && can(regex("[A-Z]", var.administrator_login_password))
         && can(regex("[a-z]", var.administrator_login_password))
