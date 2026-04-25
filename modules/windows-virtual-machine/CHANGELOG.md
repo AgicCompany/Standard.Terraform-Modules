@@ -15,6 +15,13 @@ All notable changes to this module will be documented in this file.
 
 - **BREAKING:** New security defaults enable encryption at host, secure boot, and vTPM. Existing consumers not setting these explicitly will get these features enabled.
 
+## [1.1.0] - 2026-04-25
+
+### Fixed
+
+- Ternary null-guard fixes in variable validation blocks for Terraform 1.9.x compatibility
+- Code review findings: validation, security default, and consistency fixes
+
 ## [1.0.0] - 2026-02-09
 
 ### Added
