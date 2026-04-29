@@ -83,6 +83,12 @@ cd modules/<name>
 terraform fmt -check
 terraform validate
 
+# Install pre-commit hooks (one-time setup)
+make install-hooks
+
+# Run pre-commit on all files manually
+pre-commit run -a
+
 # Test a module (manual, pre-release)
 cd modules/<name>/examples/complete
 terraform init && terraform plan
