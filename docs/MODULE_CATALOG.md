@@ -1,7 +1,7 @@
 # Terraform Module Catalog
 
 > **Repository:** `git::https://github.com/AgicCompany/Standard.Terraform-Modules.git`
-> **Provider:** AzureRM >= 4.0.0 | **Terraform:** >= 1.9.0
+> **Provider:** AzureRM >= 4.0.0 | **Terraform:** >= 1.10.0
 > **Defaults:** Private endpoints enabled, TLS 1.2 enforced, public access disabled
 
 ## Usage Pattern
@@ -270,7 +270,7 @@ Creates an Azure Monitor diagnostic setting to route logs and metrics to Log Ana
 
 ## Compute
 
-### aks `v2.1.0`
+### aks `v3.0.0`
 Creates an Azure Kubernetes Service cluster with private-by-default config, Azure AD auth, RBAC, and Container Insights.
 
 | Variable | Type | Required | Default | Description |
@@ -804,7 +804,7 @@ Creates an Azure Application Gateway (v2) with public IP, L7 load balancing, SSL
 
 ---
 
-### front-door `v1.2.0`
+### front-door `v1.3.0`
 Creates an Azure Front Door profile with endpoints, origins, custom domains, WAF, and rule sets.
 
 | Variable | Type | Required | Default | Description |
@@ -826,7 +826,7 @@ Creates an Azure Front Door profile with endpoints, origins, custom domains, WAF
 
 ---
 
-### api-management `v2.2.0`
+### api-management `v2.3.0`
 Creates an Azure API Management service with VNet integration, multi-region support, and optional private endpoint.
 
 | Variable | Type | Required | Default | Description |
@@ -904,9 +904,67 @@ Creates an Azure Event Hub namespace with event hubs, consumer groups, and optio
 
 ---
 
+### communication-service-email `v1.0.1`
+Composes an Azure Communication Service, Email Communication Service, an email domain (Azure-managed or customer-managed), per-entry sender usernames, and the communication-service ↔ domain association. ACS resources are global — the module's `location` variable is required by convention but not passed to the underlying resources.
+
+| Variable | Type | Required | Default | Description |
+|----------|------|----------|---------|-------------|
+| `resource_group_name` | string | yes | — | Resource group name |
+| `location` | string | yes | — | Module convention only; not passed to ACS resources |
+| `name` | string | yes | — | Communication Service name |
+| `data_location` | string | yes | — | Africa, Asia Pacific, Australia, Brazil, Canada, Europe, France, Germany, India, Japan, Korea, Norway, Switzerland, UAE, UK, United States, usgov. ForceNew. |
+| `email_service_name` | string | no | `"${name}-email"` | Override email service name |
+| `domain_name` | string | no | `null` | FQDN for custom domain (required when `enable_custom_domain = true`) |
+| `user_engagement_tracking_enabled` | bool | no | `false` | Engagement tracking on the email domain |
+| `sender_usernames` | map(object) | no | `{}` | `{ username, display_name? }`. Keys are stable identifiers (changing a key replaces the sender). |
+| `enable_custom_domain` | bool | no | `false` | true = CustomerManaged + `domain_name`; false = AzureManagedDomain |
+| `diagnostic_settings` | object | no | `null` | Phase 2 multi-sink object. Attached to the Communication Service only (Email service exposes no categories). |
+| `tags` | map(string) | no | `{}` | Tags |
+
+**Outputs:** `id`, `name`, `communication_service_id`, `email_service_id`, `domain_id`, `from_sender_domain`, `mail_from_sender_domain`, `hostname`, `sender_usernames` (map of `{ id, username, from_address }`), `verification_records` (`{ domain, spf, dkim, dkim2, dmarc }` when custom domain enabled, else `null`). `primary_connection_string` intentionally not exported — retrieve via `data.azurerm_communication_service` and write to Key Vault.
+
+---
+
+## AI / ML
+
+### ai-foundry `v1.0.1`
+Wraps `azurerm_ai_foundry` (hub, AML-workspace flavour with kind = Hub) and a single default `azurerm_ai_foundry_project`. Optional private endpoint to the `amlworkspace` subresource and Phase 2 diagnostic settings. Connections are out of scope — AzureRM has no `azurerm_ai_foundry_connection` resource yet.
+
+| Variable | Type | Required | Default | Description |
+|----------|------|----------|---------|-------------|
+| `resource_group_name` | string | yes | — | Resource group name |
+| `location` | string | yes | — | Azure region |
+| `name` | string | yes | — | Hub name |
+| `storage_account_id` | string | yes | — | Hub backing storage |
+| `key_vault_id` | string | yes | — | Hub backing Key Vault |
+| `project_name` | string | yes | — | Default project name (no derived default — Azure limits ~32 chars) |
+| `application_insights_id` | string | no | `null` | Optional App Insights linked to hub |
+| `container_registry_id` | string | no | `null` | Optional ACR linked to hub |
+| `description` | string | no | `null` | Hub description |
+| `friendly_name` | string | no | `null` | Hub display name |
+| `project_description` | string | no | `null` | Project description |
+| `project_friendly_name` | string | no | `null` | Project display name |
+| `identity_type` | string | no | `"SystemAssigned"` | SystemAssigned, UserAssigned, "SystemAssigned, UserAssigned" |
+| `identity_ids` | list(string) | no | `[]` | UAMI IDs (required when identity_type includes UserAssigned) |
+| `primary_user_assigned_identity` | string | no | `null` | UAMI used for CMK access |
+| `managed_network_isolation_mode` | string | no | `null` | null, Disabled, AllowOnlyApprovedOutbound, AllowInternetOutbound |
+| `high_business_impact_enabled` | bool | no | `false` | ForceNew — rebuild on change |
+| `encryption` | object | no | `null` | CMK: `{ key_id, key_vault_id, user_assigned_identity_id? }`. Use `versionless_id` for the key. ForceNew. |
+| `enable_public_network_access` | bool | no | `false` | Disabled by default (secure) |
+| `enable_private_endpoint` | bool | no | `false` | Requires `subnet_id` |
+| `subnet_id` | string | no | `null` | PE subnet |
+| `private_dns_zone_ids` | list(string) | no | `[]` | Needs both `privatelink.api.azureml.ms` and `privatelink.notebooks.azure.net` |
+| `private_endpoint_name` | string | no | `null` | Override (defaults to `pep-<name>`) |
+| `diagnostic_settings` | object | no | `null` | Phase 2 multi-sink object |
+| `tags` | map(string) | no | `{}` | Tags |
+
+**Outputs:** `id`, `name`, `workspace_id`, `discovery_url`, `principal_id`, `tenant_id`, `project_id`, `project_name`, `project_workspace_id`, `private_endpoint_id`, `private_endpoint_ip_address`. No secret outputs.
+
+---
+
 ## Monitoring
 
-### application-insights `v1.0.0`
+### application-insights `v2.0.0`
 Creates an Azure Application Insights resource backed by Log Analytics for APM.
 
 | Variable | Type | Required | Default | Description |
@@ -925,7 +983,7 @@ Creates an Azure Application Insights resource backed by Log Analytics for APM.
 | `internet_query_enabled` | bool | no | `false` | Allow internet queries |
 | `tags` | map(string) | no | `{}` | Tags |
 
-**Outputs:** `id`, `name`, `app_id`, `instrumentation_key` (sensitive), `connection_string` (sensitive)
+**Outputs:** `id`, `name`, `app_id`. Secret outputs (`instrumentation_key`, `connection_string`) were removed in v2.0.0 — retrieve via `data.azurerm_application_insights` or Key Vault references.
 
 ---
 

@@ -559,7 +559,7 @@ Modules must declare minimum provider versions in `versions.tf`.
 
 ```hcl
 terraform {
-  required_version = ">= 1.9.0"
+  required_version = ">= 1.10.0"
 
   required_providers {
     azurerm = {
