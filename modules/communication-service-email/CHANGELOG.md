@@ -4,6 +4,13 @@ All notable changes to this module will be documented in this file.
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-05-17
+
+### Fixed
+
+- `diagnostic_settings.log_analytics_destination_type` validation uses ternary null guards instead of `||`. Terraform 1.10 does not short-circuit `||` in variable validation conditions, so the previous form passed `null` into `contains()` and aborted `terraform validate`.
+- `location` variable annotated with `# tflint-ignore: terraform_unused_declarations`. The variable is deliberately unused by the underlying global ACS resources but is kept on the module for consumer convention.
+
 ## [1.0.0] - 2026-05-17
 
 ### Added

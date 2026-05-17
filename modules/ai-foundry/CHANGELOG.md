@@ -4,6 +4,13 @@ All notable changes to this module will be documented in this file.
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-05-17
+
+### Fixed
+
+- `managed_network_isolation_mode` and `diagnostic_settings.log_analytics_destination_type` validations use ternary null guards instead of `||`. Terraform 1.10 does not short-circuit `||` in variable validation conditions, so the previous form passed `null` into `contains()` and aborted `terraform validate`.
+- `examples/basic` and `examples/complete` use `rbac_authorization_enabled` on `azurerm_key_vault` instead of the deprecated `enable_rbac_authorization` (will be removed in AzureRM 5.x).
+
 ## [1.0.0] - 2026-05-17
 
 ### Added
