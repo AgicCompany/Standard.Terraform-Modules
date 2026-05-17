@@ -1,4 +1,4 @@
 locals {
-  effective_project_name = coalesce(var.project_name, "${var.name}-proj")
+  effective_project_name = var.project_name
   pe_subresource_names   = ["amlworkspace"]
 }

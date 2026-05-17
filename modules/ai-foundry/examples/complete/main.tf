@@ -72,6 +72,22 @@ resource "azurerm_user_assigned_identity" "this" {
   resource_group_name = azurerm_resource_group.example.name
 }
 
+resource "azurerm_role_assignment" "uami_kv_crypto" {
+  scope                = azurerm_key_vault.this.id
+  role_definition_name = "Key Vault Crypto User"
+  principal_id         = azurerm_user_assigned_identity.this.principal_id
+}
+
+resource "azurerm_key_vault_key" "cmk" {
+  name         = "aif-cmk"
+  key_vault_id = azurerm_key_vault.this.id
+  key_type     = "RSA"
+  key_size     = 2048
+  key_opts     = ["decrypt", "encrypt", "sign", "unwrapKey", "verify", "wrapKey"]
+
+  depends_on = [azurerm_role_assignment.uami_kv_crypto]
+}
+
 resource "azurerm_virtual_network" "this" {
   name                = "vnet-aif-complete-dev-weu-001"
   location            = azurerm_resource_group.example.location
@@ -129,6 +145,12 @@ module "ai_foundry" {
   identity_ids                   = [azurerm_user_assigned_identity.this.id]
   primary_user_assigned_identity = azurerm_user_assigned_identity.this.id
 
+  encryption = {
+    key_id                    = azurerm_key_vault_key.cmk.id
+    key_vault_id              = azurerm_key_vault.this.id
+    user_assigned_identity_id = azurerm_user_assigned_identity.this.id
+  }
+
   managed_network_isolation_mode = "AllowOnlyApprovedOutbound"
   high_business_impact_enabled   = true
 
@@ -152,6 +174,7 @@ module "ai_foundry" {
   depends_on = [
     azurerm_private_dns_zone_virtual_network_link.api,
     azurerm_private_dns_zone_virtual_network_link.notebooks,
+    azurerm_key_vault_key.cmk,
   ]
 }
 
