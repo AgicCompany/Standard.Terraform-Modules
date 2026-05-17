@@ -1,0 +1,17 @@
+# Changelog
+
+All notable changes to this module will be documented in this file.
+
+## [Unreleased]
+
+## [1.0.0] - 2026-05-17
+
+### Added
+
+- Initial release of `communication-service-email` module.
+- Composes `azurerm_communication_service`, `azurerm_email_communication_service`, `azurerm_email_communication_service_domain`, `azurerm_email_communication_service_domain_sender_username` (per-entry `for_each`), and `azurerm_communication_service_email_domain_association`.
+- Toggleable Azure-managed (`AzureManagedDomain`) vs customer-managed custom domain via `enable_custom_domain`.
+- DNS verification records (domain, SPF, DKIM, DKIM2, DMARC) exposed as the `verification_records` output for custom-domain workflows.
+- Optional diagnostic settings on the Communication Service (multi-sink, auto-enumerated categories). Email Communication Service does not currently expose diagnostic categories.
+- `sender_usernames` output returns each sender's resource ID, local-part username, and computed `from_address` (`<username>@<effective_domain>`).
+- No secret outputs. `primary_connection_string` deliberately not exported.
