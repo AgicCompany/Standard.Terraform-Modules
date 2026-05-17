@@ -99,7 +99,7 @@ variable "managed_network_isolation_mode" {
   description = "Optional managed network isolation. One of: null (omit the managed_network block), Disabled, AllowOnlyApprovedOutbound, AllowInternetOutbound."
 
   validation {
-    condition     = var.managed_network_isolation_mode == null || contains(["Disabled", "AllowOnlyApprovedOutbound", "AllowInternetOutbound"], var.managed_network_isolation_mode)
+    condition     = var.managed_network_isolation_mode == null ? true : contains(["Disabled", "AllowOnlyApprovedOutbound", "AllowInternetOutbound"], var.managed_network_isolation_mode)
     error_message = "managed_network_isolation_mode must be null, Disabled, AllowOnlyApprovedOutbound, or AllowInternetOutbound."
   }
 }
@@ -170,8 +170,8 @@ variable "diagnostic_settings" {
   validation {
     condition = (
       var.diagnostic_settings == null ? true
-      : (var.diagnostic_settings.log_analytics_destination_type == null
-      || contains(["Dedicated", "AzureDiagnostics"], var.diagnostic_settings.log_analytics_destination_type))
+      : var.diagnostic_settings.log_analytics_destination_type == null ? true
+      : contains(["Dedicated", "AzureDiagnostics"], var.diagnostic_settings.log_analytics_destination_type)
     )
     error_message = "log_analytics_destination_type must be \"Dedicated\" or \"AzureDiagnostics\" when set."
   }

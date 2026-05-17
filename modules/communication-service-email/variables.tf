@@ -5,6 +5,7 @@ variable "resource_group_name" {
   description = "Name of the resource group"
 }
 
+# tflint-ignore: terraform_unused_declarations
 variable "location" {
   type        = string
   description = "Azure region. Required by module convention but NOT passed to the underlying Communication Service or Email Communication Service resources (they are global). Kept on the module so consumers' standard wiring works unchanged."
@@ -97,8 +98,8 @@ variable "diagnostic_settings" {
   validation {
     condition = (
       var.diagnostic_settings == null ? true
-      : (var.diagnostic_settings.log_analytics_destination_type == null
-      || contains(["Dedicated", "AzureDiagnostics"], var.diagnostic_settings.log_analytics_destination_type))
+      : var.diagnostic_settings.log_analytics_destination_type == null ? true
+      : contains(["Dedicated", "AzureDiagnostics"], var.diagnostic_settings.log_analytics_destination_type)
     )
     error_message = "log_analytics_destination_type must be \"Dedicated\" or \"AzureDiagnostics\" when set."
   }
