@@ -17,3 +17,4 @@ All notable changes to this module will be documented in this file.
 - Optional diagnostic settings using the standard module object pattern (multi-sink, auto-enumerated categories).
 - Outputs: `id`, `name`, `workspace_id`, `discovery_url`, `principal_id`, `tenant_id`, `project_id`, `project_name`, `project_workspace_id`, `private_endpoint_id`, `private_endpoint_ip_address`.
 - No secret outputs.
+

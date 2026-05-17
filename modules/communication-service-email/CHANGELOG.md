@@ -15,3 +15,4 @@ All notable changes to this module will be documented in this file.
 - Optional diagnostic settings on the Communication Service (multi-sink, auto-enumerated categories). Email Communication Service does not currently expose diagnostic categories.
 - `sender_usernames` output returns each sender's resource ID, local-part username, and computed `from_address` (`<username>@<effective_domain>`).
 - No secret outputs. `primary_connection_string` deliberately not exported.
+
