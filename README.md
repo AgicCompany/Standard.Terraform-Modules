@@ -6,7 +6,7 @@ A library of reusable, production-ready Terraform modules for Microsoft Azure. A
 
 | Name | Version |
 |------|---------|
-| Terraform | >= 1.9.0 |
+| Terraform | >= 1.10.0 |
 | AzureRM Provider | >= 4.0.0 |
 
 ## Design Principles
@@ -78,6 +78,13 @@ A library of reusable, production-ready Terraform modules for Microsoft Azure. A
 |--------|-------------|
 | [service-bus](modules/service-bus) | Service Bus namespace with queues, topics, and private endpoint |
 | [event-hub](modules/event-hub) | Event Hub namespace with hubs, consumer groups, and private endpoint |
+| [communication-service-email](modules/communication-service-email) | Communication Service + Email Service + domain (Azure-managed or customer-managed) with sender usernames |
+
+### AI / ML
+
+| Module | Description |
+|--------|-------------|
+| [ai-foundry](modules/ai-foundry) | AI Foundry hub + default project with optional private endpoint, managed network isolation, and CMK encryption |
 
 ### Monitoring
 
