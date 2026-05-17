@@ -8,8 +8,10 @@ Provisions an Azure AI Foundry hub (`Microsoft.MachineLearningServices/workspace
 
 The hub's managed identity (system- or user-assigned) needs RBAC on the backing storage account and key vault to function. The module does not grant these; consumers must wire `azurerm_role_assignment` separately. Minimum:
 
-- Storage account: `Storage Blob Data Contributor` to the hub MSI.
-- Key Vault: `Key Vault Administrator` (or fine-grained equivalents) to the hub MSI.
+- Storage account: `Storage Blob Data Contributor` to the hub MSI (for notebook scratch and run artifacts).
+- Key Vault (non-CMK path): `Key Vault Secrets User` to the hub MSI.
+- Key Vault (CMK path only): `Key Vault Crypto Service Encryption User` to the user-assigned identity referenced in the `encryption` block (covers get + wrap + unwrap).
+- Avoid granting `Key Vault Administrator` to the hub MSI in production — it grants full data-plane control of the vault.
 
 ## ForceNew foot-guns
 
@@ -66,7 +68,7 @@ No modules.
 | <a name="input_private_endpoint_name"></a> [private\_endpoint\_name](#input\_private\_endpoint\_name) | Override the private endpoint name. Defaults to pep-<name>. | `string` | `null` | no |
 | <a name="input_project_description"></a> [project\_description](#input\_project\_description) | Description of the default project | `string` | `null` | no |
 | <a name="input_project_friendly_name"></a> [project\_friendly\_name](#input\_project\_friendly\_name) | Display name of the default project | `string` | `null` | no |
-| <a name="input_project_name"></a> [project\_name](#input\_project\_name) | Name of the default project. Required (no default derived from var.name to avoid silently exceeding Azure project name length limits). Alphanumeric + hyphens, ~32 char max. | `string` | `null` | no |
+| <a name="input_project_name"></a> [project\_name](#input\_project\_name) | Name of the default project. No default — derived names would silently exceed Azure project name length limits (~32 char max). Alphanumeric + hyphens. | `string` | n/a | yes |
 | <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name) | Name of the resource group | `string` | n/a | yes |
 | <a name="input_storage_account_id"></a> [storage\_account\_id](#input\_storage\_account\_id) | Resource ID of the storage account backing the hub | `string` | n/a | yes |
 | <a name="input_subnet_id"></a> [subnet\_id](#input\_subnet\_id) | Subnet resource ID for the private endpoint. Required when enable\_private\_endpoint = true. | `string` | `null` | no |

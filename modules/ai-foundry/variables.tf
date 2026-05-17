@@ -27,6 +27,11 @@ variable "key_vault_id" {
   description = "Resource ID of the Key Vault backing the hub"
 }
 
+variable "project_name" {
+  type        = string
+  description = "Name of the default project. No default — derived names would silently exceed Azure project name length limits (~32 char max). Alphanumeric + hyphens."
+}
+
 # === Optional: Configuration ===
 
 variable "application_insights_id" {
@@ -51,12 +56,6 @@ variable "friendly_name" {
   type        = string
   default     = null
   description = "Display name of the hub"
-}
-
-variable "project_name" {
-  type        = string
-  default     = null
-  description = "Name of the default project. Required (no default derived from var.name to avoid silently exceeding Azure project name length limits). Alphanumeric + hyphens, ~32 char max."
 }
 
 variable "project_description" {
@@ -125,6 +124,11 @@ variable "subnet_id" {
   type        = string
   default     = null
   description = "Subnet resource ID for the private endpoint. Required when enable_private_endpoint = true."
+
+  validation {
+    condition     = !var.enable_private_endpoint || var.subnet_id != null
+    error_message = "subnet_id is required when enable_private_endpoint = true."
+  }
 }
 
 variable "private_dns_zone_ids" {

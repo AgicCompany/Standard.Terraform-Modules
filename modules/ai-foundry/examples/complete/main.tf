@@ -146,7 +146,7 @@ module "ai_foundry" {
   primary_user_assigned_identity = azurerm_user_assigned_identity.this.id
 
   encryption = {
-    key_id                    = azurerm_key_vault_key.cmk.id
+    key_id                    = azurerm_key_vault_key.cmk.versionless_id
     key_vault_id              = azurerm_key_vault.this.id
     user_assigned_identity_id = azurerm_user_assigned_identity.this.id
   }

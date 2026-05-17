@@ -19,7 +19,7 @@ resource "azurerm_ai_foundry" "this" {
 
   identity {
     type         = var.identity_type
-    identity_ids = var.identity_ids
+    identity_ids = length(var.identity_ids) > 0 ? var.identity_ids : null
   }
 
   dynamic "managed_network" {
@@ -47,16 +47,11 @@ resource "azurerm_ai_foundry" "this" {
       condition     = !contains(["UserAssigned", "SystemAssigned, UserAssigned"], var.identity_type) || length(var.identity_ids) > 0
       error_message = "identity_ids must be non-empty when identity_type includes UserAssigned."
     }
-
-    precondition {
-      condition     = !var.enable_private_endpoint || var.subnet_id != null
-      error_message = "subnet_id is required when enable_private_endpoint = true."
-    }
   }
 }
 
 resource "azurerm_ai_foundry_project" "this" {
-  name               = local.effective_project_name
+  name               = var.project_name
   location           = var.location
   ai_services_hub_id = azurerm_ai_foundry.this.id
 
@@ -66,17 +61,10 @@ resource "azurerm_ai_foundry_project" "this" {
 
   identity {
     type         = var.identity_type
-    identity_ids = var.identity_ids
+    identity_ids = length(var.identity_ids) > 0 ? var.identity_ids : null
   }
 
   tags = var.tags
-
-  lifecycle {
-    precondition {
-      condition     = var.project_name != null
-      error_message = "project_name is required (no derived default — see variable description)."
-    }
-  }
 }
 
 resource "azurerm_private_endpoint" "this" {
@@ -104,6 +92,11 @@ resource "azurerm_private_endpoint" "this" {
   }
 
   tags = var.tags
+}
+
+data "azurerm_monitor_diagnostic_categories" "this" {
+  count       = var.diagnostic_settings == null ? 0 : 1
+  resource_id = azurerm_ai_foundry.this.id
 }
 
 resource "azurerm_monitor_diagnostic_setting" "this" {
