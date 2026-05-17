@@ -68,6 +68,17 @@ variable "enable_geo_redundant_backup" {
   description = "Enable geo-redundant backup storage"
 }
 
+variable "storage_account_type" {
+  type        = string
+  default     = null
+  description = "Backup storage account redundancy class. One of \"Geo\", \"GeoZone\", \"Local\", \"Zone\". null leaves the Azure default (\"Geo\"). Set to \"Local\" or \"Zone\" in regions that do not offer geo-redundant storage for SQL Database backups (e.g. Italy North), otherwise creation fails with `ProvisioningDisabled: Provisioning of geo-redundant storage is not available in this region`. Independent of `enable_geo_redundant_backup`, which only controls whether geo-replicated copies are created."
+
+  validation {
+    condition     = var.storage_account_type == null ? true : contains(["Geo", "GeoZone", "Local", "Zone"], var.storage_account_type)
+    error_message = "storage_account_type must be one of \"Geo\", \"GeoZone\", \"Local\", \"Zone\", or null."
+  }
+}
+
 variable "enable_read_scale" {
   type        = bool
   default     = false

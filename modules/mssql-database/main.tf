@@ -7,9 +7,10 @@ resource "azurerm_mssql_database" "this" {
   collation    = var.collation
   license_type = var.license_type
 
-  zone_redundant     = var.enable_zone_redundancy
-  geo_backup_enabled = var.enable_geo_redundant_backup
-  read_scale         = var.enable_read_scale
+  zone_redundant       = var.enable_zone_redundancy
+  geo_backup_enabled   = var.enable_geo_redundant_backup
+  storage_account_type = var.storage_account_type
+  read_scale           = var.enable_read_scale
 
   short_term_retention_policy {
     retention_days = var.short_term_retention_days
