@@ -54,11 +54,11 @@ output "sender_usernames" {
 
 output "verification_records" {
   value = var.enable_custom_domain ? {
-    domain = try(one(azurerm_email_communication_service_domain.this.verification_records[*].domain[0]), null)
-    spf    = try(one(azurerm_email_communication_service_domain.this.verification_records[*].spf[0]), null)
-    dkim   = try(one(azurerm_email_communication_service_domain.this.verification_records[*].dkim[0]), null)
-    dkim2  = try(one(azurerm_email_communication_service_domain.this.verification_records[*].dkim2[0]), null)
-    dmarc  = try(one(azurerm_email_communication_service_domain.this.verification_records[*].dmarc[0]), null)
+    domain = try(azurerm_email_communication_service_domain.this.verification_records[0].domain[0], null)
+    spf    = try(azurerm_email_communication_service_domain.this.verification_records[0].spf[0], null)
+    dkim   = try(azurerm_email_communication_service_domain.this.verification_records[0].dkim[0], null)
+    dkim2  = try(azurerm_email_communication_service_domain.this.verification_records[0].dkim2[0], null)
+    dmarc  = try(azurerm_email_communication_service_domain.this.verification_records[0].dmarc[0], null)
   } : null
   description = "DNS verification records required when enable_custom_domain = true. null when using the Azure-managed domain. Each non-null sub-block contains { name, type, value, ttl }."
 }

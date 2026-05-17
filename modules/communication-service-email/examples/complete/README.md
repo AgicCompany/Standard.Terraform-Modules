@@ -46,6 +46,6 @@ No inputs.
 
 | Name | Description |
 |------|-------------|
-| <a name="output_sender_addresses"></a> [sender\_addresses](#output\_sender\_addresses) | n/a |
+| <a name="output_sender_addresses"></a> [sender\_addresses](#output\_sender\_addresses) | Sender email addresses ready to use in application config |
 | <a name="output_verification_records"></a> [verification\_records](#output\_verification\_records) | Provision these at your DNS registrar to complete domain verification |
 <!-- END_TF_DOCS -->

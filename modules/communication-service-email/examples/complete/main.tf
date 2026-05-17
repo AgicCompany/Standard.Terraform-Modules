@@ -69,4 +69,5 @@ output "sender_addresses" {
   value = {
     for k, s in module.acs_email.sender_usernames : k => s.from_address
   }
+  description = "Sender email addresses ready to use in application config"
 }
