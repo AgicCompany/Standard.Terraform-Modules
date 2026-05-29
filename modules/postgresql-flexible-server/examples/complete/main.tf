@@ -72,7 +72,7 @@ module "postgresql" {
   entra_admin_principal_name = "DBA Team"
 
   sku_name              = "GP_Standard_D2s_v3"
-  version_number        = "16"
+  version_number        = "17"
   storage_mb            = 65536
   backup_retention_days = 14
 
