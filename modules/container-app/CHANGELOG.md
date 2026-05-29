@@ -4,6 +4,15 @@ All notable changes to this module will be documented in this file.
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-05-29
+
+### Added
+
+- `registries` variable (optional, default `[]`): list of private registry authentication entries.
+  Supports managed identity auth (`identity` = user-assigned identity resource ID) and
+  username/password auth (`username` + `password_secret_name`). Generates a `registry` block
+  per entry on the Container App resource.
+
 ## [1.2.0] - 2026-04-18
 
 ### Added
