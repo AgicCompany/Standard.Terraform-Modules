@@ -39,9 +39,17 @@ variable "registries" {
   validation {
     condition = alltrue([
       for r in var.registries :
-      (r.identity != null) != (r.username != null || r.password_secret_name != null)
+      (r.identity != null) != (r.username != null && r.password_secret_name != null)
     ])
-    error_message = "Each registry entry must use either 'identity' or 'username'+'password_secret_name', not both and not neither."
+    error_message = "Each registry entry must use either 'identity' or both 'username' and 'password_secret_name', not both methods and not neither."
+  }
+
+  validation {
+    condition = alltrue([
+      for r in var.registries :
+      (r.username == null) == (r.password_secret_name == null)
+    ])
+    error_message = "'username' and 'password_secret_name' must be set together."
   }
 }
 ```
@@ -85,7 +93,10 @@ resource "azurerm_user_assigned_identity" "app" {
   resource_group_name = azurerm_resource_group.example.name
 }
 
-# (ACR resource omitted for brevity; consumer is expected to provide login_server)
+data "azurerm_container_registry" "example" {
+  name                = "acrexampledevweu001"
+  resource_group_name = azurerm_resource_group.example.name
+}
 
 module "container_app" {
   # ...existing config...
@@ -94,7 +105,7 @@ module "container_app" {
 
   registries = [
     {
-      server   = "myacr.azurecr.io"
+      server   = data.azurerm_container_registry.example.login_server
       identity = azurerm_user_assigned_identity.app.id
     }
   ]
