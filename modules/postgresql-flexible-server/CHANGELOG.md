@@ -9,6 +9,10 @@ All notable changes to this module will be documented in this file.
 - Entra AD administrator support via `entra_admin_object_id`, `entra_admin_principal_name`, and `entra_admin_principal_type` variables.
 - Precondition: `enable_entra_auth = true` now requires `entra_admin_object_id` and `entra_admin_principal_name`.
 
+### Fixed
+
+- `administrator_password` validation no longer crashes when the value is `null`. Replaced `||` short-circuit pattern (which Terraform does not honour) with a ternary so `length()` is only evaluated when the value is non-null. Affects deployments using `enable_password_auth = false` (Entra ID-only).
+
 ## [4.1.0] - 2026-04-18
 
 ### Added
