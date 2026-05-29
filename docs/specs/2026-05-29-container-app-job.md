@@ -119,8 +119,9 @@ variable "registries" {
     password_secret_name = optional(string)
   }))
   default = []
-  # validation: identity XOR (username + password_secret_name), username/password always paired
-  # (identical to container-app v1.3.0)
+  # Two validation blocks (identical to container-app v1.3.0):
+  # 1. identity XOR (username AND password_secret_name)
+  # 2. username and password_secret_name must be set together
 }
 
 variable "secrets" {
@@ -153,7 +154,9 @@ variable "init_containers" {
 
 ### Trigger Variables
 
-Exactly one must be set. Validation on `event_trigger_config` enforces the constraint.
+Exactly one must be set. Enforced via a `check` block in `main.tf` (Terraform 1.8+, module
+requires 1.10+). Variable-level `validation` blocks cannot reference other variables in
+Terraform and are not used here.
 
 ```hcl
 variable "event_trigger_config" {
@@ -177,17 +180,6 @@ variable "event_trigger_config" {
     }), {})
   })
   default = null
-
-  validation {
-    condition = length([
-      for v in [
-        var.event_trigger_config,
-        var.manual_trigger_config,
-        var.schedule_trigger_config
-      ] : v if v != null
-    ]) == 1
-    error_message = "Exactly one of event_trigger_config, manual_trigger_config, or schedule_trigger_config must be set."
-  }
 }
 
 variable "manual_trigger_config" {
@@ -205,6 +197,23 @@ variable "schedule_trigger_config" {
     replica_completion_count = optional(number, 1)
   })
   default = null
+}
+```
+
+`check` block in `main.tf`:
+
+```hcl
+check "trigger_config_exactly_one" {
+  assert {
+    condition = length([
+      for v in [
+        var.event_trigger_config,
+        var.manual_trigger_config,
+        var.schedule_trigger_config
+      ] : v if v != null
+    ]) == 1
+    error_message = "Exactly one of event_trigger_config, manual_trigger_config, or schedule_trigger_config must be set."
+  }
 }
 ```
 
@@ -261,7 +270,19 @@ the presence of `lifecycle { ignore_changes = [secret] }`. All blocks (`identity
 `secret`, `event_trigger_config`, `manual_trigger_config`, `schedule_trigger_config`, `template`)
 are identical between the two resources and use `dynamic` blocks throughout.
 
+A `check` block enforces that exactly one trigger config is set (see Trigger Variables above).
+
 ```hcl
+check "trigger_config_exactly_one" {
+  assert {
+    condition = length([
+      for v in [var.event_trigger_config, var.manual_trigger_config, var.schedule_trigger_config]
+      : v if v != null
+    ]) == 1
+    error_message = "Exactly one of event_trigger_config, manual_trigger_config, or schedule_trigger_config must be set."
+  }
+}
+
 resource "azurerm_container_app_job" "with_lifecycle" {
   count = var.enable_secret_ignore_changes ? 1 : 0
   # ... all blocks ...
