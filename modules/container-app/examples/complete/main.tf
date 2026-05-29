@@ -24,7 +24,8 @@ resource "azurerm_user_assigned_identity" "app" {
   resource_group_name = azurerm_resource_group.example.name
 }
 
-# Container registry for private image pulls
+# Container registry for private image pulls.
+# In practice, the ACR is often in a separate shared/platform resource group.
 data "azurerm_container_registry" "example" {
   name                = "acrexampledevweu001"
   resource_group_name = azurerm_resource_group.example.name
@@ -97,7 +98,7 @@ module "container_app" {
 
   # Main container with probes
   container = {
-    image  = "mcr.microsoft.com/azuredocs/containerapps-helloworld:latest"
+    image  = "${data.azurerm_container_registry.example.login_server}/myapp:latest"
     cpu    = 0.5
     memory = "1Gi"
 
