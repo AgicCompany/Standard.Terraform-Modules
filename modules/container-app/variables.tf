@@ -141,7 +141,7 @@ variable "registries" {
     password_secret_name = optional(string)
   }))
   default     = []
-  description = "Private registry authentication. Each entry requires either 'identity' (resource ID of a user-assigned managed identity) or both 'username' and 'password_secret_name'. The identity must be present in user_assigned_identity_ids."
+  description = "Private registry authentication. Each entry requires either 'identity' (resource ID of a user-assigned managed identity) or both 'username' and 'password_secret_name'. The identity should be listed in user_assigned_identity_ids; Azure will reject the deployment if it is not."
 
   validation {
     condition = alltrue([
