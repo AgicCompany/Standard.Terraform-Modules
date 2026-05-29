@@ -133,6 +133,33 @@ variable "init_containers" {
   description = "Init containers to run before the main container"
 }
 
+variable "registries" {
+  type = list(object({
+    server               = string
+    identity             = optional(string)
+    username             = optional(string)
+    password_secret_name = optional(string)
+  }))
+  default     = []
+  description = "Private registry authentication. Each entry requires either 'identity' (resource ID of a user-assigned managed identity) or both 'username' and 'password_secret_name'. The identity must be present in user_assigned_identity_ids."
+
+  validation {
+    condition = alltrue([
+      for r in var.registries :
+      (r.identity != null) != (r.username != null && r.password_secret_name != null)
+    ])
+    error_message = "Each registry entry must use either 'identity' or both 'username' and 'password_secret_name', not both methods and not neither."
+  }
+
+  validation {
+    condition = alltrue([
+      for r in var.registries :
+      (r.username == null) == (r.password_secret_name == null)
+    ])
+    error_message = "'username' and 'password_secret_name' must be set together."
+  }
+}
+
 # === Optional: Feature Flags ===
 variable "enable_ingress" {
   type        = bool
