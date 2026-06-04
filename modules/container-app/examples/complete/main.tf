@@ -18,6 +18,28 @@ resource "azurerm_resource_group" "example" {
   location = "westeurope"
 }
 
+resource "azurerm_user_assigned_identity" "app" {
+  name                = "id-ca-complete-dev-weu-001"
+  location            = azurerm_resource_group.example.location
+  resource_group_name = azurerm_resource_group.example.name
+}
+
+# Container registry for private image pulls.
+resource "azurerm_container_registry" "example" {
+  name                = "acrexampledevweu001"
+  resource_group_name = azurerm_resource_group.example.name
+  location            = azurerm_resource_group.example.location
+  sku                 = "Basic"
+}
+
+# Grant the user-assigned identity pull access to the registry.
+# Container Apps requires this permission to pull private images.
+resource "azurerm_role_assignment" "acr_pull" {
+  scope                = azurerm_container_registry.example.id
+  role_definition_name = "AcrPull"
+  principal_id         = azurerm_user_assigned_identity.app.principal_id
+}
+
 # Log Analytics workspace (required by Container Apps Environment)
 resource "azurerm_log_analytics_workspace" "example" {
   name                = "law-ca-complete-dev-weu-001"
@@ -85,7 +107,7 @@ module "container_app" {
 
   # Main container with probes
   container = {
-    image  = "mcr.microsoft.com/azuredocs/containerapps-helloworld:latest"
+    image  = "${azurerm_container_registry.example.login_server}/myapp:latest"
     cpu    = 0.5
     memory = "1Gi"
 
@@ -165,6 +187,15 @@ module "container_app" {
 
   # System-assigned managed identity
   enable_system_assigned_identity = true
+
+  user_assigned_identity_ids = [azurerm_user_assigned_identity.app.id]
+
+  registries = [
+    {
+      server   = azurerm_container_registry.example.login_server
+      identity = azurerm_user_assigned_identity.app.id
+    }
+  ]
 
   tags = {
     project     = "complete-example"

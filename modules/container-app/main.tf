@@ -134,6 +134,18 @@ resource "azurerm_container_app" "this" {
     }
   }
 
+  # Registry
+  dynamic "registry" {
+    for_each = var.registries
+
+    content {
+      server               = registry.value.server
+      identity             = registry.value.identity
+      username             = registry.value.username
+      password_secret_name = registry.value.password_secret_name
+    }
+  }
+
   tags = var.tags
 
   lifecycle {

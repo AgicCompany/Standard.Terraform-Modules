@@ -103,6 +103,6 @@ terraform init && terraform plan
 ## Reference
 
 - `docs/MODULE_STANDARDS.md` -- complete standards document
-- `docs/IMPLEMENTATION_PLAN.md` -- module priority matrix and build order
+- `docs/MODULE_CATALOG.md` -- full module listing with variable interfaces and versions
 - `docs/terraform-framework-spec.md` -- how consuming projects are structured
 - `docs/TESTING.md` -- pre-release testing checklist

@@ -444,7 +444,37 @@ Creates an Azure Container Apps Environment with VNet integration and workload p
 
 ---
 
-### container-app `v1.2.0`
+### container-app-job `v1.0.0`
+Creates an Azure Container App Job for event-driven, scheduled, or manually triggered batch workloads.
+
+| Variable | Type | Required | Default | Description |
+|----------|------|----------|---------|-------------|
+| `resource_group_name` | string | yes | — | Resource group name |
+| `location` | string | yes | — | Azure region |
+| `name` | string | yes | — | Container App Job name |
+| `container_app_environment_id` | string | yes | — | CAE resource ID |
+| `replica_timeout_in_seconds` | number | yes | — | Maximum seconds a replica may run |
+| `container` | object | yes | — | Main container: image, cpu, memory, env, probes |
+| `event_trigger_config` | object | no | `null` | KEDA event trigger: parallelism, replica_completion_count, scale rules |
+| `manual_trigger_config` | object | no | `null` | Manual trigger: parallelism, replica_completion_count |
+| `schedule_trigger_config` | object | no | `null` | Cron trigger: cron_expression, parallelism, replica_completion_count |
+| `secrets` | map(object) | no | `{}` | Secrets: plain value or Key Vault reference |
+| `registries` | list(object) | no | `[]` | Private registry auth: server, identity or username + password_secret_name |
+| `user_assigned_identity_ids` | list(string) | no | `[]` | User-assigned identity IDs |
+| `init_containers` | list(object) | no | `[]` | Init containers |
+| `workload_profile_name` | string | no | `null` | Workload profile (null = Consumption) |
+| `replica_retry_limit` | number | no | `null` | Max retries before replica is failed |
+| `enable_system_assigned_identity` | bool | no | `false` | Enable system-assigned identity |
+| `enable_secret_ignore_changes` | bool | no | `true` | Ignore secret drift (for externally-rotated secrets) |
+| `tags` | map(string) | no | `{}` | Tags |
+
+**Note:** Exactly one of `event_trigger_config`, `manual_trigger_config`, or `schedule_trigger_config` must be set.
+
+**Outputs:** `id`, `name`, `outbound_ip_addresses`, `event_stream_endpoint`, `principal_id`, `tenant_id`
+
+---
+
+### container-app `v1.3.0`
 Creates an Azure Container App in an existing Container Apps Environment.
 
 | Variable | Type | Required | Default | Description |

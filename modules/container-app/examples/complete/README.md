@@ -1,6 +1,6 @@
 # Example: Complete Usage
 
-Demonstrates all features of the container-app module including probes, init containers, scale rules, secrets, and managed identity.
+Demonstrates all features of the container-app module including probes, init containers, scale rules, secrets, managed identity, and private registry authentication.
 
 ## Usage
 
@@ -14,24 +14,27 @@ terraform apply
 
 - Azure subscription
 - Azure CLI authenticated
-- Existing resource group (or modify example to create one)
 
 ## What This Creates
 
 - Resource group `rg-ca-complete-dev-weu-001`
+- Container Registry `acrexampledevweu001` (Basic SKU)
+- User-assigned managed identity `id-ca-complete-dev-weu-001`
+- Role assignment: `AcrPull` on the registry for the managed identity
 - Log Analytics workspace `law-ca-complete-dev-weu-001`
 - Virtual network with a `/21` subnet delegated to `Microsoft.App/environments`
 - Container Apps Environment `cae-complete-dev-weu-001` with:
   - Internal load balancer
   - Dedicated workload profile (D4)
 - Container App `ca-api-complete-dev-weu-001` with:
-  - Hello-world container image (0.5 CPU / 1Gi memory)
+  - Private ACR image (0.5 CPU / 1Gi memory)
+  - Private registry authentication via managed identity
   - HTTP ingress on port 80 (external)
   - Liveness, readiness, and startup probes
   - Init container for database migrations
   - Secret-referenced environment variable
   - HTTP scale rule (1-5 replicas, 50 concurrent requests)
-  - System-assigned managed identity
+  - System-assigned and user-assigned managed identity
   - Dedicated workload profile
 
 ## Clean Up
@@ -65,9 +68,12 @@ terraform destroy
 | Name | Type |
 |------|------|
 | [azurerm_container_app_environment.example](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/container_app_environment) | resource |
+| [azurerm_container_registry.example](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/container_registry) | resource |
 | [azurerm_log_analytics_workspace.example](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/log_analytics_workspace) | resource |
 | [azurerm_resource_group.example](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group) | resource |
+| [azurerm_role_assignment.acr_pull](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
 | [azurerm_subnet.cae](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/subnet) | resource |
+| [azurerm_user_assigned_identity.app](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/user_assigned_identity) | resource |
 | [azurerm_virtual_network.example](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/virtual_network) | resource |
 
 ## Inputs
