@@ -28,12 +28,12 @@ variable "sku_name" {
 
 variable "version_number" {
   type        = string
-  default     = "16"
+  default     = "17"
   description = "PostgreSQL major version"
 
   validation {
-    condition     = contains(["12", "13", "14", "15", "16"], var.version_number)
-    error_message = "PostgreSQL version must be one of: 12, 13, 14, 15, 16."
+    condition     = contains(["14", "15", "16", "17", "18"], var.version_number)
+    error_message = "PostgreSQL version must be one of: 14, 15, 16, 17, 18."
   }
 }
 

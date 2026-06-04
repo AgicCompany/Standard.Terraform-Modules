@@ -128,7 +128,7 @@ No modules.
 | <a name="input_storage_tier"></a> [storage\_tier](#input\_storage\_tier) | Storage tier (P4, P6, P10, P15, P20, P30, P40, P50, P60, P70, P80). Auto-selected if null. | `string` | `null` | no |
 | <a name="input_subnet_id"></a> [subnet\_id](#input\_subnet\_id) | Subnet ID for the private endpoint. Required when enable\_private\_endpoint = true. | `string` | `null` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | Tags to apply to the resource | `map(string)` | `{}` | no |
-| <a name="input_version_number"></a> [version\_number](#input\_version\_number) | PostgreSQL major version | `string` | `"16"` | no |
+| <a name="input_version_number"></a> [version\_number](#input\_version\_number) | PostgreSQL major version | `string` | `"17"` | no |
 | <a name="input_zone"></a> [zone](#input\_zone) | Availability zone (1, 2, or 3) | `string` | `null` | no |
 
 ## Outputs

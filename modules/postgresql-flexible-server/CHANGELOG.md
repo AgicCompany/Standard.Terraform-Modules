@@ -9,6 +9,10 @@ All notable changes to this module will be documented in this file.
 - Entra AD administrator support via `entra_admin_object_id`, `entra_admin_principal_name`, and `entra_admin_principal_type` variables.
 - Precondition: `enable_entra_auth = true` now requires `entra_admin_object_id` and `entra_admin_principal_name`.
 
+### Changed
+
+- **BREAKING:** `version_number` validation updated to allow PostgreSQL 14–18 (adds 17 and 18, removes 12 and 13 which are in Azure Extended Support). Default changed from "16" to "17".
+
 ### Fixed
 
 - `administrator_password` validation no longer crashes when the value is `null`. Replaced `||` short-circuit pattern (which Terraform does not honour) with a ternary so `length()` is only evaluated when the value is non-null. Affects deployments using `enable_password_auth = false` (Entra ID-only).
