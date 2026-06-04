@@ -81,7 +81,7 @@ Creates an Azure Virtual Network with configurable subnets.
 
 ---
 
-### network-security-group `v1.1.0`
+### network-security-group `v1.2.0`
 Creates an Azure NSG with configurable security rules managed as separate resources.
 
 | Variable | Type | Required | Default | Description |
@@ -110,7 +110,7 @@ Creates an Azure Private DNS Zone with virtual network linking.
 
 ---
 
-### route-table `v1.1.0`
+### route-table `v1.2.0`
 Creates an Azure Route Table with configurable routes managed as separate resources.
 
 | Variable | Type | Required | Default | Description |
@@ -164,7 +164,7 @@ Creates bidirectional Azure Virtual Network peering between two VNets.
 
 ---
 
-### storage-account `v3.1.0`
+### storage-account `v3.1.1`
 Creates an Azure Storage Account with secure defaults and optional private endpoints per subresource.
 
 | Variable | Type | Required | Default | Description |
@@ -175,7 +175,7 @@ Creates an Azure Storage Account with secure defaults and optional private endpo
 | `account_tier` | string | no | `"Standard"` | Standard or Premium |
 | `account_replication_type` | string | no | `"LRS"` | LRS, ZRS, GRS, RAGRS, GZRS, RAGZRS |
 | `access_tier` | string | no | `null` | Hot or Cool |
-| `min_tls_version` | string | no | `"TLS1_2"` | Must be TLS1_2 |
+| `min_tls_version` | string | no | `"1.2"` | Must be 1.2 |
 | `enable_blob_soft_delete` | bool | no | `true` | Enable blob soft delete |
 | `blob_soft_delete_retention_days` | number | no | `7` | Blob soft delete retention |
 | `enable_container_soft_delete` | bool | no | `true` | Enable container soft delete |
@@ -252,7 +252,7 @@ Creates an Azure Log Analytics workspace for centralized logging.
 
 ---
 
-### diagnostic-settings `v1.0.0`
+### diagnostic-settings `v1.0.1`
 Creates an Azure Monitor diagnostic setting to route logs and metrics to Log Analytics.
 
 | Variable | Type | Required | Default | Description |
@@ -306,13 +306,13 @@ Creates an Azure Kubernetes Service cluster with private-by-default config, Azur
 
 ---
 
-### aks-node-pool `v1.0.0`
+### aks-node-pool `v2.0.0`
 Creates additional user node pools for an existing AKS cluster.
 
 | Variable | Type | Required | Default | Description |
 |----------|------|----------|---------|-------------|
 | `kubernetes_cluster_id` | string | yes | — | AKS cluster resource ID |
-| `node_pools` | map(object) | no | `{}` | Node pools: vm_size, node_count, min/max_count, auto_scaling, os_type, priority, zones, labels, taints, subnet_id |
+| `node_pools` | map(object) | no | `{}` | Node pools: vm_size, node_count, min/max_count, auto_scaling, os_type, priority, zones (default `null`), labels, taints, subnet_id |
 
 **Outputs:** `node_pool_ids`, `node_pool_names`
 
@@ -394,7 +394,7 @@ Creates an Azure Linux Function App with secure defaults and optional private en
 
 ---
 
-### function-app-flex `v1.1.0`
+### function-app-flex `v1.2.0`
 Creates an Azure Flex Consumption (FC1) Function App with private endpoint. Requires a dedicated FC1 App Service Plan (`sku_name = "FC1"`).
 
 | Variable | Type | Required | Default | Description |
@@ -499,7 +499,7 @@ Creates an Azure Container App in an existing Container Apps Environment.
 
 ---
 
-### container-registry `v2.1.0`
+### container-registry `v2.2.0`
 Creates an Azure Container Registry with secure defaults and optional private endpoint.
 
 | Variable | Type | Required | Default | Description |
@@ -522,7 +522,7 @@ Creates an Azure Container Registry with secure defaults and optional private en
 
 ---
 
-### linux-virtual-machine `v1.1.0`
+### linux-virtual-machine `v1.2.0`
 Creates an Azure Linux VM with NIC, optional public IP, and data disk management.
 
 | Variable | Type | Required | Default | Description |
@@ -549,7 +549,7 @@ Creates an Azure Linux VM with NIC, optional public IP, and data disk management
 
 ---
 
-### windows-virtual-machine `v1.0.0`
+### windows-virtual-machine `v1.1.0`
 Creates an Azure Windows VM with NIC, optional public IP, and data disk management.
 
 | Variable | Type | Required | Default | Description |
@@ -646,26 +646,29 @@ Creates an Azure SQL logical server with Azure AD auth and optional private endp
 
 ---
 
-### mssql-database `v1.1.0`
+### mssql-database `v1.3.0`
 Creates an Azure SQL Database on an existing SQL server.
 
 | Variable | Type | Required | Default | Description |
 |----------|------|----------|---------|-------------|
 | `name` | string | yes | — | Database name |
 | `server_id` | string | yes | — | SQL server resource ID |
-| `sku_name` | string | yes | — | DTU (S0, S1, P1) or vCore (GP_Gen5_2, etc.) |
-| `backup_retention_days` | number | no | `null` | Short-term backup retention (1-35) |
-| `geo_redundant_backup_enabled` | bool | no | `true` | Geo-redundant backup |
-| `zone_redundancy_enabled` | bool | no | `false` | Zone redundancy |
-| `read_scale_out_enabled` | bool | no | `false` | Read scale-out |
-| `license_type` | string | no | `null` | LicenseIncluded or BasePrice |
+| `sku_name` | string | no | `"S0"` | DTU (S0, S1, P1) or vCore (GP_Gen5_2, etc.) |
+| `max_size_gb` | number | no | `2` | Maximum database size in GB |
+| `collation` | string | no | `"SQL_Latin1_General_CP1_CI_AS"` | Database collation |
+| `license_type` | string | no | `"LicenseIncluded"` | LicenseIncluded or BasePrice |
+| `short_term_retention_days` | number | no | `7` | Point-in-time restore retention (1-35) |
+| `enable_geo_redundant_backup` | bool | no | `true` | Geo-redundant backup |
+| `storage_account_type` | string | no | `null` | Backup storage redundancy: Geo, GeoZone, Local, Zone. Set to Local/Zone in regions without geo-redundant storage (e.g. Italy North) |
+| `enable_zone_redundancy` | bool | no | `false` | Zone redundancy |
+| `enable_read_scale` | bool | no | `false` | Read scale-out (Premium/Business Critical/Hyperscale only) |
 | `tags` | map(string) | no | `{}` | Tags |
 
 **Outputs:** `id`, `name`
 
 ---
 
-### mysql-flexible-server `v3.1.0`
+### mysql-flexible-server `v3.1.1`
 Creates an Azure MySQL Flexible Server with configurable databases and server parameters.
 
 | Variable | Type | Required | Default | Description |
@@ -691,7 +694,7 @@ Creates an Azure MySQL Flexible Server with configurable databases and server pa
 
 ---
 
-### postgresql-flexible-server `v4.1.0`
+### postgresql-flexible-server `v5.0.0`
 Creates an Azure PostgreSQL Flexible Server with configurable databases and server parameters.
 
 | Variable | Type | Required | Default | Description |
@@ -702,7 +705,7 @@ Creates an Azure PostgreSQL Flexible Server with configurable databases and serv
 | `administrator_login` | string | yes | — | Admin login |
 | `administrator_password` | string | yes | — | Admin password (sensitive) |
 | `sku_name` | string | yes | — | B_Standard_B1s, Standard_D2s_v3, etc. |
-| `version_number` | string | no | `"16"` | PostgreSQL major version: 12, 13, 14, 15, 16 |
+| `version_number` | string | no | `"17"` | PostgreSQL major version: 14, 15, 16, 17, 18 |
 | `databases` | map(object) | no | `{}` | Database names |
 | `firewall_rules` | map(object) | no | `{}` | Rules: start_ip, end_ip |
 | `server_parameters` | map(object) | no | `{}` | Server config parameters |
@@ -745,7 +748,7 @@ Creates an Azure Cosmos DB account with SQL API databases and optional private e
 
 ---
 
-### redis-cache `v3.1.0`
+### redis-cache `v4.0.0`
 Creates an Azure Cache for Redis with secure defaults and optional private endpoint.
 
 | Variable | Type | Required | Default | Description |
@@ -755,7 +758,7 @@ Creates an Azure Cache for Redis with secure defaults and optional private endpo
 | `name` | string | yes | — | Redis cache name |
 | `sku_name` | string | no | `"Standard"` | Basic, Standard, Premium |
 | `family` | string | no | `"C"` | C (Basic/Standard) or P (Premium) |
-| `capacity` | number | no | `1` | 0-6 for C, 1-5 for P |
+| `capacity` | number | no | `0` | 0-6 for C, 1-5 for P |
 | `minimum_tls_version` | string | no | `"1.2"` | Must be 1.2 |
 | `maxmemory_policy` | string | no | `null` | Eviction policy |
 | `firewall_rules` | map(object) | no | `{}` | IP firewall rules |
@@ -772,7 +775,7 @@ Creates an Azure Cache for Redis with secure defaults and optional private endpo
 
 ---
 
-### managed-redis `v1.1.0`
+### managed-redis `v1.2.0`
 Creates an Azure Managed Redis (Enterprise) instance with modules, geo-replication, and private endpoint. Requires AzureRM >= 4.54.0.
 
 | Variable | Type | Required | Default | Description |
