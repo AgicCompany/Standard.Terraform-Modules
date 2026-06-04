@@ -13,3 +13,8 @@
 # OS
 .DS_Store
 Thumbs.db
+
+# Working docs — local only, never push to remote
+docs/tmp/
+docs/plans/
+docs/specs/
