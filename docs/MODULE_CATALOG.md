@@ -24,7 +24,7 @@ module "<name>" {
 - `api-management`, `container-registry`, `cosmosdb`, `event-hub`, `function-app`, `key-vault`, `linux-web-app`, `mssql-server`, `redis-cache`, `service-bus`, `static-web-app`, `storage-account` → `v2.0.0`
 - `mysql-flexible-server`, `postgresql-flexible-server` → `v3.0.0` (PE naming override)
 
-See `docs/specs/2026-04-18-module-library-enhancements-design.md` (Phase 1) for design details.
+See the relevant PR and CHANGELOG entries in each module for design details.
 
 ### Phase 2 Module Enhancements (2026-04-18)
 
@@ -57,7 +57,7 @@ Updated modules and versions:
 | `key-vault` | `v2.1.0` |
 | `container-registry` | `v2.1.0` |
 
-See `docs/specs/2026-04-18-module-library-enhancements-design.md` (Phase 2) for design details and the `diagnostic_settings` variable contract.
+See the relevant PR and CHANGELOG entries in each module for design details and the `diagnostic_settings` variable contract.
 
 ---
 
@@ -646,7 +646,7 @@ Creates an Azure MySQL Flexible Server with configurable databases and server pa
 | `administrator_login` | string | yes | — | Admin login |
 | `administrator_password` | string | yes | — | Admin password (sensitive) |
 | `sku_name` | string | yes | — | B_Standard_B1s, Standard_D2ds_v4, etc. |
-| `version` | string | no | `null` | 5.7, 8.0.21 |
+| `version_number` | string | no | `"8.0.21"` | MySQL version: 5.7, 8.0.21 |
 | `databases` | map(object) | no | `{}` | Database names |
 | `firewall_rules` | map(object) | no | `{}` | Rules: start_ip, end_ip |
 | `server_parameters` | map(object) | no | `{}` | Server config parameters |
@@ -672,7 +672,7 @@ Creates an Azure PostgreSQL Flexible Server with configurable databases and serv
 | `administrator_login` | string | yes | — | Admin login |
 | `administrator_password` | string | yes | — | Admin password (sensitive) |
 | `sku_name` | string | yes | — | B_Standard_B1s, Standard_D2s_v3, etc. |
-| `version` | string | no | `null` | 12-16 |
+| `version_number` | string | no | `"16"` | PostgreSQL major version: 12, 13, 14, 15, 16 |
 | `databases` | map(object) | no | `{}` | Database names |
 | `firewall_rules` | map(object) | no | `{}` | Rules: start_ip, end_ip |
 | `server_parameters` | map(object) | no | `{}` | Server config parameters |
