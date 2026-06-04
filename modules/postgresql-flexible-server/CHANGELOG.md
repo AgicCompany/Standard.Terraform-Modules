@@ -11,7 +11,7 @@ All notable changes to this module will be documented in this file.
 
 ### Changed
 
-- `version_number` validation updated to allow PostgreSQL 14–18 (adds 17 and 18, removes 12 and 13 which are in Azure Extended Support). Default changed from `"16"` to `"17"`.
+- **BREAKING:** `version_number` validation updated to allow PostgreSQL 14–18 (adds 17 and 18, removes 12 and 13 which are in Azure Extended Support). Default changed from "16" to "17".
 
 ### Fixed
 
