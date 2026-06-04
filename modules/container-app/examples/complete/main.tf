@@ -25,10 +25,19 @@ resource "azurerm_user_assigned_identity" "app" {
 }
 
 # Container registry for private image pulls.
-# In practice, the ACR is often in a separate shared/platform resource group.
-data "azurerm_container_registry" "example" {
+resource "azurerm_container_registry" "example" {
   name                = "acrexampledevweu001"
   resource_group_name = azurerm_resource_group.example.name
+  location            = azurerm_resource_group.example.location
+  sku                 = "Basic"
+}
+
+# Grant the user-assigned identity pull access to the registry.
+# Container Apps requires this permission to pull private images.
+resource "azurerm_role_assignment" "acr_pull" {
+  scope                = azurerm_container_registry.example.id
+  role_definition_name = "AcrPull"
+  principal_id         = azurerm_user_assigned_identity.app.principal_id
 }
 
 # Log Analytics workspace (required by Container Apps Environment)
@@ -98,7 +107,7 @@ module "container_app" {
 
   # Main container with probes
   container = {
-    image  = "${data.azurerm_container_registry.example.login_server}/myapp:latest"
+    image  = "${azurerm_container_registry.example.login_server}/myapp:latest"
     cpu    = 0.5
     memory = "1Gi"
 
@@ -183,7 +192,7 @@ module "container_app" {
 
   registries = [
     {
-      server   = data.azurerm_container_registry.example.login_server
+      server   = azurerm_container_registry.example.login_server
       identity = azurerm_user_assigned_identity.app.id
     }
   ]
