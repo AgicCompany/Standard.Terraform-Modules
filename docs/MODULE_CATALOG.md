@@ -444,7 +444,7 @@ Creates an Azure Container Apps Environment with VNet integration and workload p
 
 ---
 
-### container-app `v1.2.0`
+### container-app `v1.3.0`
 Creates an Azure Container App in an existing Container Apps Environment.
 
 | Variable | Type | Required | Default | Description |
@@ -457,6 +457,7 @@ Creates an Azure Container App in an existing Container Apps Environment.
 | `ingress` | object | no | `null` | Ingress: target_port, transport (auto/http/http2/tcp), traffic_weight |
 | `secrets` | map(string) | no | `{}` | Secrets (sensitive) |
 | `scale` | object | no | `null` | Scale: min_replicas, max_replicas, rules |
+| `registries` | list(object) | no | `[]` | Private registry auth: server, identity (UAI resource ID) or username + password_secret_name |
 | `user_assigned_identity_ids` | list(string) | no | `[]` | User-assigned identity IDs |
 | `workload_profile_name` | string | no | `null` | Workload profile (null = Consumption) |
 | `init_containers` | list(object) | no | `[]` | Init containers |
