@@ -19,6 +19,11 @@ variable "offer_type" {
   type        = string
   default     = "Standard"
   description = "Cosmos DB offer type"
+
+  validation {
+    condition     = var.offer_type == "Standard"
+    error_message = "offer_type must be \"Standard\" (the only supported value for Azure Cosmos DB)."
+  }
 }
 
 variable "kind" {
