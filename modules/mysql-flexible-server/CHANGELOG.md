@@ -25,10 +25,9 @@ All notable changes to this module will be documented in this file.
 
 - Password complexity validation aligns with Azure's built-in MySQL Flexible Server complexity rules.
 
-### Fixed
+### Added
 
-- `enable_public_access` variable is now correctly wired to `public_network_access_enabled` on the server resource
-- Added default server configurations enforcing `require_secure_transport = ON` and `tls_version = TLSv1.2`
+- Default server configurations enforcing `require_secure_transport = ON` and `tls_version = TLSv1.2` (merged with consumer-supplied `server_configurations`).
 
 ## [3.0.0] - 2026-03-30
 

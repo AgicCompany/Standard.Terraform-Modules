@@ -11,11 +11,6 @@ All notable changes to this module will be documented in this file.
 - **BREAKING:** `enable_secure_boot` added with default `true` (Trusted Launch). Existing VMs upgrading from v1.x will have Secure Boot enabled, which requires a Gen2 VM image. Pass `enable_secure_boot = false` to preserve previous behavior.
 - **BREAKING:** `enable_vtpm` added with default `true` (Trusted Launch). Existing VMs upgrading from v1.x will have vTPM enabled. Pass `enable_vtpm = false` to preserve previous behavior.
 
-### Added
-- `public_ip_name` variable to override PIP resource name (default: `pip-{name}`).
-- `nic_name` variable to override NIC resource name (default: `nic-{name}`).
-- `managed_disk_name_prefix` variable to override managed disk name prefix (default: `disk-{name}`).
-
 ## [1.2.0] - 2026-06-05
 
 ### Added
