@@ -4,6 +4,10 @@ All notable changes to this module will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- Validation: `redis_version` must be "6"; `capacity` must be 0-6.
+
 ### Changed
 
 - **BREAKING:** Default `sku_name` changed from `Basic` to `Standard`. Basic SKU is incompatible with the default `enable_private_endpoint = true`. Consumers using Basic must explicitly set `sku_name = "Basic"` and `enable_private_endpoint = false`.

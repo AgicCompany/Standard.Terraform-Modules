@@ -41,6 +41,11 @@ variable "capacity" {
   type        = number
   default     = 0
   description = "Cache size: 0-6 for C family, 1-5 for P family"
+
+  validation {
+    condition     = var.capacity >= 0 && var.capacity <= 6
+    error_message = "capacity must be between 0 and 6 (0-6 for Basic/Standard, 1-5 for Premium)."
+  }
 }
 
 variable "min_tls_version" {
@@ -127,6 +132,11 @@ variable "redis_version" {
   type        = string
   default     = "6"
   description = "Redis version: 6"
+
+  validation {
+    condition     = contains(["6"], var.redis_version)
+    error_message = "redis_version must be \"6\" (the only currently supported version)."
+  }
 }
 
 # === Optional: Feature Flags ===
