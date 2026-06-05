@@ -313,19 +313,19 @@ variable "enable_system_assigned_identity" {
 
 variable "enable_auto_scaling" {
   type        = bool
-  default     = true
+  default     = false
   description = "Enable cluster autoscaler on the default node pool"
 }
 
 variable "enable_container_insights" {
   type        = bool
-  default     = true
+  default     = false
   description = "Enable Container Insights via Log Analytics"
 }
 
 variable "workload_identity_enabled" {
   type        = bool
-  default     = false
+  default     = true
   description = "Enable workload identity for pod-to-Azure-service authentication"
 }
 
