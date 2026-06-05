@@ -4,6 +4,16 @@ All notable changes to this module will be documented in this file.
 
 ## [Unreleased]
 
+## [4.0.0] - 2026-06-05
+
+### Added
+- `default_node_pool.name` field (default: "system") allowing consumers to override the default node pool name.
+
+### Changed
+- **BREAKING:** `workload_identity_enabled` default changed from `false` to `true`. Consumers who don't want workload identity must pass `workload_identity_enabled = false`.
+- **BREAKING:** `enable_auto_scaling` default changed from `true` to `false`. Consumers who want auto-scaling must pass `enable_auto_scaling = true`.
+- **BREAKING:** `enable_container_insights` default changed from `true` to `false`. Consumers who want Container Insights must pass `enable_container_insights = true` and provide `log_analytics_workspace_id`.
+
 ## [3.0.0] - 2026-04-25
 
 ### Removed

@@ -4,6 +4,8 @@ All notable changes to this module will be documented in this file.
 
 ## [Unreleased]
 
+## [3.1.1] - 2026-06-05
+
 ### Added
 
 - Validation: `offer_type` must be "Standard".

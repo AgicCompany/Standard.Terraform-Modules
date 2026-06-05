@@ -4,6 +4,12 @@ All notable changes to this module will be documented in this file.
 
 ## [Unreleased]
 
+## [4.0.1] - 2026-06-05
+
+### Added
+
+- Validation: `redis_version` must be "6"; `capacity` must be 0-6.
+
 ## [4.0.0] - 2026-04-25
 
 ### Changed

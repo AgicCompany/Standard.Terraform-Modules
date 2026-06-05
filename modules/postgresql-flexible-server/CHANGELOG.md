@@ -4,6 +4,12 @@ All notable changes to this module will be documented in this file.
 
 ## [Unreleased]
 
+## [5.0.1] - 2026-06-05
+
+### Added
+
+- Validation: `storage_mb` constrained to allowed values; `storage_tier` constrained to P4-P80 or null; `zone` constrained to "1", "2", "3" or null.
+
 ## [5.0.0] - 2026-06-04
 
 ### Changed

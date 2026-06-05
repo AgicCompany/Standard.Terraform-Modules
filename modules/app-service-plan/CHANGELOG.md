@@ -4,7 +4,10 @@ All notable changes to this module will be documented in this file.
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-06-05
+
 ### Fixed
+
 - Moved `os_type` variable from Required to Optional Configuration section (has default value "Linux").
 
 ## [1.0.0] - 2026-02-08
