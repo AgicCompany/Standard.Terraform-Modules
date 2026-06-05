@@ -236,7 +236,7 @@ variable "url_path_maps" {
 
 variable "enable_http2" {
   type        = bool
-  default     = true
+  default     = false
   description = "Enable HTTP/2"
 }
 

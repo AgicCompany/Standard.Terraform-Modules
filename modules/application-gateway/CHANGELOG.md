@@ -4,6 +4,9 @@ All notable changes to this module will be documented in this file.
 
 ## [Unreleased]
 
+### Changed
+- **BREAKING:** `enable_http2` default changed from `true` to `false`. HTTP/2 is a functionality feature and follows the convention of defaulting to disabled. Consumers who want HTTP/2 must pass `enable_http2 = true`.
+
 ## [1.2.0] - 2026-04-18
 
 ### Added
