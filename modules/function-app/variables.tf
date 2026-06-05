@@ -121,7 +121,7 @@ variable "enable_system_assigned_identity" {
 
 variable "enable_application_insights" {
   type        = bool
-  default     = true
+  default     = false
   description = "Connect to Application Insights for monitoring"
 }
 

@@ -4,6 +4,10 @@ All notable changes to this module will be documented in this file.
 
 ## [Unreleased]
 
+### Changed
+
+- **BREAKING:** `enable_application_insights` default changed from `true` to `false`. Application Insights is a functionality feature. Consumers who want it must pass `enable_application_insights = true` and provide `application_insights_connection_string`.
+
 ## [2.1.0] - 2026-04-18
 
 ### Added
