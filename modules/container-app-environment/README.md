@@ -88,7 +88,7 @@ No modules.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_enable_internal_load_balancer"></a> [enable\_internal\_load\_balancer](#input\_enable\_internal\_load\_balancer) | Use internal load balancer. Requires VNet integration. | `bool` | `true` | no |
+| <a name="input_enable_internal_load_balancer"></a> [enable\_internal\_load\_balancer](#input\_enable\_internal\_load\_balancer) | Use internal load balancer (requires VNet integration via infrastructure\_subnet\_id). Default false (external). | `bool` | `false` | no |
 | <a name="input_enable_zone_redundancy"></a> [enable\_zone\_redundancy](#input\_enable\_zone\_redundancy) | Enable zone redundant deployment. Requires VNet integration. | `bool` | `false` | no |
 | <a name="input_infrastructure_subnet_id"></a> [infrastructure\_subnet\_id](#input\_infrastructure\_subnet\_id) | Subnet ID for VNet integration. Required when enable\_internal\_load\_balancer = true. | `string` | `null` | no |
 | <a name="input_location"></a> [location](#input\_location) | Azure region | `string` | n/a | yes |
