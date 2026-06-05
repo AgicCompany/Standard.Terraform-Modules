@@ -60,6 +60,16 @@ variable "default_node_pool" {
   })
   default     = {}
   description = "Default (system) node pool configuration."
+
+  validation {
+    condition     = contains(["Managed", "Ephemeral"], var.default_node_pool.os_disk_type)
+    error_message = "default_node_pool.os_disk_type must be Managed or Ephemeral."
+  }
+
+  validation {
+    condition     = contains(["AzureLinux", "Ubuntu", "Windows2019", "Windows2022"], var.default_node_pool.os_sku)
+    error_message = "default_node_pool.os_sku must be AzureLinux, Ubuntu, Windows2019, or Windows2022."
+  }
 }
 
 variable "network_profile" {
@@ -81,6 +91,21 @@ variable "network_profile" {
   })
   default     = {}
   description = "Network configuration. Defaults to Azure CNI Overlay. The load_balancer_profile sub-block configures outbound traffic. The outbound source fields (managed_outbound_ip_count, outbound_ip_address_ids, outbound_ip_prefix_ids) are mutually exclusive."
+
+  validation {
+    condition     = contains(["azure", "kubenet", "none"], var.network_profile.network_plugin)
+    error_message = "network_profile.network_plugin must be azure, kubenet, or none."
+  }
+
+  validation {
+    condition     = contains(["azure", "calico", "cilium"], var.network_profile.network_policy)
+    error_message = "network_profile.network_policy must be azure, calico, or cilium."
+  }
+
+  validation {
+    condition     = contains(["loadBalancer", "managedNATGateway", "userAssignedNATGateway", "userDefinedRouting"], var.network_profile.outbound_type)
+    error_message = "network_profile.outbound_type must be loadBalancer, managedNATGateway, userAssignedNATGateway, or userDefinedRouting."
+  }
 }
 
 variable "authorized_ip_ranges" {

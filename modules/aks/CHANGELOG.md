@@ -4,6 +4,12 @@ All notable changes to this module will be documented in this file.
 
 ## [Unreleased]
 
+## [4.1.0] - 2026-06-05
+
+### Added
+- Validation blocks for `default_node_pool.os_disk_type` (Managed, Ephemeral) and `default_node_pool.os_sku` (AzureLinux, Ubuntu, Windows2019, Windows2022).
+- Validation blocks for `network_profile.network_plugin` (azure, kubenet, none), `network_profile.network_policy` (azure, calico, cilium), and `network_profile.outbound_type` (loadBalancer, managedNATGateway, userAssignedNATGateway, userDefinedRouting).
+
 ## [4.0.0] - 2026-06-05
 
 ### Added
