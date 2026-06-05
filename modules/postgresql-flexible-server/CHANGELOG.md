@@ -6,6 +6,7 @@ All notable changes to this module will be documented in this file.
 
 ### Added
 
+- Validation: `storage_mb` constrained to allowed values; `storage_tier` constrained to P4-P80 or null; `zone` constrained to "1", "2", "3" or null.
 - Entra AD administrator support via `entra_admin_object_id`, `entra_admin_principal_name`, and `entra_admin_principal_type` variables.
 - Precondition: `enable_entra_auth = true` now requires `entra_admin_object_id` and `entra_admin_principal_name`.
 
