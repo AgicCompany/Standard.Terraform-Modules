@@ -1,7 +1,8 @@
 # locals.tf - Local values
 
 locals {
-  pe_name_prefix = coalesce(var.private_endpoint_name_prefix, "pep-${var.name}")
+  pe_name_prefix  = coalesce(var.private_endpoint_name_prefix, "pep-${var.name}")
+  psc_name_prefix = coalesce(var.private_service_connection_name_prefix, "psc-${var.name}")
 
   # Determine which private endpoints to create
   private_endpoints = var.enable_private_endpoint ? {

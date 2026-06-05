@@ -4,6 +4,10 @@ All notable changes to this module will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- `private_service_connection_name_prefix` variable to override PSC name prefix (default: `psc-{name}`).
+
 ### Fixed
 
 - `blob_properties` block is now conditional and excluded for `FileStorage` account kind (which only supports file shares).
