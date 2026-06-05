@@ -4,6 +4,11 @@ All notable changes to this module will be documented in this file.
 
 ## [Unreleased]
 
+## [2.1.0] - 2026-06-05
+
+### Added
+- `ssl_policy_name` variable to configure the predefined SSL policy (default: `AppGwSslPolicy20220101`, unchanged behavior). Previously hardcoded in the resource block.
+
 ## [2.0.0] - 2026-06-05
 
 ### Changed

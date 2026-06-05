@@ -66,6 +66,17 @@ variable "firewall_policy_id" {
   description = "WAF policy resource ID (for WAF_v2 SKU)"
 }
 
+variable "ssl_policy_name" {
+  type        = string
+  default     = "AppGwSslPolicy20220101"
+  description = "Predefined SSL policy name. Default enforces TLS 1.2+ with modern ciphers."
+
+  validation {
+    condition     = contains(["AppGwSslPolicy20150501", "AppGwSslPolicy20170401", "AppGwSslPolicy20170401S", "AppGwSslPolicy20220101", "AppGwSslPolicy20220101S"], var.ssl_policy_name)
+    error_message = "ssl_policy_name must be a valid predefined policy: AppGwSslPolicy20150501, AppGwSslPolicy20170401, AppGwSslPolicy20170401S, AppGwSslPolicy20220101, or AppGwSslPolicy20220101S."
+  }
+}
+
 variable "frontend_ports" {
   type = map(object({
     port = number
