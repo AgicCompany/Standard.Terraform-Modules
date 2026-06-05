@@ -4,6 +4,10 @@ All notable changes to this module will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- Validation: `version_number` must be "12.0".
+
 ## [3.1.0] - 2026-04-18
 
 ### Added
