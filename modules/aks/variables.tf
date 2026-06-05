@@ -40,6 +40,7 @@ variable "sku_tier" {
 
 variable "default_node_pool" {
   type = object({
+    name                        = optional(string, "system")
     vm_size                     = optional(string, "Standard_D2s_v3")
     vnet_subnet_id              = optional(string)
     node_count                  = optional(number, 3)

@@ -15,7 +15,7 @@ resource "azurerm_kubernetes_cluster" "this" {
   private_dns_zone_id       = var.private_dns_zone_id
 
   default_node_pool {
-    name                        = "system"
+    name                        = var.default_node_pool.name
     vm_size                     = var.default_node_pool.vm_size
     vnet_subnet_id              = var.default_node_pool.vnet_subnet_id
     auto_scaling_enabled        = var.enable_auto_scaling
