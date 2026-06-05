@@ -1,7 +1,7 @@
 resource "azurerm_public_ip" "this" {
   count = var.enable_public_ip ? 1 : 0
 
-  name                = "pip-${var.name}"
+  name                = coalesce(var.public_ip_name, "pip-${var.name}")
   location            = var.location
   resource_group_name = var.resource_group_name
   allocation_method   = "Static"
@@ -11,7 +11,7 @@ resource "azurerm_public_ip" "this" {
 }
 
 resource "azurerm_network_interface" "this" {
-  name                = "nic-${var.name}"
+  name                = coalesce(var.nic_name, "nic-${var.name}")
   location            = var.location
   resource_group_name = var.resource_group_name
 
@@ -102,7 +102,7 @@ resource "azurerm_linux_virtual_machine" "this" {
 resource "azurerm_managed_disk" "this" {
   for_each = var.data_disks
 
-  name                 = "disk-${var.name}-${each.key}"
+  name                 = "${coalesce(var.managed_disk_name_prefix, "disk-${var.name}")}-${each.key}"
   location             = var.location
   resource_group_name  = var.resource_group_name
   storage_account_type = each.value.storage_account_type

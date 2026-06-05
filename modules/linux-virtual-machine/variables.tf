@@ -122,6 +122,24 @@ variable "boot_diagnostics_storage_uri" {
   description = "Storage account URI for boot diagnostics. If null with boot diagnostics enabled, uses managed storage."
 }
 
+variable "public_ip_name" {
+  type        = string
+  default     = null
+  description = "Override name for the public IP resource. Defaults to \"pip-{name}\"."
+}
+
+variable "nic_name" {
+  type        = string
+  default     = null
+  description = "Override name for the network interface. Defaults to \"nic-{name}\"."
+}
+
+variable "managed_disk_name_prefix" {
+  type        = string
+  default     = null
+  description = "Override prefix for managed disk names. Defaults to \"disk-{name}\". Final name: \"{prefix}-{disk_key}\"."
+}
+
 # === Optional: Feature Flags ===
 variable "enable_boot_diagnostics" {
   type        = bool
