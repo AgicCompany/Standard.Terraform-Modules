@@ -1,0 +1,44 @@
+name: Changelog Check
+
+on:
+  pull_request:
+    paths: ['modules/**']
+
+jobs:
+  check-changelog:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Verify CHANGELOG updated for changed modules
+        run: |
+          FAILED=0
+
+          # Get modules with .tf file changes
+          MODULES_WITH_TF=$(git diff --name-only origin/main...HEAD -- 'modules/**/*.tf' \
+            | grep -E '^modules/[^/]+/[^/]+\.tf$' \
+            | cut -d'/' -f2 | sort -u)
+
+          if [ -z "$MODULES_WITH_TF" ]; then
+            echo "No .tf file changes in module roots. Skipping."
+            exit 0
+          fi
+
+          # Get modules with CHANGELOG changes
+          MODULES_WITH_CHANGELOG=$(git diff --name-only origin/main...HEAD -- 'modules/*/CHANGELOG.md' \
+            | cut -d'/' -f2 | sort -u)
+
+          for MODULE in $MODULES_WITH_TF; do
+            if ! echo "$MODULES_WITH_CHANGELOG" | grep -qx "$MODULE"; then
+              echo "::error::Module '$MODULE' has .tf changes but CHANGELOG.md was not updated. Add an entry under ## [Unreleased]."
+              FAILED=1
+            else
+              echo "✓ $MODULE — CHANGELOG updated"
+            fi
+          done
+
+          if [ "$FAILED" -eq 1 ]; then
+            exit 1
+          fi
