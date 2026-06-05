@@ -161,6 +161,68 @@ module "redis" {
 
 ---
 
+## container-app-environment
+
+### v1.x → v2.0.0
+
+`enable_internal_load_balancer` default changed from `true` to `false`. Environments now default to an external load balancer, and the minimum-viable config no longer requires `infrastructure_subnet_id`.
+
+**To preserve v1.x behavior (internal load balancer):**
+
+```hcl
+module "cae" {
+  source = "git::...//modules/container-app-environment?ref=container-app-environment/v2.0.0"
+
+  enable_internal_load_balancer = true
+  infrastructure_subnet_id      = azurerm_subnet.cae.id
+  # ...
+}
+```
+
+---
+
+## function-app-flex
+
+### v1.x → v2.0.0
+
+`enable_public_access` was added (default `false`) and wired to `public_network_access_enabled`. The Function App is now private by default; previously public access was left on by the Azure default.
+
+**To preserve v1.x behavior (public access):**
+
+```hcl
+module "function_app_flex" {
+  source = "git::...//modules/function-app-flex?ref=function-app-flex/v2.0.0"
+
+  enable_public_access = true
+  # ...
+}
+```
+
+**Recommended upgrade path:** Accept the private default and reach the app via a private endpoint (`enable_private_endpoint = true`, default) or VNet integration.
+
+---
+
+## mysql-flexible-server
+
+### v3.x → v4.0.0
+
+`enable_public_access` is now functional (it was a no-op in v3.x) and wired to the server's `public_network_access` argument. Servers in private-endpoint mode (`enable_private_endpoint = true`, no `delegated_subnet_id`) are now private by default; previously they were left public by the Azure default. Delegation (`delegated_subnet_id`) is unaffected — public access stays Disabled.
+
+**To preserve v3.x behavior (public access in PE/no-delegation mode):**
+
+```hcl
+module "mysql" {
+  source = "git::...//modules/mysql-flexible-server?ref=mysql-flexible-server/v4.0.0"
+
+  enable_public_access = true
+  # ...
+}
+```
+
+**Recommended upgrade path:** Accept the private default; access the server via its private endpoint.
+
+---
+
 ## Quick reference: which consumers need what
 
 | Consumer | Module | Current pin | Target | Action needed |

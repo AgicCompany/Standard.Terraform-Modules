@@ -151,6 +151,10 @@ Include when applicable:
 | Managed Identity | `principal_id`, `tenant_id` | `principal_id` |
 | Companion Resources | `<resource>_id` | `private_endpoint_id` |
 
+### Cross-Project Outputs
+
+Some modules expose `public_<resource>_<attr>` aliases (e.g. `public_aks_id`, `public_static_web_app_id`, `public_default_host_name`) that duplicate canonical outputs such as `id` / `name`. These are an intentional, optional convention for downstream projects that consume a module's state across separate Terraform configurations via `terraform_remote_state`, where a stable, resource-qualified name is clearer than a bare `id`. They must never expose anything listed under Forbidden Outputs.
+
 ### Forbidden Outputs
 
 Never output:

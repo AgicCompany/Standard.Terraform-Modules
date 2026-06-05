@@ -4,6 +4,12 @@ All notable changes to this module will be documented in this file.
 
 ## [Unreleased]
 
+## [4.0.0] - 2026-06-05
+
+### Changed
+
+- **BREAKING:** `enable_public_access` is now wired to the server's `public_network_access` argument (it was previously a documented no-op). With the default `false`, servers created in private-endpoint mode (`enable_private_endpoint = true`, no `delegated_subnet_id`) now have public network access **Disabled by default** — previously it was left enabled by the Azure default. When `delegated_subnet_id` is set, public access stays Disabled as before. To keep public access, set `enable_public_access = true`.
+
 ## [3.1.1] - 2026-04-25
 
 ### Deprecated

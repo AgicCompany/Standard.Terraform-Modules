@@ -151,6 +151,12 @@ variable "enable_private_endpoint" {
   description = "Create a private endpoint for the Function App."
 }
 
+variable "enable_public_access" {
+  type        = bool
+  default     = false
+  description = "Allow public network access to the Function App (default: disabled for security)."
+}
+
 # === Optional: Private Endpoint ===
 variable "private_endpoint_subnet_id" {
   type        = string
