@@ -28,6 +28,11 @@ variable "version_number" {
   type        = string
   default     = "12.0"
   description = "SQL Server version"
+
+  validation {
+    condition     = var.version_number == "12.0"
+    error_message = "version_number must be \"12.0\" (the only supported value for Azure SQL)."
+  }
 }
 
 variable "administrator_login" {

@@ -71,7 +71,7 @@ resource "azurerm_private_endpoint" "this" {
   subnet_id           = var.subnet_id
 
   private_service_connection {
-    name                           = "psc-${var.name}-${each.key}"
+    name                           = "${local.psc_name_prefix}-${each.key}"
     private_connection_resource_id = azurerm_storage_account.this.id
     subresource_names              = [each.key]
     is_manual_connection           = false

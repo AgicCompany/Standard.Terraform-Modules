@@ -139,6 +139,8 @@ Every module must output:
 | `id` | Resource ID |
 | `name` | Resource name |
 
+**Exception -- multi-resource modules:** Modules that manage multiple resources via top-level `for_each` (e.g., `aks-node-pool`) output maps keyed by instance instead of scalar `id`/`name`. Use `<resource>_ids` and `<resource>_names` (plural) as output names. Document this pattern in the module README.
+
 ### Conditional Outputs
 
 Include when applicable:

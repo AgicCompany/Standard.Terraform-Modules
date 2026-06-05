@@ -4,6 +4,10 @@ All notable changes to this module will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- Validation: `offer_type` must be "Standard".
+
 ## [3.1.0] - 2026-04-18
 
 ### Added

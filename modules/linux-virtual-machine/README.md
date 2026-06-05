@@ -101,10 +101,13 @@ No modules.
 | <a name="input_enable_public_ip"></a> [enable\_public\_ip](#input\_enable\_public\_ip) | Create and attach a public IP address | `bool` | `false` | no |
 | <a name="input_enable_system_assigned_identity"></a> [enable\_system\_assigned\_identity](#input\_enable\_system\_assigned\_identity) | Enable system-assigned managed identity | `bool` | `false` | no |
 | <a name="input_location"></a> [location](#input\_location) | Azure region | `string` | n/a | yes |
+| <a name="input_managed_disk_name_prefix"></a> [managed\_disk\_name\_prefix](#input\_managed\_disk\_name\_prefix) | Override prefix for managed disk names. Defaults to "disk-{name}". Final name: "{prefix}-{disk\_key}". | `string` | `null` | no |
 | <a name="input_name"></a> [name](#input\_name) | Virtual machine name (full CAF-compliant name, provided by consumer) | `string` | n/a | yes |
+| <a name="input_nic_name"></a> [nic\_name](#input\_nic\_name) | Override name for the network interface. Defaults to "nic-{name}". | `string` | `null` | no |
 | <a name="input_os_disk"></a> [os\_disk](#input\_os\_disk) | OS disk configuration | <pre>object({<br/>    caching              = optional(string, "ReadWrite")<br/>    storage_account_type = optional(string, "Premium_LRS")<br/>    disk_size_gb         = optional(number)<br/>  })</pre> | `{}` | no |
 | <a name="input_private_ip_address"></a> [private\_ip\_address](#input\_private\_ip\_address) | Static private IP address. Required when private\_ip\_address\_allocation = Static. | `string` | `null` | no |
 | <a name="input_private_ip_address_allocation"></a> [private\_ip\_address\_allocation](#input\_private\_ip\_address\_allocation) | Private IP allocation method: Dynamic or Static | `string` | `"Dynamic"` | no |
+| <a name="input_public_ip_name"></a> [public\_ip\_name](#input\_public\_ip\_name) | Override name for the public IP resource. Defaults to "pip-{name}". | `string` | `null` | no |
 | <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name) | Name of the resource group | `string` | n/a | yes |
 | <a name="input_size"></a> [size](#input\_size) | VM size (e.g., Standard\_B1s, Standard\_D2s\_v5) | `string` | n/a | yes |
 | <a name="input_source_image_reference"></a> [source\_image\_reference](#input\_source\_image\_reference) | Source image reference. Defaults to Ubuntu 22.04 LTS Gen2. | <pre>object({<br/>    publisher = string<br/>    offer     = string<br/>    sku       = string<br/>    version   = string<br/>  })</pre> | <pre>{<br/>  "offer": "0001-com-ubuntu-server-jammy",<br/>  "publisher": "Canonical",<br/>  "sku": "22_04-lts-gen2",<br/>  "version": "latest"<br/>}</pre> | no |

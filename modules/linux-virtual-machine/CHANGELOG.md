@@ -8,6 +8,9 @@ All notable changes to this module will be documented in this file.
 
 ### Added
 
+- `public_ip_name` variable to override PIP resource name (default: `pip-{name}`).
+- `nic_name` variable to override NIC resource name (default: `nic-{name}`).
+- `managed_disk_name_prefix` variable to override managed disk name prefix (default: `disk-{name}`).
 - Precondition: password auth now requires admin_password.
 
 ## [1.1.0] - 2026-02-19

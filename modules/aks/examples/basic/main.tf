@@ -33,6 +33,8 @@ module "aks" {
   location            = azurerm_resource_group.example.location
   name                = "aks-payments-dev-weu-001"
 
+  enable_auto_scaling        = true
+  enable_container_insights  = true
   log_analytics_workspace_id = azurerm_log_analytics_workspace.example.id
 
   tags = {

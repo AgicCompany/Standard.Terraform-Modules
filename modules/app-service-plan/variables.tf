@@ -24,6 +24,7 @@ variable "sku_name" {
   }
 }
 
+# === Optional: Configuration ===
 variable "os_type" {
   type        = string
   default     = "Linux"
@@ -34,8 +35,6 @@ variable "os_type" {
     error_message = "os_type must be \"Linux\", \"Windows\", or \"WindowsContainer\"."
   }
 }
-
-# === Optional: Configuration ===
 variable "worker_count" {
   type        = number
   default     = 1

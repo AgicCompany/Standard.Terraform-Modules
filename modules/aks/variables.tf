@@ -40,6 +40,7 @@ variable "sku_tier" {
 
 variable "default_node_pool" {
   type = object({
+    name                        = optional(string, "system")
     vm_size                     = optional(string, "Standard_D2s_v3")
     vnet_subnet_id              = optional(string)
     node_count                  = optional(number, 3)
@@ -312,19 +313,19 @@ variable "enable_system_assigned_identity" {
 
 variable "enable_auto_scaling" {
   type        = bool
-  default     = true
+  default     = false
   description = "Enable cluster autoscaler on the default node pool"
 }
 
 variable "enable_container_insights" {
   type        = bool
-  default     = true
+  default     = false
   description = "Enable Container Insights via Log Analytics"
 }
 
 variable "workload_identity_enabled" {
   type        = bool
-  default     = false
+  default     = true
   description = "Enable workload identity for pod-to-Azure-service authentication"
 }
 
