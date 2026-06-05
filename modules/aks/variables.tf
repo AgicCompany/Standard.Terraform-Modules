@@ -329,31 +329,6 @@ variable "private_dns_zone_id" {
   description = "Private DNS zone resource ID, \"System\", or \"None\". Only applies to private clusters (when authorized_ip_ranges is empty)."
 }
 
-# === Optional: Feature Flags ===
-variable "enable_system_assigned_identity" {
-  type        = bool
-  default     = true
-  description = "Enable system-assigned managed identity (default: true)"
-}
-
-variable "enable_auto_scaling" {
-  type        = bool
-  default     = false
-  description = "Enable cluster autoscaler on the default node pool"
-}
-
-variable "enable_container_insights" {
-  type        = bool
-  default     = false
-  description = "Enable Container Insights via Log Analytics"
-}
-
-variable "workload_identity_enabled" {
-  type        = bool
-  default     = true
-  description = "Enable workload identity for pod-to-Azure-service authentication"
-}
-
 # === Optional: Identity ===
 variable "user_assigned_identity_ids" {
   type        = list(string)
@@ -394,6 +369,31 @@ variable "diagnostic_settings" {
     )
     error_message = "log_analytics_destination_type must be \"Dedicated\" or \"AzureDiagnostics\" when set."
   }
+}
+
+# === Optional: Feature Flags ===
+variable "enable_system_assigned_identity" {
+  type        = bool
+  default     = true
+  description = "Enable system-assigned managed identity (default: true)"
+}
+
+variable "enable_auto_scaling" {
+  type        = bool
+  default     = false
+  description = "Enable cluster autoscaler on the default node pool"
+}
+
+variable "enable_container_insights" {
+  type        = bool
+  default     = false
+  description = "Enable Container Insights via Log Analytics"
+}
+
+variable "workload_identity_enabled" {
+  type        = bool
+  default     = true
+  description = "Enable workload identity for pod-to-Azure-service authentication"
 }
 
 # === Tags ===

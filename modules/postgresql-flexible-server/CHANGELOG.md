@@ -4,6 +4,12 @@ All notable changes to this module will be documented in this file.
 
 ## [Unreleased]
 
+## [5.0.2] - 2026-06-05
+
+### Changed
+
+- Reordered variable declarations so the feature-flags group is placed after the private-networking, private-endpoint-override, and diagnostics configuration blocks, per the module interface contract. No interface or behavior change.
+
 ## [5.0.1] - 2026-06-05
 
 ### Added

@@ -84,6 +84,17 @@ variable "always_on" {
   description = "Keep the app loaded at all times"
 }
 
+variable "min_tls_version" {
+  type        = string
+  default     = "1.2"
+  description = "Minimum TLS version for inbound requests. One of \"1.2\" or \"1.3\"."
+
+  validation {
+    condition     = contains(["1.2", "1.3"], var.min_tls_version)
+    error_message = "min_tls_version must be \"1.2\" or \"1.3\"."
+  }
+}
+
 variable "user_assigned_identity_ids" {
   type        = list(string)
   default     = []

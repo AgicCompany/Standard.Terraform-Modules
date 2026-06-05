@@ -4,6 +4,12 @@ All notable changes to this module will be documented in this file.
 
 ## [Unreleased]
 
+## [4.1.1] - 2026-06-05
+
+### Changed
+
+- Reordered variable declarations so the Identity and Diagnostics blocks precede the feature-flags group, per the module interface contract. No interface or behavior change.
+
 ## [4.1.0] - 2026-06-05
 
 ### Added

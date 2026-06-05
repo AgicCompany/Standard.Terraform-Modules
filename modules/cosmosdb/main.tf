@@ -10,7 +10,7 @@ resource "azurerm_cosmosdb_account" "this" {
   minimal_tls_version        = var.min_tls_version == "1.2" ? "Tls12" : var.min_tls_version
 
   public_network_access_enabled     = var.enable_public_access
-  is_virtual_network_filter_enabled = false
+  is_virtual_network_filter_enabled = var.enable_virtual_network_filter
   multiple_write_locations_enabled  = var.enable_multiple_write_locations
   local_authentication_disabled     = !var.enable_local_auth
 
