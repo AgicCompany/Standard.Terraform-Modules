@@ -4,6 +4,12 @@ All notable changes to this module will be documented in this file.
 
 ## [Unreleased]
 
+## [3.2.0] - 2026-06-05
+
+### Added
+
+- `private_service_connection_name_prefix` variable to override PSC name prefix (default: `psc-{name}`).
+
 ## [3.1.1] - 2026-04-25
 
 ### Fixed

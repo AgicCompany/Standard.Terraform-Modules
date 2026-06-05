@@ -4,19 +4,13 @@ All notable changes to this module will be documented in this file.
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-06-05
+
 ### Added
 
 - `public_ip_name` variable to override PIP resource name (default: `pip-{name}`).
 - `nic_name` variable to override NIC resource name (default: `nic-{name}`).
 - `managed_disk_name_prefix` variable to override managed disk name prefix (default: `disk-{name}`).
-- Validation: custom computer_name must be 15 characters or fewer.
-- `enable_encryption_at_host` variable (default `true`) -- encrypts temp disks and cached data at rest
-- `enable_secure_boot` variable (default `true`) -- enables Secure Boot for Trusted Launch
-- `enable_vtpm` variable (default `true`) -- enables vTPM for Trusted Launch
-
-### Changed
-
-- **BREAKING:** New security defaults enable encryption at host, secure boot, and vTPM. Existing consumers not setting these explicitly will get these features enabled.
 
 ## [1.1.0] - 2026-04-25
 
