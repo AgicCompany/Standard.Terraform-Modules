@@ -136,10 +136,6 @@ resource "azurerm_postgresql_flexible_server_configuration" "this" {
   value     = each.value
 }
 
-data "azurerm_monitor_diagnostic_categories" "this" {
-  count       = var.diagnostic_settings == null ? 0 : 1
-  resource_id = azurerm_postgresql_flexible_server.this.id
-}
 
 resource "azurerm_monitor_diagnostic_setting" "this" {
   count = var.diagnostic_settings == null ? 0 : 1

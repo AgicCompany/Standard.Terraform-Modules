@@ -209,10 +209,6 @@ resource "azurerm_application_gateway" "this" {
   }
 }
 
-data "azurerm_monitor_diagnostic_categories" "this" {
-  count       = var.diagnostic_settings == null ? 0 : 1
-  resource_id = azurerm_application_gateway.this.id
-}
 
 resource "azurerm_monitor_diagnostic_setting" "this" {
   count = var.diagnostic_settings == null ? 0 : 1

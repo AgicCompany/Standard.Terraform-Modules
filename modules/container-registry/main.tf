@@ -71,10 +71,6 @@ resource "azurerm_private_endpoint" "this" {
   tags = var.tags
 }
 
-data "azurerm_monitor_diagnostic_categories" "this" {
-  count       = var.diagnostic_settings == null ? 0 : 1
-  resource_id = azurerm_container_registry.this.id
-}
 
 resource "azurerm_monitor_diagnostic_setting" "this" {
   count = var.diagnostic_settings == null ? 0 : 1
