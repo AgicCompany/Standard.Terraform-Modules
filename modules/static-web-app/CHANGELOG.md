@@ -4,11 +4,6 @@ All notable changes to this module will be documented in this file.
 
 ## [Unreleased]
 
-## [2.1.0] - 2026-04-25
-
-### Added
-- Precondition: sku_tier and sku_size must match.
-
 ## [3.0.0] - 2026-04-18
 
 ### Changed
@@ -19,6 +14,13 @@ All notable changes to this module will be documented in this file.
 
 ### Removed
 - **BREAKING:** Removed `api_key` output. Retrieve deployment keys via `az staticwebapp secrets list` or a data source instead.
+
+## [2.1.0] - 2026-04-25
+
+### Added
+- Precondition: sku_tier and sku_size must match.
+
+> Note: released after `3.0.0` as a backport to the 2.x line; ordered by version per Keep a Changelog.
 
 ## [2.0.0] - 2026-03-30
 

@@ -41,8 +41,8 @@ Static Web Apps are secure by default:
 |---------|---------|-------|
 | HTTPS | Enforced | Always HTTPS, managed by Azure |
 | Certificates | Managed | Azure manages TLS certificates |
-| Private endpoint | Disabled | `enable_private_endpoint` (requires Standard SKU) |
-| Public access | Enabled | `enable_public_access` (disabling requires Standard SKU) |
+| Private endpoint | Enabled | `enable_private_endpoint` (requires Standard SKU; set `false` to opt out) |
+| Public access | Disabled | `enable_public_access` (Standard SKU; set `true` to allow public traffic) |
 | Preview environments | Enabled | `preview_environments_enabled` |
 | Config file changes | Enabled | `configuration_file_changes_enabled` |
 
