@@ -61,16 +61,22 @@ See the relevant PR and CHANGELOG entries in each module for design details and 
 
 ### Phase 3 Module Fixes (2026-06-05)
 
-Convention alignment release — 11 modules updated:
+Convention alignment release — 11 modules updated, plus follow-up enhancements:
 
 - **Validation blocks** (PATCH): `cosmosdb/v3.1.1`, `redis-cache/v4.0.1`, `postgresql-flexible-server/v5.0.1`, `mssql-server/v3.1.1`
 - **Naming overrides** (MINOR): `linux-virtual-machine/v1.3.0`, `windows-virtual-machine/v1.2.0`, `storage-account/v3.2.0`, `aks/v4.0.0`
 - **Feature flag defaults** (MAJOR): `aks/v4.0.0`, `application-gateway/v2.0.0`, `function-app/v3.0.0`
 - **Minor fixes**: `app-service-plan/v1.0.1`
+- **Nested object validations** (MINOR): `aks/v4.1.0` — validation blocks for `default_node_pool.os_disk_type`, `default_node_pool.os_sku`, `network_profile.network_plugin`, `network_profile.network_policy`, `network_profile.outbound_type`
+- **SSL policy variable** (MINOR): `application-gateway/v2.1.0` — extracted hardcoded `AppGwSslPolicy20220101` to configurable `ssl_policy_name` variable
+- **Security defaults documented** (MAJOR): `windows-virtual-machine/v2.0.0` — breaking security features (`enable_encryption_at_host`, `enable_secure_boot`, `enable_vtpm`) properly versioned
 
 **Breaking changes in aks/v4.0.0:** `workload_identity_enabled` → `true`, `enable_auto_scaling` → `false`, `enable_container_insights` → `false`, `kube_config_raw` output removed.
 **Breaking change in application-gateway/v2.0.0:** `enable_http2` → `false`.
 **Breaking change in function-app/v3.0.0:** `enable_application_insights` → `false`.
+**Breaking change in windows-virtual-machine/v2.0.0:** `enable_encryption_at_host`, `enable_secure_boot`, `enable_vtpm` default `true` (may cause VM recreation).
+
+See `docs/MIGRATION.md` for upgrade instructions.
 
 ---
 
@@ -284,7 +290,7 @@ Creates an Azure Monitor diagnostic setting to route logs and metrics to Log Ana
 
 ## Compute
 
-### aks `v4.0.0`
+### aks `v4.1.0`
 Creates an Azure Kubernetes Service cluster with private-by-default config, Azure AD auth, RBAC, and Container Insights.
 
 | Variable | Type | Required | Default | Description |
@@ -567,7 +573,7 @@ Creates an Azure Linux VM with NIC, optional public IP, and data disk management
 
 ---
 
-### windows-virtual-machine `v1.2.0`
+### windows-virtual-machine `v2.0.0`
 Creates an Azure Windows VM with NIC, optional public IP, and data disk management.
 
 | Variable | Type | Required | Default | Description |
@@ -583,6 +589,9 @@ Creates an Azure Windows VM with NIC, optional public IP, and data disk manageme
 | `os_disk` | object | no | Premium_LRS | caching, storage_account_type, disk_size_gb |
 | `data_disks` | map(object) | no | `{}` | Data disks: lun, size, storage type, caching |
 | `enable_public_ip` | bool | no | `false` | Create public IP |
+| `enable_encryption_at_host` | bool | no | `true` | Encrypt temp disks + cached data at rest |
+| `enable_secure_boot` | bool | no | `true` | Trusted Launch — Secure Boot (requires Gen2 image) |
+| `enable_vtpm` | bool | no | `true` | Trusted Launch — vTPM (requires Gen2 image) |
 | `enable_system_assigned_identity` | bool | no | `false` | Enable system-assigned identity |
 | `user_assigned_identity_ids` | list(string) | no | `[]` | User-assigned identity IDs |
 | `zone` | string | no | `null` | Availability zone |
@@ -828,7 +837,7 @@ Creates an Azure Managed Redis (Enterprise) instance with modules, geo-replicati
 
 ## Networking
 
-### application-gateway `v2.0.0`
+### application-gateway `v2.1.0`
 Creates an Azure Application Gateway (v2) with public IP, L7 load balancing, SSL termination, and optional WAF.
 
 | Variable | Type | Required | Default | Description |
@@ -842,6 +851,7 @@ Creates an Azure Application Gateway (v2) with public IP, L7 load balancing, SSL
 | `autoscale` | object | no | `{min=1, max=2}` | Min/max capacity |
 | `zones` | list(string) | no | `[]` | Availability zones |
 | `firewall_policy_id` | string | no | `null` | WAF policy ID |
+| `ssl_policy_name` | string | no | `"AppGwSslPolicy20220101"` | Predefined SSL policy (TLS 1.2+) |
 | `frontend_ports` | map(object) | no | ports 80, 443 | Port definitions |
 | `backend_address_pools` | map(object) | no | `{}` | Pools: fqdns, ip_addresses |
 | `backend_http_settings` | map(object) | no | `{}` | HTTP settings: port, protocol, probe, affinity, timeout |
