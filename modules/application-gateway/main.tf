@@ -21,7 +21,7 @@ resource "azurerm_application_gateway" "this" {
 
   ssl_policy {
     policy_type = "Predefined"
-    policy_name = "AppGwSslPolicy20220101"
+    policy_name = var.ssl_policy_name
   }
 
   sku {
