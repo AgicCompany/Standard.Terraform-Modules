@@ -4,6 +4,12 @@ All notable changes to this module will be documented in this file.
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-06-05
+
+### Fixed
+
+- `protocol` validation now accepts `Esp` and `Ah` (previously rejected at validate time despite being documented as supported in v1.1.0 and accepted by Azure).
+
 ## [1.2.0] - 2026-04-25
 
 ### Added

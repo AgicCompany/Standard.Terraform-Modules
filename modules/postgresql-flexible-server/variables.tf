@@ -154,54 +154,6 @@ variable "firewall_rules" {
   description = "Map of firewall rules. Key is used as the rule name. Only applicable when not VNet-integrated."
 }
 
-# === Optional: Feature Flags ===
-variable "enable_public_access" {
-  type        = bool
-  default     = false
-  description = "Allow public network access (default: disabled for security)"
-}
-
-variable "enable_private_endpoint" {
-  type        = bool
-  default     = true
-  description = "Create a private endpoint for the PostgreSQL server. Mutually exclusive with VNet delegation (delegated_subnet_id)."
-}
-
-variable "enable_password_auth" {
-  type        = bool
-  default     = false
-  description = "Enable password authentication. Disabled by default; use Entra ID where possible."
-}
-
-variable "enable_entra_auth" {
-  type        = bool
-  default     = true
-  description = "Enable Microsoft Entra (AAD) authentication (default: enabled for security)"
-}
-
-variable "entra_admin_object_id" {
-  type        = string
-  description = "Object ID of the Entra principal to set as PostgreSQL AD administrator. Required when enable_entra_auth is true."
-  default     = null
-}
-
-variable "entra_admin_principal_name" {
-  type        = string
-  description = "Display name of the Entra principal (user or group) for the PostgreSQL AD administrator."
-  default     = null
-}
-
-variable "entra_admin_principal_type" {
-  type        = string
-  description = "Type of Entra principal: User, Group, or ServicePrincipal."
-  default     = "Group"
-
-  validation {
-    condition     = contains(["User", "Group", "ServicePrincipal"], var.entra_admin_principal_type)
-    error_message = "entra_admin_principal_type must be User, Group, or ServicePrincipal."
-  }
-}
-
 # === Private Networking ===
 variable "subnet_id" {
   type        = string
@@ -282,6 +234,54 @@ variable "diagnostic_settings" {
       || contains(["Dedicated", "AzureDiagnostics"], var.diagnostic_settings.log_analytics_destination_type))
     )
     error_message = "log_analytics_destination_type must be \"Dedicated\" or \"AzureDiagnostics\" when set."
+  }
+}
+
+# === Optional: Feature Flags ===
+variable "enable_public_access" {
+  type        = bool
+  default     = false
+  description = "Allow public network access (default: disabled for security)"
+}
+
+variable "enable_private_endpoint" {
+  type        = bool
+  default     = true
+  description = "Create a private endpoint for the PostgreSQL server. Mutually exclusive with VNet delegation (delegated_subnet_id)."
+}
+
+variable "enable_password_auth" {
+  type        = bool
+  default     = false
+  description = "Enable password authentication. Disabled by default; use Entra ID where possible."
+}
+
+variable "enable_entra_auth" {
+  type        = bool
+  default     = true
+  description = "Enable Microsoft Entra (AAD) authentication (default: enabled for security)"
+}
+
+variable "entra_admin_object_id" {
+  type        = string
+  description = "Object ID of the Entra principal to set as PostgreSQL AD administrator. Required when enable_entra_auth is true."
+  default     = null
+}
+
+variable "entra_admin_principal_name" {
+  type        = string
+  description = "Display name of the Entra principal (user or group) for the PostgreSQL AD administrator."
+  default     = null
+}
+
+variable "entra_admin_principal_type" {
+  type        = string
+  description = "Type of Entra principal: User, Group, or ServicePrincipal."
+  default     = "Group"
+
+  validation {
+    condition     = contains(["User", "Group", "ServicePrincipal"], var.entra_admin_principal_type)
+    error_message = "entra_admin_principal_type must be User, Group, or ServicePrincipal."
   }
 }
 

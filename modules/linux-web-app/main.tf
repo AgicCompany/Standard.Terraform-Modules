@@ -18,7 +18,7 @@ resource "azurerm_linux_web_app" "this" {
     always_on                         = var.always_on
     health_check_path                 = var.health_check_path
     health_check_eviction_time_in_min = var.health_check_path != null ? var.health_check_eviction_time_in_min : null
-    minimum_tls_version               = "1.2"
+    minimum_tls_version               = var.min_tls_version
     ftps_state                        = "Disabled"
 
     dynamic "application_stack" {
@@ -42,12 +42,14 @@ resource "azurerm_linux_web_app" "this" {
 
   # Connection strings
   dynamic "connection_string" {
-    for_each = nonsensitive(var.connection_strings)
+    # Iterate over keys only so connection-string values stay sensitive;
+    # names are not secret and must be non-sensitive to drive for_each.
+    for_each = nonsensitive(toset(keys(var.connection_strings)))
 
     content {
-      name  = connection_string.key
-      type  = connection_string.value.type
-      value = connection_string.value.value
+      name  = connection_string.value
+      type  = var.connection_strings[connection_string.value].type
+      value = var.connection_strings[connection_string.value].value
     }
   }
 

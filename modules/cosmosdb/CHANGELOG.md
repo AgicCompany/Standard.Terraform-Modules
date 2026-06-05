@@ -4,6 +4,12 @@ All notable changes to this module will be documented in this file.
 
 ## [Unreleased]
 
+## [3.2.0] - 2026-06-05
+
+### Added
+
+- `enable_virtual_network_filter` variable (default `false`) exposing `is_virtual_network_filter_enabled`, which was previously hardcoded to `false`. Default preserves existing behavior; set `true` to honor VNet/subnet rules.
+
 ## [3.1.1] - 2026-06-05
 
 ### Added

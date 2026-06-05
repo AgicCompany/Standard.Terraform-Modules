@@ -55,9 +55,9 @@ variable "security_rules" {
   validation {
     condition = alltrue([
       for k, v in var.security_rules :
-      contains(["Tcp", "Udp", "Icmp", "*"], v.protocol)
+      contains(["Tcp", "Udp", "Icmp", "Esp", "Ah", "*"], v.protocol)
     ])
-    error_message = "protocol must be \"Tcp\", \"Udp\", \"Icmp\", or \"*\"."
+    error_message = "protocol must be \"Tcp\", \"Udp\", \"Icmp\", \"Esp\", \"Ah\", or \"*\"."
   }
 
   validation {

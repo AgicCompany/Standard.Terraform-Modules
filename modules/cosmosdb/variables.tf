@@ -147,6 +147,12 @@ variable "enable_local_auth" {
   description = "Enable local (key-based) authentication. Disabled by default; use Entra ID where possible."
 }
 
+variable "enable_virtual_network_filter" {
+  type        = bool
+  default     = false
+  description = "Enable VNet filtering on the account so `virtual_network_rule` blocks are honored. Default false preserves prior behavior; set true to restrict access by subnet."
+}
+
 # === Private Endpoint ===
 variable "subnet_id" {
   type        = string

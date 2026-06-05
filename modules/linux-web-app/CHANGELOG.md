@@ -4,6 +4,16 @@ All notable changes to this module will be documented in this file.
 
 ## [Unreleased]
 
+## [2.2.0] - 2026-06-05
+
+### Added
+
+- `min_tls_version` variable (default `"1.2"`, validated `"1.2"`/`"1.3"`) replacing the previously hardcoded minimum TLS version. Default preserves prior behavior.
+
+### Fixed
+
+- `connection_string` blocks now iterate over keys only, keeping connection-string values sensitive instead of stripping sensitivity from the whole map via `nonsensitive()`.
+
 ## [2.1.0] - 2026-04-18
 
 ### Added
