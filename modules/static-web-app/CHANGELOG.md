@@ -4,6 +4,8 @@ All notable changes to this module will be documented in this file.
 
 ## [Unreleased]
 
+## [2.1.0] - 2026-04-25
+
 ### Added
 - Precondition: sku_tier and sku_size must match.
 

@@ -4,6 +4,8 @@ All notable changes to this module will be documented in this file.
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-04-25
+
 ### Changed
 - Improved descriptions for `enabled_log_categories` and `metric_categories` to document the allLogs/AllMetrics fallback behavior.
 

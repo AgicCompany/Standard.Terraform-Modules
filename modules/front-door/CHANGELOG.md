@@ -4,6 +4,8 @@ All notable changes to this module will be documented in this file.
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-04-25
+
 ### Added
 
 - Precondition: origin Private Link now requires Premium SKU.

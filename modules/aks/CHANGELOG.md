@@ -4,6 +4,8 @@ All notable changes to this module will be documented in this file.
 
 ## [Unreleased]
 
+## [3.0.0] - 2026-04-25
+
 ### Removed
 - **BREAKING:** Removed `kube_config_raw` output. Use `az aks get-credentials` with Entra auth instead. Raw kubeconfig in Terraform state violates the no-secrets output policy.
 
