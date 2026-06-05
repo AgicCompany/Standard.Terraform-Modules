@@ -4,6 +4,8 @@ All notable changes to this module will be documented in this file.
 
 ## [Unreleased]
 
+## [2.3.0] - 2026-04-25
+
 ### Added
 
 - Precondition: VNet integration (External/Internal) now requires Premium SKU.

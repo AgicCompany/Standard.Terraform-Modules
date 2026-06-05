@@ -4,6 +4,8 @@ All notable changes to this module will be documented in this file.
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-04-25
+
 ### Added
 
 - Precondition: customer-managed key now validates that a UserAssigned identity is configured.

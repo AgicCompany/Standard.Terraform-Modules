@@ -4,10 +4,17 @@ All notable changes to this module will be documented in this file.
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-05-17
+
+### Added
+
+- Optional `storage_account_type` variable (`Geo` / `GeoZone` / `Local` / `Zone`, defaults to `null` → Azure default `Geo`). Lets consumers in regions without geo-redundant storage for SQL Database backups (e.g. Italy North) set `Local` or `Zone` to avoid `ProvisioningDisabled: Provisioning of geo-redundant storage is not available in this region`. Independent of `enable_geo_redundant_backup` (which only controls geo-replicated backup copies).
+
+## [1.2.0] - 2026-04-25
+
 ### Added
 
 - Precondition: read scale-out now validates SKU compatibility (Premium, Business Critical, or Hyperscale only).
-- Optional `storage_account_type` variable (`Geo` / `GeoZone` / `Local` / `Zone`, defaults to `null` → Azure default `Geo`). Lets consumers in regions without geo-redundant storage for SQL Database backups (e.g. Italy North) set `Local` or `Zone` to avoid `ProvisioningDisabled: Provisioning of geo-redundant storage is not available in this region`. Independent of `enable_geo_redundant_backup` (which only controls geo-replicated backup copies).
 
 ## [1.1.0] - 2026-04-18
 

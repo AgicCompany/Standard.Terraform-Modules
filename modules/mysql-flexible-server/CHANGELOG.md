@@ -4,6 +4,8 @@ All notable changes to this module will be documented in this file.
 
 ## [Unreleased]
 
+## [3.1.1] - 2026-04-25
+
 ### Deprecated
 - `enable_public_access` variable: not configurable in AzureRM provider v4+. MySQL Flexible Server auto-computes public access based on network configuration (delegated_subnet_id). Variable retained for interface compatibility but has no effect.
 
