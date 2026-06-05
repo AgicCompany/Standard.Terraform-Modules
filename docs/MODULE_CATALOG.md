@@ -59,6 +59,19 @@ Updated modules and versions:
 
 See the relevant PR and CHANGELOG entries in each module for design details and the `diagnostic_settings` variable contract.
 
+### Phase 3 Module Fixes (2026-06-05)
+
+Convention alignment release — 11 modules updated:
+
+- **Validation blocks** (PATCH): `cosmosdb/v3.1.1`, `redis-cache/v4.0.1`, `postgresql-flexible-server/v5.0.1`, `mssql-server/v3.1.1`
+- **Naming overrides** (MINOR): `linux-virtual-machine/v1.3.0`, `windows-virtual-machine/v1.2.0`, `storage-account/v3.2.0`, `aks/v4.0.0`
+- **Feature flag defaults** (MAJOR): `aks/v4.0.0`, `application-gateway/v2.0.0`, `function-app/v3.0.0`
+- **Minor fixes**: `app-service-plan/v1.0.1`
+
+**Breaking changes in aks/v4.0.0:** `workload_identity_enabled` → `true`, `enable_auto_scaling` → `false`, `enable_container_insights` → `false`, `kube_config_raw` output removed.
+**Breaking change in application-gateway/v2.0.0:** `enable_http2` → `false`.
+**Breaking change in function-app/v3.0.0:** `enable_application_insights` → `false`.
+
 ---
 
 ## Foundation
@@ -164,7 +177,7 @@ Creates bidirectional Azure Virtual Network peering between two VNets.
 
 ---
 
-### storage-account `v3.1.1`
+### storage-account `v3.2.0`
 Creates an Azure Storage Account with secure defaults and optional private endpoints per subresource.
 
 | Variable | Type | Required | Default | Description |
@@ -187,6 +200,7 @@ Creates an Azure Storage Account with secure defaults and optional private endpo
 | `network_rules` | object | no | `null` | Bypass, default_action, IP rules, VNet rules |
 | `subnet_id` | string | no | `null` | PE subnet |
 | `private_dns_zone_ids` | map(string) | no | `{}` | Map of subresources (blob, file, table, queue) to DNS zone IDs |
+| `private_service_connection_name_prefix` | string | no | `null` | Override PSC name prefix |
 | `tags` | map(string) | no | `{}` | Tags |
 
 **Outputs:** `id`, `name`, `primary_blob_endpoint`, `primary_queue_endpoint`, `primary_table_endpoint`, `primary_file_endpoint`, `private_endpoint_ids`
@@ -270,7 +284,7 @@ Creates an Azure Monitor diagnostic setting to route logs and metrics to Log Ana
 
 ## Compute
 
-### aks `v3.0.0`
+### aks `v4.0.0`
 Creates an Azure Kubernetes Service cluster with private-by-default config, Azure AD auth, RBAC, and Container Insights.
 
 | Variable | Type | Required | Default | Description |
@@ -278,7 +292,7 @@ Creates an Azure Kubernetes Service cluster with private-by-default config, Azur
 | `resource_group_name` | string | yes | — | Resource group name |
 | `location` | string | yes | — | Azure region |
 | `name` | string | yes | — | AKS cluster name |
-| `default_node_pool` | object | no | Standard_D2s_v3 | vm_size, subnet_id, node_count, min/max_count, zones, os_disk_size_gb, etc. |
+| `default_node_pool` | object | no | Standard_D2s_v3 | name (default "system"), vm_size, subnet_id, node_count, min/max_count, zones, os_disk_size_gb, etc. |
 | `dns_prefix` | string | no | name | DNS prefix |
 | `kubernetes_version` | string | no | `null` (latest) | Kubernetes version |
 | `sku_tier` | string | no | `"Free"` | Free, Standard, or Premium |
@@ -296,13 +310,13 @@ Creates an Azure Kubernetes Service cluster with private-by-default config, Azur
 | `maintenance_window_node_os` | object | no | Weekly Saturday 02:00, 4h | Node OS upgrade window |
 | `private_dns_zone_id` | string | no | `null` | Private DNS zone for private clusters |
 | `enable_system_assigned_identity` | bool | no | `true` | Enable system-assigned identity |
-| `enable_auto_scaling` | bool | no | `true` | Enable cluster autoscaler |
-| `enable_container_insights` | bool | no | `true` | Enable Container Insights |
-| `workload_identity_enabled` | bool | no | `false` | Enable workload identity |
+| `enable_auto_scaling` | bool | no | `false` | Enable cluster autoscaler |
+| `enable_container_insights` | bool | no | `false` | Enable Container Insights |
+| `workload_identity_enabled` | bool | no | `true` | Enable workload identity |
 | `user_assigned_identity_ids` | list(string) | no | `[]` | User-assigned identity IDs |
 | `tags` | map(string) | no | `{}` | Tags |
 
-**Outputs:** `id`, `name`, `fqdn`, `private_fqdn`, `kube_config_raw` (sensitive), `kubelet_identity`, `principal_id`, `tenant_id`, `oidc_issuer_url`, `node_resource_group`
+**Outputs:** `id`, `name`, `fqdn`, `private_fqdn`, `kubelet_identity`, `principal_id`, `tenant_id`, `oidc_issuer_url`, `node_resource_group`
 
 ---
 
@@ -318,7 +332,7 @@ Creates additional user node pools for an existing AKS cluster.
 
 ---
 
-### app-service-plan `v1.0.0`
+### app-service-plan `v1.0.1`
 Creates an Azure App Service Plan with configurable OS, SKU, and optional zone redundancy.
 
 | Variable | Type | Required | Default | Description |
@@ -365,7 +379,7 @@ Creates an Azure Linux Web App with secure defaults and optional private endpoin
 
 ---
 
-### function-app `v2.1.0`
+### function-app `v3.0.0`
 Creates an Azure Linux Function App with secure defaults and optional private endpoint.
 
 | Variable | Type | Required | Default | Description |
@@ -385,6 +399,7 @@ Creates an Azure Linux Function App with secure defaults and optional private en
 | `enable_public_access` | bool | no | `false` | Enable public access |
 | `enable_vnet_integration` | bool | no | `false` | Enable VNet integration |
 | `enable_system_assigned_identity` | bool | no | `true` | Enable system-assigned identity |
+| `enable_application_insights` | bool | no | `false` | Enable Application Insights |
 | `user_assigned_identity_ids` | list(string) | no | `[]` | User-assigned identity IDs |
 | `subnet_id` | string | no | `null` | PE subnet |
 | `private_dns_zone_id` | string | no | `null` | PE DNS zone |
@@ -522,7 +537,7 @@ Creates an Azure Container Registry with secure defaults and optional private en
 
 ---
 
-### linux-virtual-machine `v1.2.0`
+### linux-virtual-machine `v1.3.0`
 Creates an Azure Linux VM with NIC, optional public IP, and data disk management.
 
 | Variable | Type | Required | Default | Description |
@@ -543,13 +558,16 @@ Creates an Azure Linux VM with NIC, optional public IP, and data disk management
 | `enable_system_assigned_identity` | bool | no | `false` | Enable system-assigned identity |
 | `user_assigned_identity_ids` | list(string) | no | `[]` | User-assigned identity IDs |
 | `zone` | string | no | `null` | Availability zone |
+| `public_ip_name` | string | no | `null` | Override PIP resource name |
+| `nic_name` | string | no | `null` | Override NIC resource name |
+| `managed_disk_name_prefix` | string | no | `null` | Override disk name prefix |
 | `tags` | map(string) | no | `{}` | Tags |
 
 **Outputs:** `id`, `name`, `private_ip_address`, `network_interface_id`, `principal_id`, `tenant_id`, `public_ip_address`
 
 ---
 
-### windows-virtual-machine `v1.1.0`
+### windows-virtual-machine `v1.2.0`
 Creates an Azure Windows VM with NIC, optional public IP, and data disk management.
 
 | Variable | Type | Required | Default | Description |
@@ -568,6 +586,9 @@ Creates an Azure Windows VM with NIC, optional public IP, and data disk manageme
 | `enable_system_assigned_identity` | bool | no | `false` | Enable system-assigned identity |
 | `user_assigned_identity_ids` | list(string) | no | `[]` | User-assigned identity IDs |
 | `zone` | string | no | `null` | Availability zone |
+| `public_ip_name` | string | no | `null` | Override PIP resource name |
+| `nic_name` | string | no | `null` | Override NIC resource name |
+| `managed_disk_name_prefix` | string | no | `null` | Override disk name prefix |
 | `tags` | map(string) | no | `{}` | Tags |
 
 **Outputs:** `id`, `name`, `private_ip_address`, `network_interface_id`, `public_ip_address`
@@ -621,7 +642,7 @@ Creates an Azure Static Web App with Standard SKU and private endpoint by defaul
 
 ## Data
 
-### mssql-server `v3.1.0`
+### mssql-server `v3.1.1`
 Creates an Azure SQL logical server with Azure AD auth and optional private endpoint.
 
 | Variable | Type | Required | Default | Description |
@@ -694,7 +715,7 @@ Creates an Azure MySQL Flexible Server with configurable databases and server pa
 
 ---
 
-### postgresql-flexible-server `v5.0.0`
+### postgresql-flexible-server `v5.0.1`
 Creates an Azure PostgreSQL Flexible Server with configurable databases and server parameters.
 
 | Variable | Type | Required | Default | Description |
@@ -720,7 +741,7 @@ Creates an Azure PostgreSQL Flexible Server with configurable databases and serv
 
 ---
 
-### cosmosdb `v3.1.0`
+### cosmosdb `v3.1.1`
 Creates an Azure Cosmos DB account with SQL API databases and optional private endpoint.
 
 | Variable | Type | Required | Default | Description |
@@ -748,7 +769,7 @@ Creates an Azure Cosmos DB account with SQL API databases and optional private e
 
 ---
 
-### redis-cache `v4.0.0`
+### redis-cache `v4.0.1`
 Creates an Azure Cache for Redis with secure defaults and optional private endpoint.
 
 | Variable | Type | Required | Default | Description |
@@ -807,7 +828,7 @@ Creates an Azure Managed Redis (Enterprise) instance with modules, geo-replicati
 
 ## Networking
 
-### application-gateway `v1.2.0`
+### application-gateway `v2.0.0`
 Creates an Azure Application Gateway (v2) with public IP, L7 load balancing, SSL termination, and optional WAF.
 
 | Variable | Type | Required | Default | Description |
@@ -830,7 +851,7 @@ Creates an Azure Application Gateway (v2) with public IP, L7 load balancing, SSL
 | `ssl_certificates` | map(object) | no | `{}` | PFX data+password or Key Vault secret ID (sensitive) |
 | `redirect_configurations` | map(object) | no | `{}` | Redirects: type (Permanent/Found/SeeOther/Temporary) |
 | `url_path_maps` | map(object) | no | `{}` | Path-based routing |
-| `enable_http2` | bool | no | `true` | Enable HTTP/2 |
+| `enable_http2` | bool | no | `false` | Enable HTTP/2 |
 | `tags` | map(string) | no | `{}` | Tags |
 
 **Outputs:** `id`, `name`, `public_ip_address`, `public_ip_id`, `backend_address_pool_ids`
