@@ -45,8 +45,8 @@ variable "workload_profiles" {
 # === Optional: Feature Flags ===
 variable "enable_internal_load_balancer" {
   type        = bool
-  default     = true
-  description = "Use internal load balancer. Requires VNet integration."
+  default     = false
+  description = "Use internal load balancer (requires VNet integration via infrastructure_subnet_id). Default false (external)."
 }
 
 variable "enable_zone_redundancy" {

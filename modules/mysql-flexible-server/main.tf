@@ -17,6 +17,8 @@ resource "azurerm_mysql_flexible_server" "this" {
   delegated_subnet_id = var.delegated_subnet_id
   private_dns_zone_id = var.delegated_subnet_id != null ? var.private_dns_zone_id : null
 
+  public_network_access = var.delegated_subnet_id != null ? "Disabled" : (var.enable_public_access ? "Enabled" : "Disabled")
+
   dynamic "storage" {
     for_each = [var.storage]
 

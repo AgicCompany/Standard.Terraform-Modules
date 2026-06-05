@@ -4,6 +4,12 @@ All notable changes to this module will be documented in this file.
 
 ## [Unreleased]
 
+## [2.0.0] - 2026-06-05
+
+### Changed
+
+- **BREAKING:** Added `enable_public_access` (default `false`) wired to `public_network_access_enabled`. The Function App is now **private by default** — previously `public_network_access_enabled` was never set and defaulted to enabled (public). To keep public access, set `enable_public_access = true`.
+
 ## [1.2.0] - 2026-04-25
 
 ### Added

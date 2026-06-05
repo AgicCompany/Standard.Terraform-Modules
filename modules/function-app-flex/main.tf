@@ -7,6 +7,7 @@ resource "azurerm_function_app_flex_consumption" "this" {
   https_only                                     = var.https_only
   client_certificate_mode                        = var.client_certificate_mode
   webdeploy_publish_basic_authentication_enabled = var.webdeploy_publish_basic_authentication_enabled
+  public_network_access_enabled                  = var.enable_public_access
 
   virtual_network_subnet_id = var.virtual_network_subnet_id
   maximum_instance_count    = var.maximum_instance_count
