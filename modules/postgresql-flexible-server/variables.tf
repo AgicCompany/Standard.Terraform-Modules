@@ -54,7 +54,7 @@ variable "storage_tier" {
   description = "Storage tier (P4, P6, P10, P15, P20, P30, P40, P50, P60, P70, P80). Auto-selected if null."
 
   validation {
-    condition     = var.storage_tier == null || contains(["P4", "P6", "P10", "P15", "P20", "P30", "P40", "P50", "P60", "P70", "P80"], var.storage_tier)
+    condition     = var.storage_tier == null ? true : contains(["P4", "P6", "P10", "P15", "P20", "P30", "P40", "P50", "P60", "P70", "P80"], var.storage_tier)
     error_message = "storage_tier must be null or one of: P4, P6, P10, P15, P20, P30, P40, P50, P60, P70, P80."
   }
 }
@@ -106,7 +106,7 @@ variable "zone" {
   description = "Availability zone (1, 2, or 3)"
 
   validation {
-    condition     = var.zone == null || contains(["1", "2", "3"], var.zone)
+    condition     = var.zone == null ? true : contains(["1", "2", "3"], var.zone)
     error_message = "zone must be null or one of: \"1\", \"2\", \"3\"."
   }
 }
