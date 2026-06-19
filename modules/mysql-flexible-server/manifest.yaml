@@ -1,0 +1,387 @@
+schema_version: "0.1"
+
+metadata:
+  module_name: mysql-flexible-server
+  module_version: "4.0.0"
+  schema_authored_by: AGIC Infrastructure Team
+  schema_last_updated: "2026-06-19"
+
+catalogue:
+  display_name: "MySQL Flexible Server"
+  short_description: "Azure Database for MySQL – Flexible Server with VNet integration, high availability, and security-first defaults."
+  long_description: |
+    Azure Database for MySQL – Flexible Server with security-first defaults:
+    public access disabled, private endpoint or VNet delegation enabled. Supports
+    Burstable, General Purpose, and Memory Optimized SKU tiers; high availability
+    (SameZone/ZoneRedundant); geo-redundant backups; custom maintenance windows;
+    per-server configuration parameters; and optional multi-sink diagnostic settings.
+  category: data
+  subcategory: relational
+  icon: mysql-flexible-server
+  complexity: high
+  cost_tier: medium
+  deprecated: false
+  tags:
+    - mysql
+    - database
+    - flexible-server
+    - relational
+    - private-endpoint
+
+variables:
+  # --- Deployment-context derived ---
+  resource_group_name:
+    widget: hidden
+    derived_from: { source: deployment_context.resource_group }
+
+  location:
+    widget: hidden
+    derived_from: { source: deployment_context.location }
+
+  name:
+    widget: hidden
+    derived_from: { source: naming.mysql_flexible_server }
+
+  tags:
+    widget: hidden
+    derived_from: { source: deployment_context.tags }
+
+  # --- Core configuration ---
+  sku_name:
+    widget: text
+    group: core
+    order: 10
+    placeholder: "B_Standard_B1ms"
+    help: "SKU name. Format: B_Standard_<size>, GP_Standard_<size>, or MO_Standard_<size> (e.g. GP_Standard_D2ds_v4)."
+    # NOTE: regex validation (not contains) — derive_from_validation not applicable.
+
+  version_number:
+    widget: select
+    widget_options: { derive_from_validation: true }
+    group: core
+    order: 20
+    help: "MySQL server version. 8.0.21 is the recommended stable release."
+
+  storage:
+    widget: object
+    widget_options:
+      fields:
+        size_gb:
+          widget: number
+          widget_options: { min: 20 }
+          help: "Storage size in GB. Minimum 20 GB."
+        iops:
+          widget: number
+          help: "Provisioned IOPS. Leave empty for the default IOPS for the selected storage size."
+        auto_grow_enabled:
+          widget: toggle
+          help: "Automatically grow storage when usage approaches the provisioned limit."
+    group: core
+    order: 30
+    help: "Storage configuration for the MySQL Flexible Server."
+
+  zone:
+    widget: text
+    group: core
+    order: 40
+    placeholder: "(optional) 1, 2, or 3"
+    help: "Preferred availability zone. Leave empty for no zone preference."
+
+  # --- Security ---
+  administrator_login:
+    widget: text
+    group: security
+    order: 10
+    placeholder: "mysqladmin"
+    help: "Administrator login name."
+
+  administrator_password:
+    widget: text
+    sensitive_override: true
+    group: security
+    order: 20
+    help: "Administrator password. Min 12 chars; must include upper, lower, digit, and symbol."
+
+  # --- Networking ---
+  enable_private_endpoint:
+    widget: toggle
+    group: networking
+    order: 10
+    help: "Create a private endpoint for this server. Mutually exclusive with VNet delegation (delegated_subnet_id)."
+
+  enable_public_access:
+    widget: toggle
+    group: networking
+    order: 20
+    help: "Allow public network access. Disabled by default. Forced off when delegated_subnet_id is set."
+
+  delegated_subnet_id:
+    widget: resource_picker
+    widget_options: { resource_type: subnet }
+    group: networking
+    order: 30
+    help: "Subnet for VNet injection (requires Microsoft.DBforMySQL/flexibleServers delegation). Mutually exclusive with private endpoint."
+
+  subnet_id:
+    widget: resource_picker
+    widget_options: { resource_type: subnet }
+    group: networking
+    order: 40
+    help: "Subnet hosting the private endpoint NIC. Required when enable_private_endpoint is true."
+    show_when:
+      enable_private_endpoint: true
+    required_when:
+      enable_private_endpoint: true
+
+  private_dns_zone_id:
+    widget: resource_picker
+    widget_options: { resource_type: private_dns_zone }
+    group: networking
+    order: 50
+    help: "Private DNS zone for privatelink.mysql.database.azure.com. Required when using VNet delegation or private endpoint."
+
+  firewall_rules:
+    widget: repeater
+    widget_options:
+      mode: keyed_map
+      key_field:
+        label: "Rule name"
+        placeholder: "allow-office"
+      row_fields:
+        start_ip_address:
+          widget: text
+          help: "Start IP address of the allowed range."
+        end_ip_address:
+          widget: text
+          help: "End IP address of the allowed range."
+      add_label: "Add firewall rule"
+    group: networking
+    order: 60
+    advanced: true
+    help: "Firewall rules. Applicable only when not using VNet integration."
+
+  private_endpoint_name:
+    widget: text
+    group: networking
+    order: 70
+    advanced: true
+    placeholder: "pep-<server-name>"
+    help: "Override the private endpoint resource name. Defaults to pep-{name}."
+    show_when:
+      enable_private_endpoint: true
+
+  private_service_connection_name:
+    widget: text
+    group: networking
+    order: 80
+    advanced: true
+    placeholder: "psc-<server-name>"
+    help: "Override the private service connection name. Defaults to psc-{name}."
+    show_when:
+      enable_private_endpoint: true
+
+  private_endpoint_nic_name:
+    widget: text
+    group: networking
+    order: 90
+    advanced: true
+    placeholder: "pep-<server-name>-nic"
+    help: "Override the PE network interface name. Defaults to pep-{name}-nic."
+    show_when:
+      enable_private_endpoint: true
+
+  # --- Features ---
+  backup_retention_days:
+    widget: number
+    widget_options: { min: 1, max: 35, step: 1 }
+    group: features
+    order: 10
+    help: "Backup retention in days (1–35). Default is 7."
+
+  geo_redundant_backup_enabled:
+    widget: toggle
+    group: features
+    order: 20
+    help: "Geo-replicate backups to a paired region."
+
+  high_availability:
+    widget: object
+    widget_options:
+      fields:
+        mode:
+          widget: select
+          widget_options:
+            options:
+              - { value: "SameZone", label: "Same Zone" }
+              - { value: "ZoneRedundant", label: "Zone Redundant" }
+          help: "HA mode. ZoneRedundant places standby in a different AZ."
+        standby_availability_zone:
+          widget: text
+          help: "Availability zone for the standby replica. Optional."
+    group: features
+    order: 30
+    help: "High availability configuration. Leave blank to disable HA."
+
+  # --- Entities ---
+  databases:
+    widget: repeater
+    widget_options:
+      mode: keyed_map
+      key_field:
+        label: "Database name"
+        placeholder: "mydb"
+      row_fields:
+        charset:
+          widget: text
+          help: "Character set (default: utf8mb4)."
+        collation:
+          widget: text
+          help: "Collation (default: utf8mb4_unicode_ci)."
+      add_label: "Add database"
+    group: entities
+    order: 10
+    help: "Databases to create on this server."
+
+  # --- Add-ons ---
+  server_configurations:
+    widget: key_value_map
+    group: addons
+    order: 10
+    help: "Server configuration parameters (key = parameter name, value = parameter value)."
+
+  # --- Maintenance ---
+  maintenance_window:
+    widget: object
+    widget_options:
+      fields:
+        day_of_week:
+          widget: number
+          widget_options: { min: 0, max: 6 }
+          help: "Day of week (0 = Sunday, 1 = Monday, …, 6 = Saturday). Default: 0."
+        start_hour:
+          widget: number
+          widget_options: { min: 0, max: 23 }
+          help: "UTC hour to start maintenance (0–23). Default: 0."
+        start_minute:
+          widget: number
+          widget_options: { min: 0, max: 59 }
+          help: "Minute within the start hour (0–59). Default: 0."
+    group: maintenance
+    order: 10
+    help: "Custom maintenance window. Leave blank for the Azure-managed default window."
+
+  # --- Monitoring ---
+  diagnostic_settings:
+    widget: object
+    widget_options:
+      fields:
+        name:
+          widget: text
+          placeholder: "diag-<server-name>"
+        log_analytics_workspace_id:
+          widget: resource_picker
+          widget_options: { resource_type: log_analytics_workspace }
+        storage_account_id:
+          widget: resource_picker
+          widget_options: { resource_type: storage_account }
+        eventhub_authorization_rule_id:
+          widget: text
+        eventhub_name:
+          widget: text
+        log_analytics_destination_type:
+          widget: select
+          widget_options:
+            options: ["Dedicated", "AzureDiagnostics"]
+        enabled_log_categories:
+          widget: text
+          widget_options: { multiline: true }
+          help: "One category per line. Leave empty for all supported categories."
+        enabled_metrics:
+          widget: text
+          widget_options: { multiline: true }
+          help: "One metric per line. Leave empty for all supported metrics."
+    group: monitoring
+    order: 10
+    advanced: true
+    help: "Optional. Leave blank to disable diagnostic settings. At least one sink destination is required when set."
+
+dependencies:
+  required_inputs_from_other_resources:
+    - variable: delegated_subnet_id
+      resource_type: subnet
+      cardinality: one
+      notes: "Required for VNet injection. Mutually exclusive with private endpoint."
+    - variable: subnet_id
+      resource_type: subnet
+      cardinality: one
+      notes: "Required when enable_private_endpoint is true."
+    - variable: private_dns_zone_id
+      resource_type: private_dns_zone
+      cardinality: one
+      notes: "DNS zone for privatelink.mysql.database.azure.com. Required with VNet delegation or private endpoint."
+    - variable: diagnostic_settings.log_analytics_workspace_id
+      resource_type: log_analytics_workspace
+      cardinality: one
+      notes: "Optional diagnostic sink."
+    - variable: diagnostic_settings.storage_account_id
+      resource_type: storage_account
+      cardinality: one
+      notes: "Optional diagnostic sink."
+
+  produces_outputs_consumable_by:
+    - output: id
+      resource_type: mysql_flexible_server
+
+outputs_display:
+  id:
+    display_name: "Resource ID"
+    show_in_summary: true
+    copyable: true
+    format: arm_id
+
+  name:
+    display_name: "MySQL Server name"
+    show_in_summary: true
+    copyable: true
+
+  fqdn:
+    display_name: "FQDN"
+    show_in_summary: true
+    copyable: true
+    format: url
+
+  database_ids:
+    display_name: "Database resource IDs"
+    show_in_summary: false
+    copyable: false
+
+  private_endpoint_id:
+    display_name: "Private endpoint ID"
+    show_in_summary: false
+    copyable: true
+    format: arm_id
+
+  private_ip_address:
+    display_name: "Private IP address"
+    show_in_summary: true
+    copyable: true
+
+  public_mysql_server_id:
+    display_name: "Resource ID (public)"
+    show_in_summary: false
+    copyable: true
+    format: arm_id
+    role: public_alias
+
+  public_mysql_server_name:
+    display_name: "MySQL Server name (public)"
+    show_in_summary: false
+    copyable: true
+    role: public_alias
+
+  public_mysql_server_fqdn:
+    display_name: "FQDN (public)"
+    show_in_summary: false
+    copyable: true
+    format: url
+    role: public_alias

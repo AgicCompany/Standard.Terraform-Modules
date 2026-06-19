@@ -1,0 +1,416 @@
+schema_version: "0.1"
+
+metadata:
+  module_name: cosmosdb
+  module_version: "3.2.0"
+  schema_authored_by: AGIC Infrastructure Team
+  schema_last_updated: "2026-06-19"
+
+catalogue:
+  display_name: "Azure Cosmos DB"
+  short_description: "Azure Cosmos DB account with private endpoint, security-first defaults, and geo-replication support."
+  long_description: |
+    Azure Cosmos DB NoSQL account with security-first defaults: private endpoint
+    enabled, public access disabled, local (key-based) authentication disabled,
+    and TLS 1.2 enforced. Supports configurable consistency policies, geo-replication,
+    automatic failover, multi-region writes, SQL API database provisioning, and
+    optional diagnostic settings with multi-sink output (Log Analytics, storage,
+    Event Hub).
+  category: data
+  subcategory: nosql
+  icon: cosmosdb
+  complexity: high
+  cost_tier: high
+  deprecated: false
+  tags:
+    - cosmosdb
+    - nosql
+    - database
+    - private-endpoint
+    - geo-redundancy
+
+variables:
+  # --- Deployment-context derived ---
+  resource_group_name:
+    widget: hidden
+    derived_from: { source: deployment_context.resource_group }
+
+  location:
+    widget: hidden
+    derived_from: { source: deployment_context.location }
+
+  name:
+    widget: hidden
+    derived_from: { source: naming.cosmosdb_account }
+
+  tags:
+    widget: hidden
+    derived_from: { source: deployment_context.tags }
+
+  # offer_type: validation locks this to "Standard" (the only Azure-supported value).
+  offer_type:
+    widget: hidden
+    derived_from: { source: hcl_default }
+
+  # min_tls_version: validation locks this to "1.2" — TLS 1.0/1.1 retired by Azure 2025-08-31.
+  min_tls_version:
+    widget: hidden
+    derived_from: { source: hcl_default }
+
+  # --- Core configuration ---
+  kind:
+    widget: select
+    widget_options: { derive_from_validation: true }
+    group: core
+    order: 10
+    help: "GlobalDocumentDB = SQL/Core API (recommended). MongoDB = MongoDB-compatible API. Parse is legacy."
+
+  consistency_policy:
+    widget: object
+    widget_options:
+      fields:
+        consistency_level:
+          widget: select
+          widget_options:
+            options: ["BoundedStaleness", "Eventual", "Session", "Strong", "ConsistentPrefix"]
+          help: "Session is the default and suits most workloads. BoundedStaleness enables the staleness controls below."
+        max_interval_in_seconds:
+          widget: number
+          widget_options: { min: 5, max: 86400 }
+          help: "Staleness window in seconds (5–86400). Only applies to BoundedStaleness."
+          show_when:
+            consistency_level: BoundedStaleness
+        max_staleness_prefix:
+          widget: number
+          widget_options: { min: 10, max: 2147483647 }
+          help: "Maximum stale request count. Only applies to BoundedStaleness."
+          show_when:
+            consistency_level: BoundedStaleness
+    group: core
+    order: 20
+    help: "Consistency policy for the account. BoundedStaleness surfaces time/prefix staleness controls."
+
+  # --- Features ---
+  free_tier_enabled:
+    widget: toggle
+    group: features
+    order: 10
+    help: "Enable Cosmos DB free tier (first 1000 RU/s and 25 GB free). Limited to one account per subscription."
+
+  automatic_failover_enabled:
+    widget: toggle
+    group: features
+    order: 20
+    help: "Automatically fail over to the next-priority region on a service outage. Requires at least two geo_locations."
+
+  enable_multiple_write_locations:
+    widget: toggle
+    group: features
+    order: 30
+    help: "Enable multi-region writes (active-active). Requires two or more geo_locations."
+
+  geo_locations:
+    widget: repeater
+    widget_options:
+      mode: ordered_list
+      row_fields:
+        location:
+          widget: text
+          placeholder: "westeurope"
+          help: "Azure region name (e.g. westeurope, northeurope)."
+        failover_priority:
+          widget: number
+          widget_options: { min: 0 }
+          help: "Failover priority. 0 = primary write region; must be unique across entries."
+        zone_redundant:
+          widget: toggle
+          help: "Enable availability zone redundancy for this region."
+      add_label: "Add geo-location"
+    group: features
+    order: 40
+    help: "Geo-replication locations. When empty, the deployment region is used as the sole location (priority 0)."
+
+  backup:
+    widget: object
+    widget_options:
+      fields:
+        type:
+          widget: select
+          widget_options:
+            options: ["Periodic", "Continuous"]
+          help: "Periodic: scheduled backups to Azure Storage. Continuous: point-in-time restore (higher cost)."
+        interval_in_minutes:
+          widget: number
+          widget_options: { min: 60, max: 1440 }
+          help: "Backup frequency in minutes (60–1440). Periodic only."
+          show_when:
+            type: Periodic
+        retention_in_hours:
+          widget: number
+          widget_options: { min: 8, max: 720 }
+          help: "Backup retention in hours (8–720). Periodic only."
+          show_when:
+            type: Periodic
+        storage_redundancy:
+          widget: select
+          widget_options:
+            options: ["Geo", "Local", "Zone"]
+          help: "Redundancy of backup storage. Periodic only."
+          show_when:
+            type: Periodic
+        tier:
+          widget: select
+          widget_options:
+            options: ["Continuous7Days", "Continuous30Days"]
+          help: "Continuous backup tier. Continuous only."
+          show_when:
+            type: Continuous
+    group: features
+    order: 50
+    advanced: true
+    help: "Backup policy. Defaults to Periodic with 4-hour intervals and 8-hour retention."
+
+  capacity:
+    widget: object
+    widget_options:
+      fields:
+        total_throughput_limit:
+          widget: number
+          widget_options: { min: -1 }
+          help: "Maximum total provisioned throughput for the account in RU/s. Use -1 for unlimited."
+    group: features
+    order: 60
+    advanced: true
+    help: "Account-level throughput cap. Leave blank to apply no limit."
+
+  # --- Entities ---
+  sql_databases:
+    widget: repeater
+    widget_options:
+      mode: keyed_map
+      key_field:
+        label: "Database name"
+        placeholder: "mydb"
+      row_fields:
+        throughput:
+          widget: number
+          widget_options: { min: 400, step: 100 }
+          help: "Provisioned throughput in RU/s. Mutually exclusive with max_throughput."
+        max_throughput:
+          widget: number
+          widget_options: { min: 4000, step: 100 }
+          help: "Autoscale max throughput in RU/s. Mutually exclusive with throughput."
+      add_label: "Add SQL database"
+    group: entities
+    order: 10
+    help: "SQL API databases to provision within this account. Key becomes the database name."
+
+  # --- Security ---
+  enable_local_auth:
+    widget: toggle
+    group: security
+    order: 10
+    help: "Enable local (key-based) authentication. Disabled by default; prefer Entra ID managed identity."
+
+  # --- Networking ---
+  enable_public_access:
+    widget: toggle
+    group: networking
+    order: 10
+    help: "Allow public network access. When false, the account is reachable only via private endpoints."
+
+  enable_virtual_network_filter:
+    widget: toggle
+    group: networking
+    order: 20
+    help: "Restrict access to allowed VNet subnets. Set true to honour virtual_network_rule entries (not yet surfaced in this sidecar; set via advanced HCL if needed)."
+
+  ip_range_filter:
+    widget: text
+    widget_options: { multiline: true }
+    group: networking
+    order: 30
+    help: "Allowed CIDR ranges for the Cosmos DB firewall, one per line. Only active when public access is enabled."
+    show_when:
+      enable_public_access: true
+
+  enable_private_endpoint:
+    widget: toggle
+    group: networking
+    order: 40
+    help: "Create a private endpoint for this Cosmos DB account. Requires subnet_id and private_dns_zone_id."
+
+  subnet_id:
+    widget: resource_picker
+    widget_options: { resource_type: subnet }
+    group: networking
+    order: 50
+    help: "Subnet that will host the private endpoint NIC. Required when enable_private_endpoint = true."
+    show_when:
+      enable_private_endpoint: true
+    required_when:
+      enable_private_endpoint: true
+
+  private_dns_zone_id:
+    widget: resource_picker
+    widget_options: { resource_type: private_dns_zone }
+    group: networking
+    order: 60
+    help: "Private DNS zone for privatelink.documents.azure.com. Required when enable_private_endpoint = true."
+    show_when:
+      enable_private_endpoint: true
+    required_when:
+      enable_private_endpoint: true
+
+  private_endpoint_name:
+    widget: text
+    group: networking
+    order: 70
+    advanced: true
+    placeholder: "pep-<cosmos-account-name>"
+    help: "Override the private endpoint resource name. Defaults to pep-{name}."
+    show_when:
+      enable_private_endpoint: true
+
+  private_service_connection_name:
+    widget: text
+    group: networking
+    order: 80
+    advanced: true
+    placeholder: "psc-<cosmos-account-name>"
+    help: "Override the private service connection name. Defaults to psc-{name}."
+    show_when:
+      enable_private_endpoint: true
+
+  private_endpoint_nic_name:
+    widget: text
+    group: networking
+    order: 90
+    advanced: true
+    placeholder: "pep-<cosmos-account-name>-nic"
+    help: "Override the private endpoint NIC name. Defaults to pep-{name}-nic."
+    show_when:
+      enable_private_endpoint: true
+
+  # --- Monitoring ---
+  diagnostic_settings:
+    widget: object
+    widget_options:
+      fields:
+        name:
+          widget: text
+          placeholder: "diag-<cosmos-account-name>"
+        log_analytics_workspace_id:
+          widget: resource_picker
+          widget_options: { resource_type: log_analytics_workspace }
+        storage_account_id:
+          widget: resource_picker
+          widget_options: { resource_type: storage_account }
+        eventhub_authorization_rule_id:
+          widget: text
+        eventhub_name:
+          widget: text
+        log_analytics_destination_type:
+          widget: select
+          widget_options:
+            options: ["Dedicated", "AzureDiagnostics"]
+        enabled_log_categories:
+          widget: text
+          widget_options: { multiline: true }
+          help: "One category per line. Leave empty for all supported."
+        enabled_metrics:
+          widget: text
+          widget_options: { multiline: true }
+          help: "One metric per line. Leave empty for all supported."
+    group: monitoring
+    order: 10
+    advanced: true
+    help: "Optional. Leave blank to disable diagnostic settings."
+
+dependencies:
+  required_inputs_from_other_resources:
+    - variable: subnet_id
+      resource_type: subnet
+      cardinality: one
+      notes: "Required when enable_private_endpoint = true."
+
+    - variable: private_dns_zone_id
+      resource_type: private_dns_zone
+      cardinality: one
+      notes: "Private DNS zone for privatelink.documents.azure.com. Required when enable_private_endpoint = true."
+
+    - variable: diagnostic_settings.log_analytics_workspace_id
+      resource_type: log_analytics_workspace
+      cardinality: one
+      notes: "Optional diagnostic sink."
+
+    - variable: diagnostic_settings.storage_account_id
+      resource_type: storage_account
+      cardinality: one
+      notes: "Optional diagnostic sink."
+
+  produces_outputs_consumable_by:
+    - output: id
+      resource_type: cosmosdb_account
+
+    - output: database_ids
+      resource_type: cosmos_container
+      cardinality: many
+      notes: "Map of database name to resource ID."
+
+    - output: public_cosmosdb_id
+      resource_type: cosmosdb_account
+
+outputs_display:
+  id:
+    display_name: "Resource ID"
+    show_in_summary: true
+    copyable: true
+    format: arm_id
+
+  name:
+    display_name: "Cosmos DB account name"
+    show_in_summary: true
+    copyable: true
+
+  endpoint:
+    display_name: "Cosmos DB endpoint"
+    show_in_summary: true
+    copyable: true
+    format: url
+
+  database_ids:
+    display_name: "SQL database IDs"
+    show_in_summary: false
+    copyable: true
+
+  private_endpoint_id:
+    display_name: "Private endpoint ID"
+    show_in_summary: false
+    copyable: true
+    format: arm_id
+
+  private_ip_address:
+    display_name: "Private IP address"
+    show_in_summary: true
+    copyable: true
+
+  public_cosmosdb_id:
+    display_name: "Resource ID (public)"
+    show_in_summary: false
+    copyable: true
+    format: arm_id
+    role: public_alias
+
+  public_cosmosdb_name:
+    display_name: "Cosmos DB account name (public)"
+    show_in_summary: false
+    copyable: true
+    role: public_alias
+
+  public_cosmosdb_endpoint:
+    display_name: "Cosmos DB endpoint (public)"
+    show_in_summary: false
+    copyable: true
+    format: url
+    role: public_alias

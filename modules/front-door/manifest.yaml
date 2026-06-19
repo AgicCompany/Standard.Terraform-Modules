@@ -1,0 +1,630 @@
+schema_version: "0.1"
+
+metadata:
+  module_name: front-door
+  module_version: "1.3.0"
+  schema_authored_by: AGIC Infrastructure Team
+  schema_last_updated: "2026-06-19"
+
+catalogue:
+  display_name: "Azure Front Door"
+  short_description: "Global CDN + load balancer with optional WAF, custom domains, and rule sets."
+  long_description: |
+    Azure Front Door (Standard/Premium) is Microsoft's global anycast edge network
+    for HTTP/HTTPS workloads. It provides layer-7 load balancing, SSL offload,
+    URL-based routing, caching, and compression.
+
+    Premium SKU unlocks WAF (managed rule sets and custom rules), Private Link
+    origin connectivity, and enhanced analytics. Standard covers core CDN and
+    routing features.
+
+    Key concepts: endpoints (public entry points), origin groups (target pools
+    with health probing and load balancing), origins (individual backend
+    instances), routes (bind endpoints → origin groups with pattern matching),
+    custom domains, and optional rule sets for request/response manipulation.
+
+    Front Door is a global resource — no Azure region is chosen at deployment time.
+  category: networking
+  subcategory: cdn-waf
+  icon: front-door
+  complexity: high
+  cost_tier: high
+  deprecated: false
+  tags:
+    - front-door
+    - cdn
+    - waf
+    - global-load-balancer
+    - private-link
+
+variables:
+  # --- Deployment-context derived ---
+  resource_group_name:
+    widget: hidden
+    derived_from: { source: deployment_context.resource_group }
+
+  name:
+    widget: hidden
+    derived_from: { source: naming.cdn_frontdoor_profile }
+    # Front Door is a global service; no location variable to derive.
+
+  tags:
+    widget: hidden
+    derived_from: { source: deployment_context.tags }
+
+  # --- Core: SKU and timeout ---
+  sku_name:
+    widget: select
+    widget_options: { derive_from_validation: true }
+    group: core
+    order: 10
+    help: "Standard includes CDN, routing, and caching. Premium adds WAF, Private Link origins, and enhanced security. WAF requires Premium."
+
+  response_timeout_seconds:
+    widget: number
+    widget_options: { min: 16, max: 240 }
+    group: core
+    order: 20
+    help: "Maximum wait time for an origin response before Front Door returns a 503 (16-240 s). Default is 60."
+
+  # --- Core: topology ---
+  endpoints:
+    widget: repeater
+    widget_options:
+      mode: keyed_map
+      key_field:
+        label: "Endpoint name"
+        placeholder: "web"
+      row_fields:
+        enabled:
+          widget: toggle
+      add_label: "Add endpoint"
+    group: core
+    order: 30
+    help: "Front Door endpoints (public hostnames, e.g. <name>.z01.azurefd.net). The map key is used as the endpoint resource name."
+
+  origin_groups:
+    widget: repeater
+    widget_options:
+      mode: keyed_map
+      key_field:
+        label: "Origin group name"
+        placeholder: "appsvc-group"
+      row_fields:
+        session_affinity_enabled:
+          widget: toggle
+          help: "Route repeated requests from the same client to the same origin."
+        restore_traffic_time_to_healed_or_new_endpoint_in_minutes:
+          widget: number
+          widget_options: { min: 0, max: 50 }
+          help: "Minutes to wait before restoring traffic to a newly healed or added origin (0 = immediate)."
+        health_probe:
+          widget: object
+          widget_options:
+            fields:
+              interval_in_seconds:
+                widget: number
+                widget_options: { min: 5, max: 31536000 }
+                help: "Probe frequency in seconds."
+              path:
+                widget: text
+                placeholder: "/"
+              protocol:
+                widget: select
+                widget_options:
+                  options: ["Http", "Https"]
+              request_type:
+                widget: select
+                widget_options:
+                  options: ["HEAD", "GET"]
+                help: "HEAD is lower-overhead; GET verifies response body."
+          help: "Health probe settings. Leave empty to disable health probing for this group."
+        load_balancing:
+          widget: object
+          widget_options:
+            fields:
+              additional_latency_in_milliseconds:
+                widget: number
+                widget_options: { min: 0 }
+                help: "Extra latency tolerance added to the fastest probe sample when selecting origins."
+              sample_size:
+                widget: number
+                widget_options: { min: 1 }
+                help: "Number of probe samples used in load balancing decisions."
+              successful_samples_required:
+                widget: number
+                widget_options: { min: 1 }
+                help: "Minimum successful samples required for an origin to be considered healthy."
+          help: "Load balancing tuning. Defaults: 50 ms latency window, 4 samples, 3 required."
+      add_label: "Add origin group"
+    group: core
+    order: 40
+    help: "Origin groups pool backend targets with health probing and load balancing. Referenced by routes and origins."
+
+  origins:
+    widget: repeater
+    widget_options:
+      mode: keyed_map
+      key_field:
+        label: "Origin name"
+        placeholder: "appsvc-origin"
+      row_fields:
+        origin_group_name:
+          widget: text
+          help: "Key of the origin group this origin belongs to."
+        host_name:
+          widget: text
+          placeholder: "app.azurewebsites.net"
+          help: "Hostname or IP of the backend."
+        origin_host_header:
+          widget: text
+          placeholder: "app.azurewebsites.net"
+          help: "Host header sent to the origin. Defaults to the origin hostname when empty."
+        http_port:
+          widget: number
+          widget_options: { min: 1, max: 65535 }
+        https_port:
+          widget: number
+          widget_options: { min: 1, max: 65535 }
+        priority:
+          widget: number
+          widget_options: { min: 1, max: 5 }
+          help: "Routing priority (1 = highest). Traffic goes to lower-priority origins only when all higher-priority ones are unhealthy."
+        weight:
+          widget: number
+          widget_options: { min: 1, max: 1000 }
+          help: "Relative load balancing weight among origins at the same priority."
+        certificate_name_check_enabled:
+          widget: toggle
+          help: "Validate the origin TLS certificate hostname. Disable only for self-signed certs in non-production."
+        enabled:
+          widget: toggle
+        private_link:
+          widget: object
+          widget_options:
+            fields:
+              target_id:
+                widget: text
+                placeholder: "Resource ID of the Private Link Service or Private Link-enabled resource"
+                # NOTE: Ideally resource_picker(private_link_service), but private_link_service
+                # is absent from the T1 resourceType vocabulary (T1 §5.5.1). This is a contract
+                # finding — the vocab needs a cdn_frontdoor_private_link entry or generic
+                # private_link_service entry. See findings doc (T1-Retrofit-Findings-05).
+                help: "Azure resource ID of the Private Link Service (or Private Link-enabled resource, e.g. App Service, Storage)."
+              location:
+                widget: text
+                placeholder: "westeurope"
+                help: "Azure region where the target Private Link resource is deployed."
+              target_type:
+                widget: text
+                placeholder: "sites"
+                help: "Private Link sub-resource type (e.g. 'sites' for App Service, 'blob' for Storage Blob). Leave empty when targeting a Private Link Service directly."
+              request_message:
+                widget: text
+                placeholder: "AFD Private Link connection"
+                help: "Message sent with the Private Link approval request."
+          help: "Optional. Connect this origin via Azure Private Link (Premium SKU required)."
+      add_label: "Add origin"
+    group: core
+    order: 50
+    help: "Origins (backend instances). Each origin references an origin group by key name."
+
+  routes:
+    widget: repeater
+    widget_options:
+      mode: keyed_map
+      key_field:
+        label: "Route name"
+        placeholder: "default-route"
+      row_fields:
+        endpoint_name:
+          widget: text
+          help: "Key of the Front Door endpoint this route is associated with."
+        origin_group_name:
+          widget: text
+          help: "Key of the origin group this route forwards traffic to."
+        origin_names:
+          widget: text
+          widget_options: { multiline: true }
+          help: "Origin keys to include, one per line. Leave empty to use all origins in the group."
+        patterns_to_match:
+          widget: text
+          widget_options: { multiline: true }
+          placeholder: "/*"
+          help: "URL patterns to match, one per line (e.g. /*, /api/*). Default is /*."
+        supported_protocols:
+          widget: multiselect
+          widget_options:
+            options: ["Http", "Https"]
+        forwarding_protocol:
+          widget: select
+          widget_options:
+            options: ["HttpsOnly", "HttpOnly", "MatchRequest"]
+          help: "Protocol used when forwarding requests to the origin. HttpsOnly enforces TLS end-to-end."
+        https_redirect_enabled:
+          widget: toggle
+          help: "Automatically redirect plain HTTP requests to HTTPS."
+        link_to_default_domain:
+          widget: toggle
+          help: "Accept traffic arriving on the Front Door default *.azurefd.net hostname."
+        enabled:
+          widget: toggle
+        custom_domain_keys:
+          widget: text
+          widget_options: { multiline: true }
+          help: "Custom domain keys to associate with this route, one per line. References domains defined in custom_domains."
+        rule_set_keys:
+          widget: text
+          widget_options: { multiline: true }
+          help: "Rule set keys to apply on this route, one per line. References rule sets defined in rule_sets."
+          advanced: true
+        compression_enabled:
+          widget: toggle
+          help: "Enable gzip/brotli response compression for content types in content_types_to_compress."
+          advanced: true
+        content_types_to_compress:
+          widget: text
+          widget_options: { multiline: true }
+          help: "MIME types to compress, one per line (e.g. text/html, application/javascript). Only effective when compression_enabled is true."
+          advanced: true
+      add_label: "Add route"
+    group: core
+    order: 60
+    help: "Routes bind endpoints to origin groups with URL pattern matching, protocol settings, and optional rule sets."
+
+  # --- Networking: custom domains ---
+  custom_domains:
+    widget: repeater
+    widget_options:
+      mode: keyed_map
+      key_field:
+        label: "Domain resource name"
+        placeholder: "www-contoso"
+        validation: "^[a-zA-Z0-9-]+$"
+      row_fields:
+        hostname:
+          widget: text
+          placeholder: "www.contoso.com"
+          help: "Fully qualified custom hostname (e.g. www.contoso.com)."
+        certificate_type:
+          widget: select
+          widget_options:
+            options:
+              - { value: ManagedCertificate, label: "Managed Certificate (Azure-provisioned)" }
+              - { value: CustomerCertificate, label: "Customer Certificate (BYO via cdn_frontdoor_secret)" }
+          help: "ManagedCertificate auto-provisions and renews a TLS cert via Azure. CustomerCertificate uses a cert you supply."
+        secret_id:
+          widget: text
+          placeholder: "Resource ID of the azurerm_cdn_frontdoor_secret"
+          help: "Required when certificate_type is CustomerCertificate. Provide the resource ID of the corresponding azurerm_cdn_frontdoor_secret."
+      add_label: "Add custom domain"
+    group: networking
+    order: 10
+    help: "Custom hostnames to attach to the Front Door profile. Each domain must be validated by adding a CNAME or TXT DNS record."
+
+  # --- Security: WAF ---
+  waf:
+    widget: object
+    widget_options:
+      fields:
+        name:
+          widget: text
+          placeholder: "waf-frontdoor"
+          help: "Name of the WAF policy resource."
+        mode:
+          widget: select
+          widget_options:
+            options:
+              - { value: Detection, label: "Detection — log matching requests, do not block" }
+              - { value: Prevention, label: "Prevention — block matching requests" }
+          help: "Detection is safe for initial rollout; switch to Prevention after validating rule coverage."
+        managed_rules:
+          widget: repeater
+          widget_options:
+            mode: ordered_list
+            row_fields:
+              type:
+                widget: text
+                placeholder: "DefaultRuleSet"
+                help: "Managed rule set type (e.g. DefaultRuleSet, Microsoft_BotManagerRuleSet)."
+              version:
+                widget: text
+                placeholder: "1.1"
+                help: "Rule set version. Consult the Azure Front Door docs for current versions."
+              action:
+                widget: select
+                widget_options:
+                  options: ["Allow", "Block", "Log", "Redirect"]
+                help: "Default action when a rule in this set matches. Log is recommended during initial rollout."
+            add_label: "Add managed rule set"
+          help: "Azure-managed rule sets to attach. Requires Premium SKU."
+    group: security
+    order: 10
+    help: "WAF firewall policy. Leave empty (null) to disable WAF. Requires Premium SKU. Custom rules are not supported in this module version; use managed rule sets only."
+
+  # --- Features: rule sets ---
+  rule_sets:
+    widget: repeater
+    widget_options:
+      mode: keyed_map
+      key_field:
+        label: "Rule set name"
+        placeholder: "security-rules"
+      row_fields:
+        rules:
+          widget: repeater
+          widget_options:
+            mode: keyed_map
+            key_field:
+              label: "Rule name"
+              placeholder: "redirect-to-https"
+            row_fields:
+              order:
+                widget: number
+                widget_options: { min: 1, max: 25000 }
+                help: "Rule evaluation order within the rule set. Lower numbers run first."
+              conditions:
+                widget: object
+                widget_options:
+                  fields:
+                    url_file_extension:
+                      widget: object
+                      widget_options:
+                        fields:
+                          operator:
+                            widget: text
+                            placeholder: "Equal"
+                            help: "Match operator (e.g. Equal, Contains, BeginsWith, EndsWith, LessThan, GreaterThan)."
+                          match_values:
+                            widget: text
+                            widget_options: { multiline: true }
+                            help: "File extension values to match, one per line (without the leading dot, e.g. jpg)."
+                      help: "Optional. Match on URL file extension."
+                    request_header:
+                      widget: object
+                      widget_options:
+                        fields:
+                          operator:
+                            widget: text
+                            placeholder: "Equal"
+                            help: "Match operator."
+                          header_name:
+                            widget: text
+                            placeholder: "X-Custom-Header"
+                          match_values:
+                            widget: text
+                            widget_options: { multiline: true }
+                            help: "Header values to match, one per line."
+                      help: "Optional. Match on a request header value."
+                help: "Optional match conditions. All specified sub-conditions must match (AND semantics). Leave empty for unconditional rule execution."
+              actions:
+                widget: object
+                widget_options:
+                  fields:
+                    request_header_actions:
+                      widget: repeater
+                      widget_options:
+                        mode: ordered_list
+                        row_fields:
+                          header_action:
+                            widget: select
+                            widget_options:
+                              options: ["Append", "Delete", "Overwrite"]
+                          header_name:
+                            widget: text
+                            placeholder: "X-Forwarded-Host"
+                          value:
+                            widget: text
+                            help: "Header value. Required for Append and Overwrite; omit for Delete."
+                        add_label: "Add request header action"
+                      help: "Modify request headers before forwarding to the origin."
+                    response_header_actions:
+                      widget: repeater
+                      widget_options:
+                        mode: ordered_list
+                        row_fields:
+                          header_action:
+                            widget: select
+                            widget_options:
+                              options: ["Append", "Delete", "Overwrite"]
+                          header_name:
+                            widget: text
+                            placeholder: "Strict-Transport-Security"
+                          value:
+                            widget: text
+                            help: "Header value. Required for Append and Overwrite; omit for Delete."
+                        add_label: "Add response header action"
+                      help: "Modify response headers before returning to the client."
+                    url_rewrite:
+                      widget: object
+                      widget_options:
+                        fields:
+                          source_pattern:
+                            widget: text
+                            placeholder: "/old-path"
+                            help: "URL prefix or pattern to match for rewriting."
+                          destination:
+                            widget: text
+                            placeholder: "/new-path"
+                            help: "Replacement destination path."
+                          preserve_unmatched_path:
+                            widget: toggle
+                            help: "Append any unmatched path suffix to the destination."
+                      help: "Optional. Rewrite the request URL before forwarding to the origin."
+                    url_redirect:
+                      widget: object
+                      widget_options:
+                        fields:
+                          redirect_type:
+                            widget: select
+                            widget_options:
+                              options: ["Moved", "Found", "TemporaryRedirect", "PermanentRedirect"]
+                            help: "HTTP status code for the redirect (301/302/307/308)."
+                          redirect_protocol:
+                            widget: select
+                            widget_options:
+                              options: ["MatchRequest", "Http", "Https"]
+                          destination_hostname:
+                            widget: text
+                            placeholder: "www.contoso.com"
+                            help: "Override destination hostname. Leave empty to keep the original."
+                          destination_path:
+                            widget: text
+                            placeholder: "/new-path"
+                            help: "Override destination path. Leave empty to keep the original."
+                      help: "Optional. Redirect the request instead of forwarding it to the origin. Mutually exclusive with url_rewrite."
+                help: "Rule actions. At least one action block must be non-empty."
+            add_label: "Add rule"
+          help: "Rules within this rule set (evaluated in ascending order)."
+      add_label: "Add rule set"
+    group: features
+    order: 10
+    advanced: true
+    help: "Rule sets for request/response manipulation (header rewrites, URL rewrites, redirects). Each rule set must be referenced by at least one route via rule_set_keys."
+
+  # --- Monitoring ---
+  diagnostic_settings:
+    widget: object
+    widget_options:
+      fields:
+        name:
+          widget: text
+          placeholder: "diag-frontdoor"
+        log_analytics_workspace_id:
+          widget: resource_picker
+          widget_options: { resource_type: log_analytics_workspace }
+        storage_account_id:
+          widget: resource_picker
+          widget_options: { resource_type: storage_account }
+        eventhub_authorization_rule_id:
+          widget: text
+        eventhub_name:
+          widget: text
+        log_analytics_destination_type:
+          widget: select
+          widget_options:
+            options: ["Dedicated", "AzureDiagnostics"]
+        enabled_log_categories:
+          widget: text
+          widget_options: { multiline: true }
+          help: "One log category per line. Leave empty to capture all supported categories."
+        enabled_metrics:
+          widget: text
+          widget_options: { multiline: true }
+          help: "One metric name per line. Leave empty to capture all supported metrics."
+    group: monitoring
+    order: 10
+    advanced: true
+    help: "Optional diagnostic settings. Leave empty to disable. At least one of Log Analytics, Storage Account, or Event Hub sink must be set when enabled."
+
+dependencies:
+  required_inputs_from_other_resources:
+    - variable: diagnostic_settings.log_analytics_workspace_id
+      resource_type: log_analytics_workspace
+      cardinality: one
+      notes: "Optional diagnostic sink."
+
+    - variable: diagnostic_settings.storage_account_id
+      resource_type: storage_account
+      cardinality: one
+      notes: "Optional diagnostic sink (must differ from the profile's own storage account)."
+
+    # NOTE: origins.private_link.target_id references a Private Link Service or
+    # Private Link-enabled resource ID. private_link_service is absent from the T1
+    # resourceType vocabulary (T1 §5.5.1). This is a contract finding: the vocab needs
+    # a private_link_service entry (and potentially a cdn_frontdoor_profile entry for
+    # the produces side). Recorded in T1-Retrofit-Findings-05-front-door.md.
+
+  # NOTE: Front Door outputs (profile ID, endpoint host names) are globally consumable
+  # by downstream modules. However, cdn_frontdoor_profile is not yet in the T1
+  # resourceType vocabulary. Omitting produces_outputs_consumable_by pending vocab
+  # extension. See findings doc.
+
+outputs_display:
+  id:
+    display_name: "Resource ID"
+    show_in_summary: true
+    copyable: true
+    format: arm_id
+
+  name:
+    display_name: "Front Door profile name"
+    show_in_summary: true
+    copyable: true
+
+  resource_guid:
+    display_name: "Resource GUID"
+    show_in_summary: false
+    copyable: true
+
+  endpoint_ids:
+    display_name: "Endpoint IDs"
+    show_in_summary: false
+    copyable: true
+    format: map
+
+  endpoint_host_names:
+    display_name: "Endpoint hostnames"
+    show_in_summary: true
+    copyable: true
+    # Map of endpoint key -> *.z01.azurefd.net FQDN.
+
+  origin_group_ids:
+    display_name: "Origin group IDs"
+    show_in_summary: false
+    copyable: true
+    format: map
+
+  origin_ids:
+    display_name: "Origin IDs"
+    show_in_summary: false
+    copyable: true
+    format: map
+
+  route_ids:
+    display_name: "Route IDs"
+    show_in_summary: false
+    copyable: true
+    format: map
+
+  custom_domain_ids:
+    display_name: "Custom domain IDs"
+    show_in_summary: false
+    copyable: true
+    format: map
+
+  # NOTE: custom_domain_validation_tokens is intentionally omitted.
+  # outputs.tf marks it sensitive=true; T1 §7.1 check 8 forbids displaying
+  # sensitive outputs. DNS validation tokens must be retrieved via the Azure
+  # portal, CLI, or the Terraform state file. See findings doc.
+
+  firewall_policy_id:
+    display_name: "WAF policy ID"
+    show_in_summary: false
+    copyable: true
+    format: arm_id
+
+  rule_set_ids:
+    display_name: "Rule set IDs"
+    show_in_summary: false
+    copyable: true
+    format: map
+
+  public_frontdoor_id:
+    display_name: "Resource ID (public)"
+    show_in_summary: false
+    copyable: true
+    format: arm_id
+    role: public_alias
+
+  public_frontdoor_name:
+    display_name: "Front Door profile name (public)"
+    show_in_summary: false
+    copyable: true
+    role: public_alias
+
+  public_frontdoor_endpoint_host_names:
+    display_name: "Endpoint hostnames (public)"
+    show_in_summary: false
+    copyable: true
+    role: public_alias
