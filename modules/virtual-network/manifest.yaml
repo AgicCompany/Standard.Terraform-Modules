@@ -1,0 +1,191 @@
+schema_version: "0.1"
+
+metadata:
+  module_name: virtual-network
+  module_version: "1.0.0"
+  schema_authored_by: AGIC Infrastructure Team
+  schema_last_updated: "2026-06-19"
+
+catalogue:
+  display_name: "Virtual Network"
+  short_description: "Azure Virtual Network with configurable subnets, NSG associations, and route tables."
+  long_description: |
+    Azure Virtual Network providing the foundational network layer for other
+    resources. Defines one or more subnets with optional service endpoints,
+    private endpoint policies, and delegations. Subnets can be associated with
+    Network Security Groups and route tables after creation. Outputs a keyed
+    map of subnet IDs consumed by all modules that require a subnet_id.
+  category: networking
+  subcategory: virtual-network
+  icon: virtual-network
+  complexity: medium
+  cost_tier: low
+  deprecated: false
+  tags:
+    - networking
+    - vnet
+    - subnet
+    - foundation
+
+variables:
+  # --- Deployment-context derived ---
+  resource_group_name:
+    widget: hidden
+    derived_from: { source: deployment_context.resource_group }
+
+  location:
+    widget: hidden
+    derived_from: { source: deployment_context.location }
+
+  name:
+    widget: hidden
+    derived_from: { source: naming.virtual_network }
+
+  tags:
+    widget: hidden
+    derived_from: { source: deployment_context.tags }
+
+  # --- Core configuration ---
+  address_space:
+    widget: text
+    widget_options: { multiline: true }
+    group: core
+    order: 10
+    placeholder: "10.0.0.0/16"
+    help: "One CIDR block per line. At least one address space is required."
+
+  subnets:
+    widget: repeater
+    widget_options:
+      mode: keyed_map
+      key_field:
+        label: "Subnet name"
+        placeholder: "app"
+        help: "Subnet name — also used as the Azure resource name."
+      row_fields:
+        address_prefixes:
+          widget: code_editor
+          help: "One CIDR per line. Must fall within the VNet address space."
+        service_endpoints:
+          widget: multiselect
+          widget_options:
+            options:
+              - "Microsoft.Storage"
+              - "Microsoft.KeyVault"
+              - "Microsoft.Sql"
+              - "Microsoft.ServiceBus"
+              - "Microsoft.EventHub"
+              - "Microsoft.ContainerRegistry"
+              - "Microsoft.Web"
+              - "Microsoft.CognitiveServices"
+          help: "Service endpoints to enable. Leave empty if not needed."
+        private_endpoint_network_policies:
+          widget: select
+          widget_options:
+            options: ["Enabled", "Disabled", "NetworkSecurityGroupEnabled", "RouteTableEnabled"]
+          help: "Network policies for private endpoints. 'Enabled' is the Azure default."
+        private_link_service_network_policies_enabled:
+          widget: toggle
+          help: "Enable network policies for Private Link services. Disabled by default."
+        delegation:
+          widget: object
+          widget_options:
+            fields:
+              name:
+                widget: text
+                placeholder: "delegation"
+                help: "Delegation name (arbitrary label)."
+              service_delegation:
+                widget: object
+                widget_options:
+                  fields:
+                    name:
+                      widget: text
+                      placeholder: "Microsoft.App/environments"
+                      help: "Service being delegated to (e.g. Microsoft.App/environments, Microsoft.Web/serverFarms)."
+                    actions:
+                      widget: code_editor
+                      help: "Delegation actions. Leave empty to use the service default."
+          help: "Optional. Delegate the subnet to a specific Azure service."
+      add_label: "Add subnet"
+    group: core
+    order: 20
+    help: "Subnets to create within the VNet. Key becomes the subnet resource name."
+
+  # --- Networking ---
+  subnet_nsg_associations:
+    widget: key_value_map
+    group: networking
+    order: 10
+    advanced: true
+    help: "Map of subnet name to NSG resource ID. Keys must match subnet names defined above."
+
+  subnet_route_table_associations:
+    widget: key_value_map
+    group: networking
+    order: 20
+    advanced: true
+    help: "Map of subnet name to route table resource ID. Keys must match subnet names defined above."
+
+dependencies:
+  required_inputs_from_other_resources:
+    - variable: subnet_nsg_associations
+      resource_type: network_security_group
+      cardinality: many
+      notes: "Optional NSG associations. Keys must match subnet names."
+    - variable: subnet_route_table_associations
+      resource_type: route_table
+      cardinality: many
+      notes: "Optional route table associations. Keys must match subnet names."
+
+  produces_outputs_consumable_by:
+    - output: id
+      resource_type: virtual_network
+    - output: subnet_ids
+      resource_type: subnet
+
+outputs_display:
+  id:
+    display_name: "Resource ID"
+    show_in_summary: true
+    copyable: true
+    format: arm_id
+
+  name:
+    display_name: "Virtual network name"
+    show_in_summary: true
+    copyable: true
+
+  address_space:
+    display_name: "Address space"
+    show_in_summary: false
+    copyable: true
+
+  subnet_ids:
+    display_name: "Subnet IDs"
+    show_in_summary: false
+    copyable: true
+
+  subnet_address_prefixes:
+    display_name: "Subnet address prefixes"
+    show_in_summary: false
+    copyable: true
+
+  public_vnet_id:
+    display_name: "Resource ID (public)"
+    show_in_summary: false
+    copyable: true
+    format: arm_id
+    role: public_alias
+
+  public_vnet_name:
+    display_name: "Virtual network name (public)"
+    show_in_summary: false
+    copyable: true
+    role: public_alias
+
+  public_subnet_ids:
+    display_name: "Subnet IDs (public)"
+    show_in_summary: false
+    copyable: true
+    role: public_alias

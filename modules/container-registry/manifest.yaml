@@ -1,0 +1,262 @@
+schema_version: "0.1"
+
+metadata:
+  module_name: container-registry
+  module_version: "2.2.0"
+  schema_authored_by: AGIC Infrastructure Team
+  schema_last_updated: "2026-06-19"
+
+catalogue:
+  display_name: "Container Registry"
+  short_description: "Azure Container Registry with private endpoint and security-first defaults."
+  long_description: |
+    Azure Container Registry with secure defaults: private endpoint enabled, public access
+    disabled, admin account disabled. Supports geo-replication (Premium SKU), content trust,
+    and optional diagnostic settings with multi-sink output.
+  category: compute
+  subcategory: containers
+  icon: container-registry
+  complexity: medium
+  cost_tier: medium
+  deprecated: false
+  tags:
+    - containers
+    - docker
+    - registry
+    - private-endpoint
+    - acr
+
+variables:
+  # --- Deployment-context derived ---
+  resource_group_name:
+    widget: hidden
+    derived_from: { source: deployment_context.resource_group }
+
+  location:
+    widget: hidden
+    derived_from: { source: deployment_context.location }
+
+  name:
+    widget: hidden
+    derived_from: { source: naming.container_registry }
+
+  tags:
+    widget: hidden
+    derived_from: { source: deployment_context.tags }
+
+  # --- Core configuration ---
+  sku:
+    widget: select
+    widget_options: { derive_from_validation: true }
+    group: core
+    order: 10
+    help: "Basic for dev/test. Standard for production. Premium for geo-replication, content trust, and private link."
+
+  # --- Security ---
+  enable_admin:
+    widget: toggle
+    group: security
+    order: 10
+    help: "Enable the built-in admin account. Not recommended — use managed identity instead."
+
+  enable_content_trust:
+    widget: toggle
+    group: security
+    order: 20
+    help: "Enable content trust (image signing). Premium SKU only."
+    show_when:
+      sku: "Premium"
+
+  # --- Networking: public access ---
+  enable_public_access:
+    widget: toggle
+    group: networking
+    order: 10
+    help: "Allow public network access. When false, the registry is reachable only via private endpoints."
+
+  # --- Networking: private endpoint ---
+  enable_private_endpoint:
+    widget: toggle
+    group: networking
+    order: 20
+    help: "Create a private endpoint for this registry. Requires subnet_id and private_dns_zone_id."
+
+  subnet_id:
+    widget: resource_picker
+    widget_options: { resource_type: subnet }
+    group: networking
+    order: 30
+    help: "Subnet hosting the private endpoint NIC. Required when enable_private_endpoint is true."
+    show_when:
+      enable_private_endpoint: true
+    required_when:
+      enable_private_endpoint: true
+
+  private_dns_zone_id:
+    widget: resource_picker
+    widget_options: { resource_type: private_dns_zone }
+    group: networking
+    order: 40
+    help: "Private DNS zone for privatelink.azurecr.io. Required when enable_private_endpoint is true."
+    show_when:
+      enable_private_endpoint: true
+    required_when:
+      enable_private_endpoint: true
+
+  # --- Private endpoint name overrides (hidden; naming engine derives defaults) ---
+  private_endpoint_name:
+    widget: hidden
+    derived_from: { source: hcl_default }
+
+  private_service_connection_name:
+    widget: hidden
+    derived_from: { source: hcl_default }
+
+  private_endpoint_nic_name:
+    widget: hidden
+    derived_from: { source: hcl_default }
+
+  # --- Features ---
+  enable_geo_replication:
+    widget: toggle
+    group: features
+    order: 10
+    help: "Enable geo-replication. Requires Premium SKU."
+    show_when:
+      sku: "Premium"
+
+  georeplications:
+    widget: repeater
+    widget_options:
+      fields:
+        location:
+          widget: text
+          help: "Azure region for this replica (e.g. westeurope)."
+        regional_endpoint_enabled:
+          widget: toggle
+        zone_redundancy_enabled:
+          widget: toggle
+    group: features
+    order: 20
+    help: "Geo-replication locations. Requires Premium SKU and enable_geo_replication = true."
+    show_when:
+      sku: "Premium"
+
+  # --- Monitoring ---
+  diagnostic_settings:
+    widget: object
+    widget_options:
+      fields:
+        name:
+          widget: text
+          placeholder: "diag-<registry-name>"
+        log_analytics_workspace_id:
+          widget: resource_picker
+          widget_options: { resource_type: log_analytics_workspace }
+        storage_account_id:
+          widget: resource_picker
+          widget_options: { resource_type: storage_account }
+        eventhub_authorization_rule_id:
+          widget: text
+        eventhub_name:
+          widget: text
+        log_analytics_destination_type:
+          widget: select
+          widget_options:
+            options: ["Dedicated", "AzureDiagnostics"]
+        enabled_log_categories:
+          widget: text
+          widget_options: { multiline: true }
+          help: "One category per line. Leave empty for all supported."
+        enabled_metrics:
+          widget: text
+          widget_options: { multiline: true }
+          help: "One metric per line. Leave empty for all supported."
+    group: monitoring
+    order: 10
+    advanced: true
+    help: "Optional. Leave blank to disable diagnostic settings."
+
+dependencies:
+  required_inputs_from_other_resources:
+    - variable: subnet_id
+      resource_type: subnet
+      cardinality: one
+      notes: "Required when enable_private_endpoint is true."
+    - variable: private_dns_zone_id
+      resource_type: private_dns_zone
+      cardinality: one
+      notes: "Required when enable_private_endpoint is true."
+    - variable: diagnostic_settings.log_analytics_workspace_id
+      resource_type: log_analytics_workspace
+      cardinality: one
+      notes: "Optional diagnostic sink."
+    - variable: diagnostic_settings.storage_account_id
+      resource_type: storage_account
+      cardinality: one
+      notes: "Optional diagnostic sink."
+
+  produces_outputs_consumable_by:
+    - output: id
+      resource_type: container_registry
+    - output: login_server
+      resource_type: container_registry
+
+outputs_display:
+  id:
+    display_name: "Resource ID"
+    show_in_summary: true
+    copyable: true
+    format: arm_id
+
+  name:
+    display_name: "Registry name"
+    show_in_summary: true
+    copyable: true
+
+  login_server:
+    display_name: "Login server"
+    show_in_summary: true
+    copyable: true
+    format: url
+
+  principal_id:
+    display_name: "Managed identity principal ID"
+    show_in_summary: false
+    copyable: true
+
+  tenant_id:
+    display_name: "Managed identity tenant ID"
+    show_in_summary: false
+    copyable: true
+
+  private_endpoint_id:
+    display_name: "Private endpoint ID"
+    show_in_summary: false
+    copyable: true
+    format: arm_id
+
+  private_ip_address:
+    display_name: "Private IP address"
+    show_in_summary: true
+    copyable: true
+
+  public_acr_id:
+    display_name: "Resource ID (public)"
+    show_in_summary: false
+    copyable: true
+    format: arm_id
+    role: public_alias
+
+  public_acr_name:
+    display_name: "Registry name (public)"
+    show_in_summary: false
+    copyable: true
+    role: public_alias
+
+  public_acr_login_server:
+    display_name: "Login server (public)"
+    show_in_summary: false
+    copyable: true
+    format: url
+    role: public_alias

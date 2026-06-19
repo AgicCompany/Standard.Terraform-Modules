@@ -1,0 +1,203 @@
+schema_version: "0.1"
+
+metadata:
+  module_name: aks-node-pool
+  module_version: "2.0.0"
+  schema_authored_by: AGIC Infrastructure Team
+  schema_last_updated: "2026-06-19"
+
+catalogue:
+  display_name: "AKS Node Pool"
+  short_description: "Additional user (or system) node pools for an existing AKS cluster."
+  long_description: |
+    Attaches one or more node pools to an existing AKS cluster. Each pool is
+    configured independently with its own VM size, autoscaling parameters, OS
+    type, availability zones, spot priority, and Kubernetes labels/taints.
+    Pools are defined as a map — the map key becomes the pool name.
+
+    Companion module: aks (creates the cluster and system node pool).
+  category: compute
+  subcategory: kubernetes
+  icon: aks-node-pool
+  complexity: medium
+  cost_tier: high
+  deprecated: false
+  tags:
+    - kubernetes
+    - aks
+    - node-pool
+    - compute
+    - spot
+
+variables:
+  # --- Core ---
+  kubernetes_cluster_id:
+    widget: resource_picker
+    widget_options: { resource_type: aks_cluster }
+    group: core
+    order: 10
+    help: "Resource ID of the AKS cluster to attach node pools to."
+
+  # --- Node pools ---
+  node_pools:
+    widget: repeater
+    widget_options:
+      mode: keyed_map
+      key_field:
+        label: "Node pool name"
+        placeholder: "userpool"
+        # Must match ^[a-z][a-z0-9]{0,11}$; Windows pools: ≤ 6 chars.
+      row_fields:
+        vm_size:
+          widget: text
+          placeholder: "Standard_D2s_v3"
+          help: "VM size for all nodes in this pool."
+        node_count:
+          widget: number
+          widget_options: { min: 1, max: 1000 }
+          help: "Initial node count. Ignored when autoscaling is enabled."
+        auto_scaling_enabled:
+          widget: toggle
+          help: "Enable cluster autoscaler for this pool."
+        min_count:
+          widget: number
+          widget_options: { min: 1, max: 1000 }
+          show_when: { auto_scaling_enabled: true }
+          help: "Minimum node count (autoscaling enabled only)."
+        max_count:
+          widget: number
+          widget_options: { min: 1, max: 1000 }
+          show_when: { auto_scaling_enabled: true }
+          help: "Maximum node count (autoscaling enabled only)."
+        mode:
+          widget: select
+          widget_options:
+            options: ["User", "System"]
+          help: "System pools run critical system pods. User pools run workloads."
+        os_type:
+          widget: select
+          widget_options:
+            options: ["Linux", "Windows"]
+        os_sku:
+          widget: select
+          widget_options:
+            options: ["AzureLinux", "Ubuntu", "Windows2019", "Windows2022"]
+        os_disk_size_gb:
+          widget: number
+          widget_options: { min: 30, max: 2048 }
+          help: "OS disk size in GB."
+        os_disk_type:
+          widget: select
+          widget_options:
+            options: ["Managed", "Ephemeral"]
+          help: "Ephemeral uses local VM cache/temp disk — faster I/O but node-local storage only."
+        vnet_subnet_id:
+          widget: resource_picker
+          widget_options: { resource_type: subnet }
+          help: "Subnet for node VMs. Leave empty to inherit the cluster default subnet."
+        zones:
+          widget: multiselect
+          widget_options:
+            options: ["1", "2", "3"]
+          help: "Availability zones. Leave empty for non-zonal subscriptions."
+        max_pods:
+          widget: number
+          widget_options: { min: 10, max: 250 }
+          help: "Maximum pods per node."
+        priority:
+          widget: select
+          widget_options:
+            options: ["Regular", "Spot"]
+          help: "Regular = on-demand. Spot = low cost but preemptible."
+        eviction_policy:
+          widget: select
+          widget_options:
+            options: ["Delete", "Deallocate"]
+          show_when: { priority: "Spot" }
+          help: "Delete frees the VMs. Deallocate keeps them stopped for faster scale-up."
+        spot_max_price:
+          widget: number
+          widget_options: { min: -1, step: 0.01 }
+          show_when: { priority: "Spot" }
+          help: "Maximum spot price per VM per hour. -1 = pay up to the on-demand price."
+        scale_down_mode:
+          widget: select
+          widget_options:
+            options: ["Delete", "Deallocate"]
+          help: "Delete removes VMs on scale-in. Deallocate stops them (faster scale-up, higher cost)."
+        node_labels:
+          widget: key_value_map
+          advanced: true
+          help: "Kubernetes node labels applied to all nodes in this pool."
+        node_taints:
+          widget: code_editor
+          advanced: true
+          help: "One taint per line: key=value:effect (e.g. dedicated=gpu:NoSchedule)."
+        orchestrator_version:
+          widget: text
+          placeholder: "latest"
+          advanced: true
+          help: "Kubernetes version for this pool. Leave empty to match the cluster version."
+        ultra_ssd_enabled:
+          widget: toggle
+          advanced: true
+          help: "Enable UltraSSD disks. Requires a zone-enabled pool and a supported VM size."
+        host_encryption_enabled:
+          widget: toggle
+          advanced: true
+          help: "Encrypt the temp disk and OS disk cache at the host."
+        fips_enabled:
+          widget: toggle
+          advanced: true
+          help: "Deploy FIPS 140-2-compliant nodes. Cannot be changed after pool creation."
+        temporary_name_for_rotation:
+          widget: text
+          advanced: true
+          help: "Temporary pool name used by Terraform when cycling nodes during vm_size/os_disk changes."
+        upgrade_settings:
+          widget: object
+          widget_options:
+            fields:
+              max_surge:
+                widget: text
+                placeholder: "33%"
+                help: "Extra nodes during upgrade (absolute number or percentage)."
+              drain_timeout_in_minutes:
+                widget: number
+                widget_options: { min: 0, max: 1440 }
+              node_soak_duration_in_minutes:
+                widget: number
+                widget_options: { min: 0, max: 30 }
+          advanced: true
+        tags:
+          widget: key_value_map
+          advanced: true
+          help: "Per-pool tags merged with resource group tags."
+      add_label: "Add node pool"
+    group: node_pool
+    order: 10
+    help: "Map of node pool configurations. Each key becomes the pool name (1–12 lowercase alphanumeric starting with a letter; Windows pools ≤ 6 chars)."
+
+dependencies:
+  required_inputs_from_other_resources:
+    - variable: kubernetes_cluster_id
+      resource_type: aks_cluster
+      cardinality: one
+      notes: "The AKS cluster to which node pools are attached."
+    - variable: node_pools.vnet_subnet_id
+      resource_type: subnet
+      cardinality: many
+      notes: "Optional per-pool VNet subnet for node placement."
+
+  produces_outputs_consumable_by: []
+
+outputs_display:
+  node_pool_ids:
+    display_name: "Node pool IDs"
+    show_in_summary: true
+    copyable: true
+
+  node_pool_names:
+    display_name: "Node pool names"
+    show_in_summary: false
+    copyable: true

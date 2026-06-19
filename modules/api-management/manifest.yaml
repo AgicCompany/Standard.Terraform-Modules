@@ -1,0 +1,365 @@
+schema_version: "0.1"
+
+metadata:
+  module_name: api-management
+  module_version: "2.3.0"
+  schema_authored_by: AGIC Infrastructure Team
+  schema_last_updated: "2026-06-19"
+
+catalogue:
+  display_name: "API Management"
+  short_description: "Azure API Management service with private endpoint, VNet integration, and managed identity."
+  long_description: |
+    Azure API Management service with security-first defaults: private endpoint
+    enabled, public network access disabled. Supports External and Internal VNet
+    injection for gateway-level isolation, system- or user-assigned managed
+    identity, optional multi-region deployments (Premium SKU), client certificate
+    authentication, and diagnostic settings with multi-sink output.
+  category: foundation
+  subcategory: api-gateway
+  icon: api-management
+  complexity: high
+  cost_tier: high
+  deprecated: false
+  tags:
+    - api-management
+    - api-gateway
+    - apim
+    - private-endpoint
+
+variables:
+  # --- Deployment-context derived ---
+  resource_group_name:
+    widget: hidden
+    derived_from: { source: deployment_context.resource_group }
+
+  location:
+    widget: hidden
+    derived_from: { source: deployment_context.location }
+
+  name:
+    widget: hidden
+    derived_from: { source: naming.api_management }
+
+  tags:
+    widget: hidden
+    derived_from: { source: deployment_context.tags }
+
+  # --- Core configuration ---
+  publisher_name:
+    widget: text
+    group: core
+    order: 10
+    help: "Publisher display name shown in the developer portal."
+
+  publisher_email:
+    widget: text
+    group: core
+    order: 20
+    help: "Publisher contact email for notifications and system alerts."
+
+  sku_name:
+    widget: select
+    widget_options:
+      options:
+        - { value: "Developer_1",   label: "Developer 1 (dev/test, no SLA)" }
+        - { value: "Basic_1",       label: "Basic 1" }
+        - { value: "Basic_2",       label: "Basic 2" }
+        - { value: "Standard_1",    label: "Standard 1" }
+        - { value: "Standard_2",    label: "Standard 2" }
+        - { value: "Premium_1",     label: "Premium 1 (multi-region, VNet)" }
+        - { value: "Premium_2",     label: "Premium 2" }
+        - { value: "Consumption_0", label: "Consumption (serverless, per-call billing)" }
+    group: core
+    order: 30
+    help: "SKU tier and unit count. Premium required for multi-region and Internal/External VNet injection."
+
+  notification_sender_email:
+    widget: text
+    group: core
+    order: 40
+    help: "Sender email address for system notifications. Defaults to publisher email when empty."
+
+  min_api_version:
+    widget: text
+    group: core
+    order: 50
+    advanced: true
+    placeholder: "2019-12-01"
+    help: "Enforce a minimum REST API version for management-plane calls. Leave empty for no restriction."
+
+  # --- Networking ---
+  virtual_network_type:
+    widget: select
+    widget_options: { derive_from_validation: true }
+    group: networking
+    order: 10
+    help: "None = no VNet integration. External = gateway reachable from internet via VNet subnet. Internal = gateway reachable only from within the VNet."
+
+  virtual_network_subnet_id:
+    widget: resource_picker
+    widget_options: { resource_type: subnet }
+    group: networking
+    order: 20
+    help: "Subnet for gateway VNet injection. Required when virtual_network_type is External or Internal."
+    show_when:
+      virtual_network_type: ["External", "Internal"]
+    required_when:
+      virtual_network_type: ["External", "Internal"]
+
+  enable_private_endpoint:
+    widget: toggle
+    group: networking
+    order: 30
+    help: "Create a private endpoint for this APIM service."
+
+  subnet_id:
+    widget: resource_picker
+    widget_options: { resource_type: subnet }
+    group: networking
+    order: 40
+    help: "Subnet for the private endpoint NIC."
+    show_when:
+      enable_private_endpoint: true
+    required_when:
+      enable_private_endpoint: true
+
+  private_dns_zone_id:
+    widget: resource_picker
+    widget_options: { resource_type: private_dns_zone }
+    group: networking
+    order: 50
+    help: "Private DNS zone (privatelink.azure-api.net) for the private endpoint."
+    show_when:
+      enable_private_endpoint: true
+    required_when:
+      enable_private_endpoint: true
+
+  # Private endpoint name overrides — null uses module-derived defaults (pep-{name}, psc-{name}).
+  # NOTE: T1.5 does not yet produce sub-resource names; these stay hidden with hcl_default.
+  private_endpoint_name:
+    widget: hidden
+    derived_from: { source: hcl_default }
+
+  private_service_connection_name:
+    widget: hidden
+    derived_from: { source: hcl_default }
+
+  private_endpoint_nic_name:
+    widget: hidden
+    derived_from: { source: hcl_default }
+
+  # --- Security ---
+  enable_public_access:
+    widget: toggle
+    group: security
+    order: 10
+    help: "Allow public network access. Disabled by default; use private endpoint instead."
+
+  client_certificate_enabled:
+    widget: toggle
+    group: security
+    order: 20
+    help: "Require client TLS certificates for gateway authentication."
+
+  gateway_disabled:
+    widget: toggle
+    group: security
+    order: 30
+    advanced: true
+    help: "Disable the gateway in the primary region. Only valid for multi-region Premium deployments with External or Internal VNet."
+
+  # --- Identity ---
+  identity_type:
+    widget: select
+    widget_options: { derive_from_validation: true }
+    group: identity
+    order: 10
+    help: "Managed identity type. SystemAssigned is the recommended default."
+
+  identity_ids:
+    widget: resource_picker
+    widget_options:
+      resource_type: user_assigned_identity
+      multiple: true
+    group: identity
+    order: 20
+    help: "User-assigned managed identity IDs. Required when identity_type includes UserAssigned."
+    # NOTE: identity_ids is also required for "SystemAssigned, UserAssigned"; show_when can only
+    # express simple equality — use visibility for the pure UserAssigned case only.
+    show_when:
+      identity_type: "UserAssigned"
+
+  # --- Features ---
+  zones:
+    widget: multiselect
+    widget_options:
+      options: ["1", "2", "3"]
+    group: features
+    order: 10
+    help: "Availability zones for zone-redundant deployment. Premium SKU only."
+
+  additional_locations:
+    widget: repeater
+    widget_options:
+      mode: ordered_list
+      row_fields:
+        location:
+          widget: text
+          help: "Azure region for this additional APIM unit."
+        zones:
+          widget: multiselect
+          widget_options:
+            options: ["1", "2", "3"]
+          help: "Availability zones in this region."
+        virtual_network_subnet_id:
+          widget: resource_picker
+          widget_options: { resource_type: subnet }
+          help: "Subnet for VNet injection in this region (Premium VNet only)."
+      add_label: "Add region"
+    group: features
+    order: 20
+    advanced: true
+    help: "Multi-region deployments for Premium SKU. Each entry adds a regional unit."
+
+  # --- Monitoring ---
+  diagnostic_settings:
+    widget: object
+    widget_options:
+      fields:
+        name:
+          widget: text
+          placeholder: "diag-<apim-name>"
+        log_analytics_workspace_id:
+          widget: resource_picker
+          widget_options: { resource_type: log_analytics_workspace }
+        storage_account_id:
+          widget: resource_picker
+          widget_options: { resource_type: storage_account }
+        eventhub_authorization_rule_id:
+          widget: text
+        eventhub_name:
+          widget: text
+        log_analytics_destination_type:
+          widget: select
+          widget_options:
+            options: ["Dedicated", "AzureDiagnostics"]
+        enabled_log_categories:
+          widget: text
+          widget_options: { multiline: true }
+          help: "One category per line. Leave empty for all supported categories."
+        enabled_metrics:
+          widget: text
+          widget_options: { multiline: true }
+          help: "One metric per line. Leave empty for all supported metrics."
+    group: monitoring
+    order: 10
+    advanced: true
+    help: "Optional. Leave blank to disable diagnostic settings."
+
+dependencies:
+  required_inputs_from_other_resources:
+    - variable: virtual_network_subnet_id
+      resource_type: subnet
+      cardinality: one
+      notes: "Required when virtual_network_type is External or Internal."
+    - variable: subnet_id
+      resource_type: subnet
+      cardinality: one
+      notes: "Required when enable_private_endpoint is true."
+    - variable: private_dns_zone_id
+      resource_type: private_dns_zone
+      cardinality: one
+      notes: "Required when enable_private_endpoint is true."
+    - variable: identity_ids
+      resource_type: user_assigned_identity
+      cardinality: many
+      notes: "Required when identity_type includes UserAssigned."
+    - variable: diagnostic_settings.log_analytics_workspace_id
+      resource_type: log_analytics_workspace
+      cardinality: one
+      notes: "Optional diagnostic sink."
+    - variable: diagnostic_settings.storage_account_id
+      resource_type: storage_account
+      cardinality: one
+      notes: "Optional diagnostic sink."
+
+  produces_outputs_consumable_by:
+    - output: id
+      resource_type: api_management
+
+outputs_display:
+  id:
+    display_name: "Resource ID"
+    show_in_summary: true
+    copyable: true
+    format: arm_id
+
+  name:
+    display_name: "Service name"
+    show_in_summary: true
+    copyable: true
+
+  gateway_url:
+    display_name: "Gateway URL"
+    show_in_summary: true
+    copyable: true
+    format: url
+
+  management_api_url:
+    display_name: "Management API URL"
+    show_in_summary: false
+    copyable: true
+    format: url
+
+  developer_portal_url:
+    display_name: "Developer portal URL"
+    show_in_summary: true
+    copyable: true
+    format: url
+
+  principal_id:
+    display_name: "System identity principal ID"
+    show_in_summary: false
+    copyable: true
+
+  tenant_id:
+    display_name: "Tenant ID"
+    show_in_summary: false
+    copyable: true
+
+  public_ip_addresses:
+    display_name: "Public IP addresses"
+    show_in_summary: false
+    copyable: true
+
+  private_endpoint_id:
+    display_name: "Private endpoint ID"
+    show_in_summary: false
+    copyable: true
+    format: arm_id
+
+  private_ip_address:
+    display_name: "Private IP address"
+    show_in_summary: true
+    copyable: true
+
+  public_apim_id:
+    display_name: "Resource ID (public)"
+    show_in_summary: false
+    copyable: true
+    format: arm_id
+    role: public_alias
+
+  public_apim_name:
+    display_name: "Service name (public)"
+    show_in_summary: false
+    copyable: true
+    role: public_alias
+
+  public_apim_gateway_url:
+    display_name: "Gateway URL (public)"
+    show_in_summary: false
+    copyable: true
+    format: url
+    role: public_alias

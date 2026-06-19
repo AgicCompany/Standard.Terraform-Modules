@@ -1,0 +1,349 @@
+schema_version: "0.1"
+
+metadata:
+  module_name: function-app-flex
+  module_version: "2.0.0"
+  schema_authored_by: AGIC Infrastructure Team
+  schema_last_updated: "2026-06-19"
+
+catalogue:
+  display_name: "Function App (Flex Consumption)"
+  short_description: "Azure Function App on Flex Consumption (FC1) with private endpoint and secure defaults."
+  long_description: |
+    Azure Function App on the Flex Consumption (FC1) plan with security-first defaults: private
+    endpoint enabled, public access disabled, HTTPS enforced, basic auth disabled. Supports
+    .NET isolated, Python, Node.js, Java, PowerShell, and custom runtimes, per-function always-ready
+    instances, VNet integration, managed identity, and optional diagnostic settings.
+  category: compute
+  subcategory: serverless
+  icon: function-app
+  complexity: high
+  cost_tier: low
+  deprecated: false
+  tags:
+    - serverless
+    - functions
+    - flex-consumption
+    - private-endpoint
+    - vnet
+
+variables:
+  # --- Deployment-context derived ---
+  resource_group_name:
+    widget: hidden
+    derived_from: { source: deployment_context.resource_group }
+
+  location:
+    widget: hidden
+    derived_from: { source: deployment_context.location }
+
+  name:
+    widget: hidden
+    derived_from: { source: naming.function_app_flex }
+
+  tags:
+    widget: hidden
+    derived_from: { source: deployment_context.tags }
+
+  # --- Core configuration ---
+  service_plan_id:
+    widget: resource_picker
+    widget_options: { resource_type: app_service_plan }
+    group: core
+    order: 10
+    help: "FC1 (Flex Consumption) App Service Plan to host this Function App."
+
+  runtime_name:
+    widget: select
+    widget_options: { derive_from_validation: true }
+    group: core
+    order: 20
+    help: "Runtime stack: dotnet-isolated, python, node, java, powershell, or custom."
+
+  runtime_version:
+    widget: text
+    group: core
+    order: 30
+    placeholder: "e.g. 8.0 (dotnet-isolated), 3.11 (python), 20 (node)"
+    help: "Runtime version string. Must match a version supported by the chosen runtime."
+
+  storage_container_endpoint:
+    widget: text
+    group: core
+    order: 40
+    placeholder: "https://<storage>.blob.core.windows.net/<container>"
+    help: "Blob container endpoint URL for deployment package storage."
+
+  storage_authentication_type:
+    widget: select
+    widget_options: { derive_from_validation: true }
+    group: core
+    order: 50
+    help: "How the Function App authenticates to the deployment storage container."
+
+  storage_container_type:
+    widget: text
+    group: core
+    order: 60
+    advanced: true
+    placeholder: "blobContainer"
+    help: "Storage container type for the FC1 deployment package. Defaults to blobContainer."
+
+  storage_user_assigned_identity_id:
+    widget: resource_picker
+    widget_options: { resource_type: user_assigned_identity }
+    group: core
+    order: 70
+    help: "User-assigned identity for storage authentication. Required when storage_authentication_type is UserAssignedIdentity."
+    show_when:
+      storage_authentication_type: "UserAssignedIdentity"
+    required_when:
+      storage_authentication_type: "UserAssignedIdentity"
+
+  instance_memory_in_mb:
+    widget: select
+    widget_options: { derive_from_validation: true }
+    group: core
+    order: 80
+    help: "Memory per instance in MB. Allowed: 512, 2048, 4096."
+
+  app_settings:
+    widget: key_value_map
+    group: core
+    order: 90
+    sensitive_override: true
+    help: "Application settings. Managed by dev teams via CI/CD after initial deployment."
+
+  # --- Scaling ---
+  maximum_instance_count:
+    widget: number
+    widget_options: { min: 1, max: 1000, step: 1 }
+    group: scaling
+    order: 10
+    help: "Maximum number of instances for scale-out."
+
+  always_ready_instances:
+    widget: repeater
+    widget_options:
+      fields:
+        instance_count:
+          widget: number
+          widget_options: { min: 0, step: 1 }
+          help: "Number of always-ready instances for this function."
+    group: scaling
+    order: 20
+    help: "Per-function always-ready instance counts to reduce cold starts. Keyed by function name."
+
+  # --- Identity ---
+  identity_type:
+    widget: select
+    widget_options: { derive_from_validation: true }
+    group: identity
+    order: 10
+    help: "Managed identity type assigned to this Function App."
+
+  identity_ids:
+    widget: resource_picker
+    widget_options: { resource_type: user_assigned_identity, multiple: true }
+    group: identity
+    order: 20
+    help: "User-assigned identity resource IDs. Required when identity_type is UserAssigned."
+    show_when:
+      identity_type: "UserAssigned"
+    required_when:
+      identity_type: "UserAssigned"
+
+  # --- Security ---
+  https_only:
+    widget: toggle
+    group: security
+    order: 10
+    help: "Require HTTPS connections. Should remain enabled."
+
+  client_certificate_mode:
+    widget: select
+    widget_options: { derive_from_validation: true }
+    group: security
+    order: 20
+    help: "Client certificate mode for mTLS. Required enforces client certs."
+
+  webdeploy_publish_basic_authentication_enabled:
+    widget: toggle
+    group: security
+    order: 30
+    help: "Enable basic authentication for web deploy publish. Disabled by default."
+
+  enable_public_access:
+    widget: toggle
+    group: security
+    order: 40
+    help: "Allow public network access. When false, the Function App is reachable only via private endpoints."
+
+  # --- Networking ---
+  virtual_network_subnet_id:
+    widget: resource_picker
+    widget_options: { resource_type: subnet }
+    group: networking
+    order: 10
+    help: "Subnet for VNet integration (outbound traffic routing)."
+
+  enable_private_endpoint:
+    widget: toggle
+    group: networking
+    order: 20
+    help: "Create a private endpoint for the Function App. Requires private_endpoint_subnet_id."
+
+  private_endpoint_subnet_id:
+    widget: resource_picker
+    widget_options: { resource_type: subnet }
+    group: networking
+    order: 30
+    help: "Subnet hosting the private endpoint NIC. Required when enable_private_endpoint is true."
+    show_when:
+      enable_private_endpoint: true
+    required_when:
+      enable_private_endpoint: true
+
+  private_dns_zone_ids:
+    widget: resource_picker
+    widget_options: { resource_type: private_dns_zone, multiple: true }
+    group: networking
+    order: 40
+    help: "Private DNS zone IDs for the private endpoint DNS zone group."
+    show_when:
+      enable_private_endpoint: true
+
+  # --- Private endpoint name overrides (hidden; naming engine derives defaults) ---
+  private_endpoint_name:
+    widget: hidden
+    derived_from: { source: hcl_default }
+
+  private_service_connection_name:
+    widget: hidden
+    derived_from: { source: hcl_default }
+
+  private_endpoint_nic_name:
+    widget: hidden
+    derived_from: { source: hcl_default }
+
+  # --- Monitoring ---
+  diagnostic_settings:
+    widget: object
+    widget_options:
+      fields:
+        name:
+          widget: text
+          placeholder: "diag-<function-app-name>"
+        log_analytics_workspace_id:
+          widget: resource_picker
+          widget_options: { resource_type: log_analytics_workspace }
+        storage_account_id:
+          widget: resource_picker
+          widget_options: { resource_type: storage_account }
+        eventhub_authorization_rule_id:
+          widget: text
+        eventhub_name:
+          widget: text
+        log_analytics_destination_type:
+          widget: select
+          widget_options:
+            options: ["Dedicated", "AzureDiagnostics"]
+        enabled_log_categories:
+          widget: text
+          widget_options: { multiline: true }
+          help: "One category per line. Leave empty for all supported."
+        enabled_metrics:
+          widget: text
+          widget_options: { multiline: true }
+          help: "One metric per line. Leave empty for all supported."
+    group: monitoring
+    order: 10
+    advanced: true
+    help: "Optional. Leave blank to disable diagnostic settings."
+
+dependencies:
+  required_inputs_from_other_resources:
+    - variable: service_plan_id
+      resource_type: app_service_plan
+      cardinality: one
+      notes: "FC1 (Flex Consumption) plan required."
+    - variable: storage_container_endpoint
+      resource_type: storage_account
+      cardinality: one
+      notes: "Blob container endpoint for deployment package storage."
+    - variable: virtual_network_subnet_id
+      resource_type: subnet
+      cardinality: one
+      notes: "Optional VNet integration subnet."
+    - variable: private_endpoint_subnet_id
+      resource_type: subnet
+      cardinality: one
+      notes: "Required when enable_private_endpoint is true."
+    - variable: private_dns_zone_ids
+      resource_type: private_dns_zone
+      cardinality: many
+      notes: "Required when enable_private_endpoint is true."
+    - variable: storage_user_assigned_identity_id
+      resource_type: user_assigned_identity
+      cardinality: one
+      notes: "Required when storage_authentication_type is UserAssignedIdentity."
+    - variable: identity_ids
+      resource_type: user_assigned_identity
+      cardinality: many
+      notes: "Required when identity_type is UserAssigned."
+    - variable: diagnostic_settings.log_analytics_workspace_id
+      resource_type: log_analytics_workspace
+      cardinality: one
+      notes: "Optional diagnostic sink."
+    - variable: diagnostic_settings.storage_account_id
+      resource_type: storage_account
+      cardinality: one
+      notes: "Optional diagnostic sink."
+
+  produces_outputs_consumable_by:
+    - output: id
+      resource_type: function_app_flex
+    - output: default_hostname
+      resource_type: function_app_flex
+
+outputs_display:
+  id:
+    display_name: "Resource ID"
+    show_in_summary: true
+    copyable: true
+    format: arm_id
+
+  name:
+    display_name: "Function App name"
+    show_in_summary: true
+    copyable: true
+
+  default_hostname:
+    display_name: "Default hostname"
+    show_in_summary: true
+    copyable: true
+    format: url
+
+  identity:
+    display_name: "Managed identity"
+    show_in_summary: false
+    copyable: false
+
+  private_endpoint_id:
+    display_name: "Private endpoint ID"
+    show_in_summary: false
+    copyable: true
+    format: arm_id
+
+  public_function_app_flex_id:
+    display_name: "Resource ID (public)"
+    show_in_summary: false
+    copyable: true
+    format: arm_id
+    role: public_alias
+
+  public_function_app_flex_name:
+    display_name: "Function App name (public)"
+    show_in_summary: false
+    copyable: true
+    role: public_alias

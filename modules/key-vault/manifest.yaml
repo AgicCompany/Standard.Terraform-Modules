@@ -1,0 +1,285 @@
+schema_version: "0.1"
+
+metadata:
+  module_name: key-vault
+  module_version: "2.1.0"
+  schema_authored_by: AGIC Infrastructure Team
+  schema_last_updated: "2026-06-19"
+
+catalogue:
+  display_name: "Key Vault"
+  short_description: "Azure Key Vault with private endpoint and security-first defaults."
+  long_description: |
+    Azure Key Vault with security-first defaults: private endpoint enabled, public access
+    disabled, purge protection enabled. Supports standard and premium SKUs, configurable
+    soft-delete retention, optional ARM/VM deployment access flags, and optional diagnostic
+    settings with multi-sink output.
+  category: security
+  subcategory: key-management
+  icon: key-vault
+  complexity: medium
+  cost_tier: low
+  deprecated: false
+  tags:
+    - security
+    - secrets
+    - keys
+    - certificates
+    - private-endpoint
+    - key-vault
+
+variables:
+  # --- Deployment-context derived ---
+  resource_group_name:
+    widget: hidden
+    derived_from: { source: deployment_context.resource_group }
+
+  location:
+    widget: hidden
+    derived_from: { source: deployment_context.location }
+
+  name:
+    widget: hidden
+    derived_from: { source: naming.key_vault }
+
+  tags:
+    widget: hidden
+    derived_from: { source: deployment_context.tags }
+
+  # Defaults to current subscription tenant; no user input needed.
+  tenant_id:
+    widget: hidden
+    derived_from: { source: hcl_default }
+
+  # --- Core configuration ---
+  sku_name:
+    widget: select
+    widget_options: { derive_from_validation: true }
+    group: core
+    order: 10
+    help: "Standard for software-protected keys. Premium for HSM-backed keys."
+
+  # --- Security ---
+  enable_purge_protection:
+    widget: toggle
+    group: security
+    order: 10
+    help: "Protect against permanent deletion. Cannot be disabled once enabled. Strongly recommended."
+
+  enable_public_access:
+    widget: toggle
+    group: security
+    order: 20
+    help: "Allow public network access. When false, the vault is reachable only via private endpoints."
+
+  # --- Features ---
+  soft_delete_retention_days:
+    widget: number
+    widget_options: { min: 7, max: 90, step: 1 }
+    group: features
+    order: 10
+    help: "Soft delete retention period in days (7-90). Defaults to 90."
+
+  enabled_for_deployment:
+    widget: toggle
+    group: features
+    order: 20
+    advanced: true
+    help: "Allow Azure VMs to retrieve certificates stored as secrets."
+
+  enabled_for_disk_encryption:
+    widget: toggle
+    group: features
+    order: 30
+    advanced: true
+    help: "Allow Azure Disk Encryption to retrieve secrets and unwrap keys."
+
+  enabled_for_template_deployment:
+    widget: toggle
+    group: features
+    order: 40
+    advanced: true
+    help: "Allow Azure Resource Manager to retrieve secrets for template deployments."
+
+  # --- Networking: private endpoint ---
+  enable_private_endpoint:
+    widget: toggle
+    group: networking
+    order: 10
+    help: "Create a private endpoint for this Key Vault. Requires subnet_id and private_dns_zone_id."
+
+  subnet_id:
+    widget: resource_picker
+    widget_options: { resource_type: subnet }
+    group: networking
+    order: 20
+    help: "Subnet hosting the private endpoint NIC. Required when enable_private_endpoint is true."
+    show_when:
+      enable_private_endpoint: true
+    required_when:
+      enable_private_endpoint: true
+
+  private_dns_zone_id:
+    widget: resource_picker
+    widget_options: { resource_type: private_dns_zone }
+    group: networking
+    order: 30
+    help: "Private DNS zone for privatelink.vaultcore.azure.net. Required when enable_private_endpoint is true."
+    show_when:
+      enable_private_endpoint: true
+    required_when:
+      enable_private_endpoint: true
+
+  # --- Networking: public access ACLs ---
+  network_acls:
+    widget: object
+    widget_options:
+      fields:
+        bypass:
+          widget: select
+          widget_options:
+            options: ["AzureServices", "None"]
+          help: "Azure service bypass. AzureServices allows trusted Microsoft services."
+        default_action:
+          widget: select
+          widget_options:
+            options: ["Allow", "Deny"]
+          help: "Default action when no IP or VNet rule matches."
+        ip_rules:
+          widget: text
+          widget_options: { multiline: true }
+          help: "One CIDR per line."
+        virtual_network_subnet_ids:
+          widget: resource_picker
+          widget_options: { resource_type: subnet }
+    group: networking
+    order: 40
+    advanced: true
+    help: "Network ACLs. Only applied when public access is enabled."
+    show_when:
+      enable_public_access: true
+
+  # --- Private endpoint name overrides (hidden; naming engine derives defaults) ---
+  private_endpoint_name:
+    widget: hidden
+    derived_from: { source: hcl_default }
+
+  private_service_connection_name:
+    widget: hidden
+    derived_from: { source: hcl_default }
+
+  private_endpoint_nic_name:
+    widget: hidden
+    derived_from: { source: hcl_default }
+
+  # --- Monitoring ---
+  diagnostic_settings:
+    widget: object
+    widget_options:
+      fields:
+        name:
+          widget: text
+          placeholder: "diag-<vault-name>"
+        log_analytics_workspace_id:
+          widget: resource_picker
+          widget_options: { resource_type: log_analytics_workspace }
+        storage_account_id:
+          widget: resource_picker
+          widget_options: { resource_type: storage_account }
+        eventhub_authorization_rule_id:
+          widget: text
+        eventhub_name:
+          widget: text
+        log_analytics_destination_type:
+          widget: select
+          widget_options:
+            options: ["Dedicated", "AzureDiagnostics"]
+        enabled_log_categories:
+          widget: text
+          widget_options: { multiline: true }
+          help: "One category per line. Leave empty for all supported."
+        enabled_metrics:
+          widget: text
+          widget_options: { multiline: true }
+          help: "One metric per line. Leave empty for all supported."
+    group: monitoring
+    order: 10
+    advanced: true
+    help: "Optional. Leave blank to disable diagnostic settings."
+
+dependencies:
+  required_inputs_from_other_resources:
+    - variable: subnet_id
+      resource_type: subnet
+      cardinality: one
+      notes: "Required when enable_private_endpoint is true."
+    - variable: private_dns_zone_id
+      resource_type: private_dns_zone
+      cardinality: one
+      notes: "Required when enable_private_endpoint is true."
+    - variable: network_acls.virtual_network_subnet_ids
+      resource_type: subnet
+      cardinality: many
+      notes: "Optional VNet service endpoint rules when public access is enabled."
+    - variable: diagnostic_settings.log_analytics_workspace_id
+      resource_type: log_analytics_workspace
+      cardinality: one
+      notes: "Optional diagnostic sink."
+    - variable: diagnostic_settings.storage_account_id
+      resource_type: storage_account
+      cardinality: one
+      notes: "Optional diagnostic sink."
+
+  produces_outputs_consumable_by:
+    - output: id
+      resource_type: key_vault
+    - output: vault_uri
+      resource_type: key_vault
+
+outputs_display:
+  id:
+    display_name: "Resource ID"
+    show_in_summary: true
+    copyable: true
+    format: arm_id
+
+  name:
+    display_name: "Key Vault name"
+    show_in_summary: true
+    copyable: true
+
+  vault_uri:
+    display_name: "Vault URI"
+    show_in_summary: true
+    copyable: true
+    format: url
+
+  tenant_id:
+    display_name: "Tenant ID"
+    show_in_summary: false
+    copyable: true
+
+  private_endpoint_id:
+    display_name: "Private endpoint ID"
+    show_in_summary: false
+    copyable: true
+    format: arm_id
+
+  private_ip_address:
+    display_name: "Private IP address"
+    show_in_summary: true
+    copyable: true
+
+  public_vault_id:
+    display_name: "Resource ID (public)"
+    show_in_summary: false
+    copyable: true
+    format: arm_id
+    role: public_alias
+
+  public_vault_uri:
+    display_name: "Vault URI (public)"
+    show_in_summary: false
+    copyable: true
+    format: url
+    role: public_alias

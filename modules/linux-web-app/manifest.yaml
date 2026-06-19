@@ -1,0 +1,397 @@
+schema_version: "0.1"
+
+metadata:
+  module_name: linux-web-app
+  module_version: "2.2.0"
+  schema_authored_by: AGIC Infrastructure Team
+  schema_last_updated: "2026-06-19"
+
+catalogue:
+  display_name: "Linux Web App"
+  short_description: "Azure App Service Linux Web App with private endpoint and VNet integration."
+  long_description: |
+    Linux Web App on Azure App Service with security-first defaults: private
+    endpoint enabled, public access disabled, TLS 1.2 enforced. Supports
+    Docker, .NET, Java, Node, PHP, and Python runtimes. Optional VNet
+    integration for outbound traffic, managed identity, and diagnostic settings
+    for Log Analytics / storage / Event Hub sinks.
+  category: compute
+  subcategory: web
+  icon: linux-web-app
+  complexity: medium
+  cost_tier: medium
+  deprecated: false
+  tags:
+    - web-app
+    - app-service
+    - linux
+    - private-endpoint
+
+variables:
+  # --- Deployment-context derived ---
+  resource_group_name:
+    widget: hidden
+    derived_from: { source: deployment_context.resource_group }
+
+  location:
+    widget: hidden
+    derived_from: { source: deployment_context.location }
+
+  name:
+    widget: hidden
+    derived_from: { source: naming.linux_web_app }
+
+  tags:
+    widget: hidden
+    derived_from: { source: deployment_context.tags }
+
+  # --- Private endpoint name overrides (derived from primary name) ---
+  private_endpoint_name:
+    widget: hidden
+    derived_from: { source: hcl_default }
+
+  private_service_connection_name:
+    widget: hidden
+    derived_from: { source: hcl_default }
+
+  private_endpoint_nic_name:
+    widget: hidden
+    derived_from: { source: hcl_default }
+
+  # --- Core configuration ---
+  service_plan_id:
+    widget: resource_picker
+    widget_options: { resource_type: app_service_plan }
+    group: core
+    order: 10
+    help: "App Service Plan to host this web app. Required."
+
+  application_stack:
+    widget: object
+    widget_options:
+      fields:
+        dotnet_version:
+          widget: select
+          widget_options:
+            options:
+              - { value: "8.0",  label: ".NET 8 (LTS)" }
+              - { value: "7.0",  label: ".NET 7" }
+              - { value: "6.0",  label: ".NET 6 (LTS)" }
+        node_version:
+          widget: select
+          widget_options:
+            options:
+              - { value: "20-lts", label: "Node 20 LTS" }
+              - { value: "18-lts", label: "Node 18 LTS" }
+              - { value: "16-lts", label: "Node 16 LTS" }
+        php_version:
+          widget: select
+          widget_options:
+            options:
+              - { value: "8.2", label: "PHP 8.2" }
+              - { value: "8.1", label: "PHP 8.1" }
+              - { value: "8.0", label: "PHP 8.0" }
+        python_version:
+          widget: select
+          widget_options:
+            options:
+              - { value: "3.12", label: "Python 3.12" }
+              - { value: "3.11", label: "Python 3.11" }
+              - { value: "3.10", label: "Python 3.10" }
+              - { value: "3.9",  label: "Python 3.9" }
+        java_version:
+          widget: select
+          widget_options:
+            options:
+              - { value: "21", label: "Java 21 (LTS)" }
+              - { value: "17", label: "Java 17 (LTS)" }
+              - { value: "11", label: "Java 11" }
+        java_server:
+          widget: select
+          widget_options:
+            options:
+              - { value: "JAVA",     label: "Embedded (SE)" }
+              - { value: "TOMCAT",   label: "Tomcat" }
+              - { value: "JBOSSEAP", label: "JBoss EAP" }
+          help: "Server type. Required when java_version is set."
+        java_server_version:
+          widget: text
+          placeholder: "10.1"
+          help: "Server version. Required when java_server is Tomcat or JBoss EAP."
+        docker_image_name:
+          widget: text
+          placeholder: "myrepo/myimage:latest"
+          help: "Docker image name and tag."
+        docker_registry_url:
+          widget: text
+          placeholder: "https://ghcr.io"
+          help: "Registry base URL including scheme."
+        docker_registry_username:
+          widget: text
+        docker_registry_password:
+          widget: text
+          help: "Registry pull password. Set exactly one runtime (dotnet, node, php, python, java, or docker)."
+    group: core
+    order: 20
+    help: "Application runtime stack. Set exactly one runtime or use Docker."
+
+  app_settings:
+    widget: key_value_map
+    group: core
+    order: 30
+    help: "Application settings injected as environment variables."
+
+  always_on:
+    widget: toggle
+    group: core
+    order: 40
+    help: "Keep the app warm at all times. Disable only for non-production slots."
+
+  connection_strings:
+    widget: repeater
+    widget_options:
+      mode: keyed_map
+      key_field:
+        label: "Connection string name"
+        placeholder: "DefaultConnection"
+      row_fields:
+        type:
+          widget: select
+          widget_options:
+            options:
+              - { value: "SQLAzure",   label: "SQL Azure" }
+              - { value: "SQLServer",  label: "SQL Server" }
+              - { value: "MySQL",      label: "MySQL" }
+              - { value: "PostgreSQL", label: "PostgreSQL" }
+              - { value: "Custom",     label: "Custom" }
+              - { value: "DocDb",      label: "Cosmos DB" }
+          help: "Connection string type."
+        value:
+          widget: text
+          help: "Connection string value. Treat as sensitive."
+      add_label: "Add connection string"
+    group: core
+    order: 50
+    advanced: true
+    help: "Connection strings injected into the app. Values are sensitive — prefer app_settings with Key Vault references."
+
+  # --- Networking ---
+  enable_private_endpoint:
+    widget: toggle
+    group: networking
+    order: 10
+    help: "Create a private endpoint. Recommended for production — keeps traffic off the public internet."
+
+  enable_public_access:
+    widget: toggle
+    group: networking
+    order: 20
+    help: "Allow public network access. Disable when using private endpoints only."
+
+  enable_vnet_integration:
+    widget: toggle
+    group: networking
+    order: 30
+    help: "Enable VNet integration for outbound traffic routing."
+
+  subnet_id:
+    widget: resource_picker
+    widget_options: { resource_type: subnet }
+    group: networking
+    order: 40
+    help: "Subnet for the private endpoint NIC. Required when private endpoint is enabled."
+    show_when:
+      enable_private_endpoint: true
+    required_when:
+      enable_private_endpoint: true
+
+  private_dns_zone_id:
+    widget: resource_picker
+    widget_options: { resource_type: private_dns_zone }
+    group: networking
+    order: 50
+    help: "Private DNS zone for privatelink.azurewebsites.net. Required when private endpoint is enabled."
+    show_when:
+      enable_private_endpoint: true
+    required_when:
+      enable_private_endpoint: true
+
+  vnet_integration_subnet_id:
+    widget: resource_picker
+    widget_options: { resource_type: subnet }
+    group: networking
+    order: 60
+    help: "Subnet for VNet-integrated outbound traffic. Required when VNet integration is enabled."
+    show_when:
+      enable_vnet_integration: true
+    required_when:
+      enable_vnet_integration: true
+
+  # --- Features ---
+  health_check_path:
+    widget: text
+    group: features
+    order: 10
+    placeholder: "/health"
+    help: "HTTP path the platform polls to determine instance health. Leave empty to disable."
+
+  health_check_eviction_time_in_min:
+    widget: number
+    widget_options: { min: 2, max: 10 }
+    group: features
+    order: 20
+    help: "Minutes after which unhealthy instances are replaced. Only applies when health_check_path is set."
+
+  # --- Security ---
+  min_tls_version:
+    widget: select
+    widget_options: { derive_from_validation: true }
+    group: security
+    order: 10
+    help: "Minimum TLS version for inbound connections. 1.2 is the secure default."
+
+  # --- Identity ---
+  enable_system_assigned_identity:
+    widget: toggle
+    group: identity
+    order: 10
+    help: "Enable system-assigned managed identity for Azure RBAC."
+
+  user_assigned_identity_ids:
+    widget: resource_picker
+    widget_options:
+      resource_type: user_assigned_identity
+      multiple: true
+    group: identity
+    order: 20
+    help: "User-assigned managed identities to attach to the web app."
+
+  # --- Monitoring ---
+  diagnostic_settings:
+    widget: object
+    widget_options:
+      fields:
+        name:
+          widget: text
+          placeholder: "diag-<web-app-name>"
+        log_analytics_workspace_id:
+          widget: resource_picker
+          widget_options: { resource_type: log_analytics_workspace }
+        storage_account_id:
+          widget: resource_picker
+          widget_options: { resource_type: storage_account }
+        eventhub_authorization_rule_id:
+          widget: text
+        eventhub_name:
+          widget: text
+        log_analytics_destination_type:
+          widget: select
+          widget_options:
+            options: ["Dedicated", "AzureDiagnostics"]
+        enabled_log_categories:
+          widget: text
+          widget_options: { multiline: true }
+          help: "One category per line. Leave empty for all supported."
+        enabled_metrics:
+          widget: text
+          widget_options: { multiline: true }
+          help: "One metric per line. Leave empty for all supported."
+    group: monitoring
+    order: 10
+    advanced: true
+    help: "Optional. Leave blank to disable diagnostic settings. At least one sink required when set."
+
+dependencies:
+  required_inputs_from_other_resources:
+    - variable: service_plan_id
+      resource_type: app_service_plan
+      cardinality: one
+      notes: "Hosting plan for the web app."
+    - variable: subnet_id
+      resource_type: subnet
+      cardinality: one
+      notes: "Required when enable_private_endpoint is true."
+    - variable: private_dns_zone_id
+      resource_type: private_dns_zone
+      cardinality: one
+      notes: "Required when enable_private_endpoint is true."
+    - variable: vnet_integration_subnet_id
+      resource_type: subnet
+      cardinality: one
+      notes: "Required when enable_vnet_integration is true."
+    - variable: diagnostic_settings.log_analytics_workspace_id
+      resource_type: log_analytics_workspace
+      cardinality: one
+      notes: "Optional diagnostic sink."
+    - variable: diagnostic_settings.storage_account_id
+      resource_type: storage_account
+      cardinality: one
+      notes: "Optional diagnostic sink."
+
+  produces_outputs_consumable_by:
+    - output: id
+      resource_type: linux_web_app
+
+outputs_display:
+  id:
+    display_name: "Resource ID"
+    show_in_summary: true
+    copyable: true
+    format: arm_id
+
+  name:
+    display_name: "Web app name"
+    show_in_summary: true
+    copyable: true
+
+  default_hostname:
+    display_name: "Default hostname"
+    show_in_summary: true
+    copyable: true
+    format: url
+
+  private_ip_address:
+    display_name: "Private IP address"
+    show_in_summary: true
+    copyable: true
+
+  outbound_ip_addresses:
+    display_name: "Outbound IP addresses"
+    show_in_summary: false
+    copyable: true
+
+  private_endpoint_id:
+    display_name: "Private endpoint ID"
+    show_in_summary: false
+    copyable: true
+    format: arm_id
+
+  principal_id:
+    display_name: "System identity principal ID"
+    show_in_summary: false
+    copyable: true
+
+  tenant_id:
+    display_name: "Tenant ID"
+    show_in_summary: false
+    copyable: true
+
+  public_web_app_id:
+    display_name: "Resource ID (public)"
+    show_in_summary: false
+    copyable: true
+    format: arm_id
+    role: public_alias
+
+  public_web_app_name:
+    display_name: "Web app name (public)"
+    show_in_summary: false
+    copyable: true
+    role: public_alias
+
+  public_web_app_default_hostname:
+    display_name: "Default hostname (public)"
+    show_in_summary: false
+    copyable: true
+    format: url
+    role: public_alias

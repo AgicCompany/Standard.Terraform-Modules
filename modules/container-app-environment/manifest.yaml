@@ -1,0 +1,179 @@
+schema_version: "0.1"
+
+metadata:
+  module_name: container-app-environment
+  module_version: "2.0.0"
+  schema_authored_by: AGIC Infrastructure Team
+  schema_last_updated: "2026-06-19"
+
+catalogue:
+  display_name: "Container Apps Environment"
+  short_description: "Azure Container Apps Environment — shared runtime for Container Apps and Container App Jobs."
+  long_description: |
+    Azure Container Apps Environment providing the shared Dapr- and KEDA-enabled
+    runtime for Container Apps and Container App Jobs. Supports Consumption-only
+    mode (no VNet integration) and dedicated workload profiles for predictable
+    compute. Internal load balancer mode restricts all ingress to the VNet.
+    Zone redundancy requires VNet integration via infrastructure_subnet_id.
+  category: compute
+  subcategory: containers
+  icon: container-app-environment
+  complexity: medium
+  cost_tier: medium
+  deprecated: false
+  tags:
+    - container-apps
+    - serverless
+    - containers
+    - dapr
+    - keda
+
+variables:
+  # --- Deployment-context derived ---
+  resource_group_name:
+    widget: hidden
+    derived_from: { source: deployment_context.resource_group }
+
+  location:
+    widget: hidden
+    derived_from: { source: deployment_context.location }
+
+  name:
+    widget: hidden
+    derived_from: { source: naming.container_app_environment }
+
+  tags:
+    widget: hidden
+    derived_from: { source: deployment_context.tags }
+
+  # --- Monitoring (required) ---
+  log_analytics_workspace_id:
+    widget: resource_picker
+    widget_options: { resource_type: log_analytics_workspace }
+    group: monitoring
+    order: 10
+    help: "Log Analytics workspace for environment-level logs and metrics. Required."
+
+  # --- Networking ---
+  enable_internal_load_balancer:
+    widget: toggle
+    group: networking
+    order: 10
+    help: "Use an internal load balancer. Restricts all app ingress to the VNet — requires infrastructure_subnet_id."
+
+  infrastructure_subnet_id:
+    widget: resource_picker
+    widget_options: { resource_type: subnet }
+    group: networking
+    order: 20
+    help: "Subnet for environment infrastructure. Required when internal load balancer or zone redundancy is enabled."
+
+  # --- Features ---
+  enable_zone_redundancy:
+    widget: toggle
+    group: features
+    order: 10
+    help: "Distribute environment infrastructure across availability zones. Requires VNet integration (infrastructure_subnet_id)."
+
+  # --- Scaling: workload profiles ---
+  workload_profiles:
+    widget: repeater
+    widget_options:
+      mode: keyed_map
+      key_field:
+        label: "Workload profile name"
+        placeholder: "gpu-profile"
+      row_fields:
+        workload_profile_type:
+          widget: select
+          widget_options:
+            options:
+              - { value: "D4",  label: "Dedicated D4 (4 vCPU, 8 GB RAM)" }
+              - { value: "D8",  label: "Dedicated D8 (8 vCPU, 16 GB RAM)" }
+              - { value: "D16", label: "Dedicated D16 (16 vCPU, 32 GB RAM)" }
+              - { value: "D32", label: "Dedicated D32 (32 vCPU, 64 GB RAM)" }
+              - { value: "E4",  label: "Memory Optimised E4 (4 vCPU, 32 GB RAM)" }
+              - { value: "E8",  label: "Memory Optimised E8 (8 vCPU, 64 GB RAM)" }
+              - { value: "E16", label: "Memory Optimised E16 (16 vCPU, 128 GB RAM)" }
+          help: "Dedicated compute profile type."
+        minimum_count:
+          widget: number
+          widget_options: { min: 0, max: 20 }
+          help: "Minimum number of dedicated nodes to maintain."
+        maximum_count:
+          widget: number
+          widget_options: { min: 1, max: 20 }
+          help: "Maximum number of dedicated nodes."
+      add_label: "Add workload profile"
+    group: scaling
+    order: 10
+    help: "Dedicated workload profiles for predictable compute. Leave empty for Consumption-only mode."
+
+dependencies:
+  required_inputs_from_other_resources:
+    - variable: log_analytics_workspace_id
+      resource_type: log_analytics_workspace
+      cardinality: one
+      notes: "Required for environment-level logs and diagnostics."
+    - variable: infrastructure_subnet_id
+      resource_type: subnet
+      cardinality: one
+      notes: "Required when enable_internal_load_balancer or enable_zone_redundancy is true."
+
+  produces_outputs_consumable_by:
+    - output: id
+      resource_type: container_app
+    - output: id
+      resource_type: container_app_job
+
+outputs_display:
+  id:
+    display_name: "Resource ID"
+    show_in_summary: true
+    copyable: true
+    format: arm_id
+
+  name:
+    display_name: "Environment name"
+    show_in_summary: true
+    copyable: true
+
+  default_domain:
+    display_name: "Default domain"
+    show_in_summary: true
+    copyable: true
+    format: url
+
+  static_ip_address:
+    display_name: "Static IP address"
+    show_in_summary: true
+    copyable: true
+
+  docker_bridge_cidr:
+    display_name: "Docker bridge CIDR"
+    show_in_summary: false
+    copyable: true
+
+  platform_reserved_cidr:
+    display_name: "Platform reserved CIDR"
+    show_in_summary: false
+    copyable: true
+
+  platform_reserved_dns_ip_address:
+    display_name: "Platform reserved DNS IP"
+    show_in_summary: false
+    copyable: true
+
+  public_container_app_environment_id:
+    display_name: "Resource ID (public)"
+    show_in_summary: false
+    copyable: true
+    format: arm_id
+    role: public_alias
+
+  public_container_app_environment_default_domain:
+    display_name: "Default domain (public)"
+    show_in_summary: false
+    copyable: true
+    format: url
+    role: public_alias
