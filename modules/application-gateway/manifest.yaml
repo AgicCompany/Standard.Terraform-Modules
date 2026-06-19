@@ -400,7 +400,7 @@ dependencies:
     - output: id
       resource_type: application_gateway
     - output: public_ip_address
-      resource_type: public_ip_address
+      resource_type: public_ip
 
 outputs_display:
   id:
