@@ -1,0 +1,114 @@
+schema_version: "0.1"
+
+metadata:
+  module_name: route-table
+  module_version: "1.2.0"
+  schema_authored_by: AGIC Infrastructure Team
+  schema_last_updated: "2026-06-19"
+
+catalogue:
+  display_name: "Route Table"
+  short_description: "Azure Route Table for custom traffic routing with user-defined routes."
+  long_description: |
+    Azure Route Table with user-defined routes (UDRs) for controlling traffic flow
+    within and out of virtual network subnets. Supports optional BGP route propagation
+    disable and fully configurable route entries with next-hop types including Internet,
+    VirtualAppliance, VnetLocal, VirtualNetworkGateway, and None.
+  category: networking
+  subcategory: routing
+  icon: route-table
+  complexity: low
+  cost_tier: low
+  deprecated: false
+  tags:
+    - networking
+    - routing
+    - udr
+    - bgp
+
+variables:
+  # --- Deployment-context derived ---
+  resource_group_name:
+    widget: hidden
+    derived_from: { source: deployment_context.resource_group }
+
+  location:
+    widget: hidden
+    derived_from: { source: deployment_context.location }
+
+  name:
+    widget: hidden
+    derived_from: { source: naming.route_table }
+
+  tags:
+    widget: hidden
+    derived_from: { source: deployment_context.tags }
+
+  # --- Core configuration ---
+  disable_bgp_route_propagation:
+    widget: toggle
+    group: core
+    order: 10
+    help: "Disable BGP route propagation on this route table. When enabled, routes learned via BGP are not propagated to subnets associated with this table."
+
+  routes:
+    widget: repeater
+    widget_options:
+      mode: keyed_map
+      key_field:
+        label: "Route name"
+        placeholder: "route-to-internet"
+      row_fields:
+        address_prefix:
+          widget: text
+          help: "CIDR address prefix that this route applies to (e.g. 0.0.0.0/0)."
+        next_hop_type:
+          widget: select
+          widget_options:
+            options:
+              - Internet
+              - VirtualAppliance
+              - VnetLocal
+              - VirtualNetworkGateway
+              - None
+          help: "How traffic matching the address prefix should be forwarded. VirtualAppliance requires next_hop_in_ip_address."
+        next_hop_in_ip_address:
+          widget: text
+          placeholder: "10.0.0.4"
+          help: "IP address of the next-hop appliance. Required when next_hop_type is VirtualAppliance."
+          show_when:
+            next_hop_type: "VirtualAppliance"
+      add_label: "Add route"
+    group: core
+    order: 20
+    help: "User-defined routes. Each entry controls how traffic for a specific address prefix is forwarded."
+
+dependencies:
+  required_inputs_from_other_resources: []
+  produces_outputs_consumable_by:
+    - output: id
+      resource_type: virtual_network
+
+outputs_display:
+  id:
+    display_name: "Resource ID"
+    show_in_summary: true
+    copyable: true
+    format: arm_id
+
+  name:
+    display_name: "Route table name"
+    show_in_summary: true
+    copyable: true
+
+  route_ids:
+    display_name: "Route IDs"
+    show_in_summary: false
+    copyable: false
+
+  public_route_table_id:
+    display_name: "Resource ID (public)"
+    show_in_summary: false
+    copyable: true
+    format: arm_id
+    role: public_alias

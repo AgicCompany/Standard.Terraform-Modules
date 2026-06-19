@@ -1,0 +1,151 @@
+schema_version: "0.1"
+
+metadata:
+  module_name: vnet-peering
+  module_version: "1.0.0"
+  schema_authored_by: AGIC Infrastructure Team
+  schema_last_updated: "2026-06-19"
+
+catalogue:
+  display_name: "VNet Peering"
+  short_description: "Bidirectional Azure Virtual Network peering between two VNets."
+  long_description: |
+    Creates a bidirectional Azure Virtual Network peering between two virtual networks.
+    Both the local-to-remote and remote-to-local peering resources are managed together
+    to ensure consistent configuration. Supports forwarded traffic, gateway transit, and
+    remote gateway use. Note: peering across subscriptions requires both VNets to be
+    accessible from the deployment context.
+  category: networking
+  subcategory: peering
+  icon: vnet-peering
+  complexity: low
+  cost_tier: low
+  deprecated: false
+  tags:
+    - networking
+    - peering
+    - vnet
+
+variables:
+  # --- Naming (engine-derived) ---
+  name:
+    widget: hidden
+    derived_from: { source: naming.vnet_peering }
+
+  # --- Tags (interface consistency; not applied to peering resources) ---
+  tags:
+    widget: hidden
+    derived_from: { source: deployment_context.tags }
+
+  # --- Networking: local VNet ---
+  # NOTE: virtual_network_resource_group_name is assumed to be the deployment resource
+  # group. Cross-subscription peering (where the local VNet is in a different RG)
+  # is a contract gap — the grammar has no way to derive this from the resource_picker
+  # selection. See findings.
+  virtual_network_resource_group_name:
+    widget: hidden
+    derived_from: { source: deployment_context.resource_group }
+
+  # NOTE: virtual_network_name must be resolved from the VNet resource_picker selection
+  # at composition time. The grammar's derived_from vocabulary has no picker-attribute
+  # source; hcl_default is used here as a placeholder. See findings.
+  virtual_network_name:
+    widget: hidden
+    derived_from: { source: hcl_default }
+
+  virtual_network_id:
+    widget: resource_picker
+    widget_options: { resource_type: virtual_network }
+    group: networking
+    order: 10
+    help: "Resource ID of the local virtual network. The peering is created from this VNet's perspective."
+
+  # --- Networking: remote VNet ---
+  # NOTE: same derived_from limitation as virtual_network_name above.
+  remote_virtual_network_name:
+    widget: hidden
+    derived_from: { source: hcl_default }
+
+  remote_virtual_network_resource_group_name:
+    widget: text
+    group: networking
+    order: 25
+    advanced: true
+    placeholder: "rg-remote-network"
+    help: "Resource group name of the remote virtual network. Required when the remote VNet is in a different resource group or subscription."
+
+  remote_virtual_network_id:
+    widget: resource_picker
+    widget_options: { resource_type: virtual_network }
+    group: networking
+    order: 20
+    help: "Resource ID of the remote virtual network to peer with."
+
+  # --- Features: traffic options ---
+  allow_virtual_network_access:
+    widget: toggle
+    group: features
+    order: 10
+    help: "Allow VMs in the peered VNets to communicate with each other. Disable to restrict cross-VNet access."
+
+  allow_forwarded_traffic:
+    widget: toggle
+    group: features
+    order: 20
+    help: "Allow traffic forwarded from the remote VNet (not originating in it). Required for hub-spoke topologies."
+
+  allow_gateway_transit:
+    widget: toggle
+    group: features
+    order: 30
+    help: "Allow the local VNet's gateway to be used by the remote VNet. Cannot be enabled with use_remote_gateways simultaneously."
+
+  use_remote_gateways:
+    widget: toggle
+    group: features
+    order: 40
+    help: "Use the remote VNet's gateway for traffic from the local VNet. Requires allow_gateway_transit on the remote peering."
+
+dependencies:
+  required_inputs_from_other_resources:
+    - variable: virtual_network_id
+      resource_type: virtual_network
+      cardinality: one
+      notes: "The local virtual network to peer from."
+    - variable: remote_virtual_network_id
+      resource_type: virtual_network
+      cardinality: one
+      notes: "The remote virtual network to peer with."
+
+  produces_outputs_consumable_by: []
+
+outputs_display:
+  id:
+    display_name: "Local-to-remote peering ID"
+    show_in_summary: true
+    copyable: true
+    format: arm_id
+
+  name:
+    display_name: "Local-to-remote peering name"
+    show_in_summary: true
+    copyable: true
+
+  # local_to_remote_id is intentionally omitted: it shares the same value expression
+  # as `id` in outputs.tf (both reference azurerm_virtual_network_peering.local_to_remote.id).
+  # Displaying both would trigger a lint.13 advisory WARN. Consumers needing the
+  # directional name explicitly should use `id`; cross-project consumers use
+  # `public_peering_id`. See findings.
+
+  remote_to_local_id:
+    display_name: "Remote-to-local peering ID"
+    show_in_summary: false
+    copyable: true
+    format: arm_id
+
+  public_peering_id:
+    display_name: "Local-to-remote peering ID (public)"
+    show_in_summary: false
+    copyable: true
+    format: arm_id
+    role: public_alias

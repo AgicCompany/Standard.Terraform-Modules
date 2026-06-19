@@ -1,0 +1,155 @@
+schema_version: "0.1"
+
+metadata:
+  module_name: bastion
+  module_version: "1.0.0"
+  schema_authored_by: AGIC Infrastructure Team
+  schema_last_updated: "2026-06-19"
+
+catalogue:
+  display_name: "Azure Bastion"
+  short_description: "Azure Bastion host for secure browser-based RDP/SSH without public IPs."
+  long_description: |
+    Azure Bastion provides secure, browser-based RDP and SSH connectivity to virtual
+    machines over TLS, eliminating the need for public IPs or VPN. Supports Basic and
+    Standard SKUs; Standard enables file copy, IP-based connect, shareable links, native
+    client tunneling, and configurable scale units.
+  category: networking
+  subcategory: remote-access
+  icon: bastion
+  complexity: low
+  cost_tier: medium
+  deprecated: false
+  tags:
+    - networking
+    - bastion
+    - rdp
+    - ssh
+    - remote-access
+
+variables:
+  # --- Deployment-context derived ---
+  resource_group_name:
+    widget: hidden
+    derived_from: { source: deployment_context.resource_group }
+
+  location:
+    widget: hidden
+    derived_from: { source: deployment_context.location }
+
+  name:
+    widget: hidden
+    derived_from: { source: naming.bastion_host }
+
+  tags:
+    widget: hidden
+    derived_from: { source: deployment_context.tags }
+
+  # --- Core configuration ---
+  sku:
+    widget: select
+    widget_options: { derive_from_validation: true }
+    group: core
+    order: 10
+    help: "Basic supports browser-based RDP/SSH only. Standard adds file copy, IP connect, shareable links, tunneling, and configurable scale units."
+
+  # --- Networking ---
+  subnet_id:
+    widget: resource_picker
+    widget_options: { resource_type: subnet }
+    group: networking
+    order: 10
+    help: "Subnet for the Bastion host. Must be named 'AzureBastionSubnet' with a minimum /26 CIDR block."
+
+  # --- Scaling ---
+  scale_units:
+    widget: number
+    widget_options: { min: 2, max: 50, step: 1 }
+    group: scaling
+    order: 10
+    help: "Number of scale units (2–50). Each unit handles approximately 25 concurrent sessions. Standard SKU only."
+    show_when:
+      sku: Standard
+
+  # --- Features ---
+  copy_paste_enabled:
+    widget: toggle
+    group: features
+    order: 10
+    help: "Enable copy/paste between the local machine and remote session."
+
+  file_copy_enabled:
+    widget: toggle
+    group: features
+    order: 20
+    help: "Enable file copy to/from the remote session. Standard SKU only."
+    show_when:
+      sku: Standard
+
+  ip_connect_enabled:
+    widget: toggle
+    group: features
+    order: 30
+    help: "Enable IP-based connection to any IP reachable from the Bastion subnet. Standard SKU only."
+    show_when:
+      sku: Standard
+
+  shareable_link_enabled:
+    widget: toggle
+    group: features
+    order: 40
+    help: "Enable shareable links so users can connect without Azure portal access. Standard SKU only."
+    show_when:
+      sku: Standard
+
+  tunneling_enabled:
+    widget: toggle
+    group: features
+    order: 50
+    help: "Enable native client tunneling for RDP/SSH via the Azure CLI. Standard SKU only."
+    show_when:
+      sku: Standard
+
+dependencies:
+  required_inputs_from_other_resources:
+    - variable: subnet_id
+      resource_type: subnet
+      cardinality: one
+      notes: "AzureBastionSubnet from the target virtual network. Must be /26 or larger."
+  produces_outputs_consumable_by: []
+
+outputs_display:
+  id:
+    display_name: "Resource ID"
+    show_in_summary: true
+    copyable: true
+    format: arm_id
+
+  name:
+    display_name: "Bastion host name"
+    show_in_summary: false
+    copyable: true
+
+  dns_name:
+    display_name: "Bastion FQDN"
+    show_in_summary: true
+    copyable: true
+    format: url
+
+  public_ip_address:
+    display_name: "Public IP address"
+    show_in_summary: true
+    copyable: true
+
+  public_ip_id:
+    display_name: "Public IP resource ID"
+    show_in_summary: false
+    copyable: true
+    format: arm_id
+
+  public_bastion_id:
+    display_name: "Resource ID (public)"
+    show_in_summary: false
+    copyable: true
+    format: arm_id
+    role: public_alias

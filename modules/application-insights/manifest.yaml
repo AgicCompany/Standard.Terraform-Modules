@@ -1,0 +1,156 @@
+schema_version: "0.1"
+
+metadata:
+  module_name: application-insights
+  module_version: "2.0.0"
+  schema_authored_by: AGIC Infrastructure Team
+  schema_last_updated: "2026-06-19"
+
+catalogue:
+  display_name: "Application Insights"
+  short_description: "Azure Application Insights workspace-based APM and telemetry."
+  long_description: |
+    Azure Application Insights (workspace-based) for application performance monitoring,
+    distributed tracing, and live metrics. Requires a Log Analytics workspace. Security
+    defaults: local authentication disabled, public ingestion and query disabled.
+  category: monitoring
+  subcategory: application-performance
+  icon: application-insights
+  complexity: low
+  cost_tier: low
+  deprecated: false
+  tags:
+    - monitoring
+    - apm
+    - telemetry
+    - application-insights
+
+variables:
+  # --- Deployment-context derived ---
+  resource_group_name:
+    widget: hidden
+    derived_from: { source: deployment_context.resource_group }
+
+  location:
+    widget: hidden
+    derived_from: { source: deployment_context.location }
+
+  name:
+    widget: hidden
+    derived_from: { source: naming.application_insights }
+
+  tags:
+    widget: hidden
+    derived_from: { source: deployment_context.tags }
+
+  # --- Core configuration ---
+  application_type:
+    widget: select
+    widget_options: { derive_from_validation: true }
+    group: core
+    order: 10
+    help: "Application type affects telemetry processing and portal experience. 'web' is the most common default."
+
+  # --- Monitoring ---
+  workspace_id:
+    widget: resource_picker
+    widget_options: { resource_type: log_analytics_workspace }
+    group: monitoring
+    order: 10
+    help: "Log Analytics workspace for this workspace-based Application Insights instance. Required."
+
+  retention_in_days:
+    widget: number
+    widget_options: { min: 30, max: 730, step: 1 }
+    group: monitoring
+    order: 20
+    help: "Data retention period in days. Allowed values: 30, 60, 90, 120, 180, 270, 365, 550, 730."
+
+  daily_data_cap_in_gb:
+    widget: number
+    widget_options: { min: 0, step: 0.1 }
+    group: monitoring
+    order: 30
+    advanced: true
+    help: "Daily ingestion volume cap in GB. Leave blank for unlimited (costs may be unpredictable)."
+
+  daily_data_cap_notifications_disabled:
+    widget: toggle
+    group: monitoring
+    order: 40
+    advanced: true
+    help: "Suppress email notifications when the daily data cap is reached."
+
+  sampling_percentage:
+    widget: number
+    widget_options: { min: 0, max: 100, step: 1 }
+    group: monitoring
+    order: 50
+    help: "Percentage of telemetry items to retain (0–100). 100 = no sampling. Reduce for high-volume apps to control costs."
+
+  # --- Security ---
+  local_authentication_disabled:
+    widget: toggle
+    group: security
+    order: 10
+    help: "Disable API-key (local) authentication. Enabled by default; set to false only if API key access is required."
+
+  disable_ip_masking:
+    widget: toggle
+    group: security
+    order: 20
+    help: "Store full client IP addresses in telemetry. Disabled by default for privacy compliance."
+
+  internet_ingestion_enabled:
+    widget: toggle
+    group: security
+    order: 30
+    help: "Allow telemetry ingestion over the public internet. Disabled by default; use private link for internal workloads."
+
+  internet_query_enabled:
+    widget: toggle
+    group: security
+    order: 40
+    help: "Allow querying Application Insights data over the public internet. Disabled by default."
+
+  # --- Features ---
+  force_customer_storage_for_profiler:
+    widget: toggle
+    group: features
+    order: 10
+    advanced: true
+    help: "Store profiler data in your own storage account instead of Microsoft-managed storage."
+
+dependencies:
+  required_inputs_from_other_resources:
+    - variable: workspace_id
+      resource_type: log_analytics_workspace
+      cardinality: one
+      notes: "Required. Workspace-based Application Insights must be linked to a Log Analytics workspace."
+  produces_outputs_consumable_by:
+    - output: id
+      resource_type: application_insights
+
+outputs_display:
+  id:
+    display_name: "Resource ID"
+    show_in_summary: true
+    copyable: true
+    format: arm_id
+
+  name:
+    display_name: "Application Insights name"
+    show_in_summary: false
+    copyable: true
+
+  app_id:
+    display_name: "Application ID"
+    show_in_summary: true
+    copyable: true
+
+  public_app_insights_id:
+    display_name: "Resource ID (public)"
+    show_in_summary: false
+    copyable: true
+    format: arm_id
+    role: public_alias

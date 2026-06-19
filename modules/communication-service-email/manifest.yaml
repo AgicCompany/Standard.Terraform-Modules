@@ -1,0 +1,203 @@
+schema_version: "0.1"
+
+metadata:
+  module_name: communication-service-email
+  module_version: "1.0.1"
+  schema_authored_by: AGIC Infrastructure Team
+  schema_last_updated: "2026-06-19"
+
+catalogue:
+  display_name: "Communication Service with Email"
+  short_description: "Azure Communication Service with Email domain and sender provisioning."
+  long_description: |
+    Azure Communication Service with an Email Communication Service and domain. Provisions
+    a Communication Service, an Email Communication Service, and an email domain (Azure-managed
+    or custom). Supports configurable sender usernames and optional diagnostic settings.
+    Both resources are global and store data at the selected data location.
+  category: messaging
+  subcategory: email
+  icon: communication-service-email
+  complexity: medium
+  cost_tier: low
+  deprecated: false
+  tags:
+    - messaging
+    - email
+    - communication-service
+    - notifications
+
+variables:
+  # --- Deployment-context derived ---
+  resource_group_name:
+    widget: hidden
+    derived_from: { source: deployment_context.resource_group }
+
+  location:
+    widget: hidden
+    derived_from: { source: deployment_context.location }
+
+  name:
+    widget: hidden
+    derived_from: { source: naming.communication_service }
+
+  tags:
+    widget: hidden
+    derived_from: { source: deployment_context.tags }
+
+  # --- Core configuration ---
+  data_location:
+    widget: select
+    widget_options: { derive_from_validation: true }
+    group: core
+    order: 10
+    help: "Region where data is stored at rest. Applied to both the Communication Service and Email Service. Cannot be changed after creation — choose carefully for data-residency requirements."
+
+  enable_custom_domain:
+    widget: toggle
+    group: core
+    order: 20
+    help: "Use a customer-managed custom domain instead of an Azure-managed *.azurecomm.net subdomain. Requires a verified DNS domain."
+
+  domain_name:
+    widget: text
+    group: core
+    order: 30
+    placeholder: "mail.example.com"
+    help: "Fully qualified custom domain for outbound email (e.g. mail.example.com). Required when custom domain is enabled."
+    show_when:
+      enable_custom_domain: true
+    required_when:
+      enable_custom_domain: true
+
+  email_service_name:
+    widget: text
+    group: core
+    order: 40
+    advanced: true
+    placeholder: "<name>-email"
+    help: "Override the Email Communication Service resource name. Defaults to <name>-email."
+
+  # --- Features ---
+  user_engagement_tracking_enabled:
+    widget: toggle
+    group: features
+    order: 10
+    help: "Enable user engagement tracking (open/click events) on the email domain."
+
+  # --- Entities: sender usernames ---
+  sender_usernames:
+    widget: repeater
+    widget_options:
+      mode: keyed_map
+      key_field:
+        label: "Sender key"
+        placeholder: "no-reply"
+      row_fields:
+        username:
+          widget: text
+          placeholder: "no-reply"
+          help: "Local-part of the sender address (e.g. 'no-reply' → no-reply@domain). Must match ^[a-zA-Z0-9._-]+$."
+        display_name:
+          widget: text
+          placeholder: "No Reply"
+          help: "Optional display name shown in the From header (e.g. 'Contoso Notifications')."
+      add_label: "Add sender"
+    group: entities
+    order: 10
+    help: "Sender usernames provisioned on the email domain. Each key is an arbitrary identifier; the username is the local-part of the from address."
+
+  # --- Monitoring ---
+  diagnostic_settings:
+    widget: object
+    widget_options:
+      fields:
+        name:
+          widget: text
+          placeholder: "diag-<communication-service-name>"
+        log_analytics_workspace_id:
+          widget: resource_picker
+          widget_options: { resource_type: log_analytics_workspace }
+        storage_account_id:
+          widget: resource_picker
+          widget_options: { resource_type: storage_account }
+        eventhub_authorization_rule_id:
+          widget: text
+        eventhub_name:
+          widget: text
+        log_analytics_destination_type:
+          widget: select
+          widget_options:
+            options: ["Dedicated", "AzureDiagnostics"]
+        enabled_log_categories:
+          widget: text
+          widget_options: { multiline: true }
+          help: "One category per line. Leave empty for all supported."
+        enabled_metrics:
+          widget: text
+          widget_options: { multiline: true }
+          help: "One metric per line. Leave empty for all supported."
+    group: monitoring
+    order: 10
+    advanced: true
+    help: "Optional diagnostic settings attached to the Communication Service. At least one destination (Log Analytics, Storage, or Event Hub) is required when non-null."
+
+dependencies:
+  required_inputs_from_other_resources: []
+  produces_outputs_consumable_by: []
+
+outputs_display:
+  id:
+    display_name: "Resource ID"
+    show_in_summary: true
+    copyable: true
+    format: arm_id
+
+  name:
+    display_name: "Communication Service name"
+    show_in_summary: false
+    copyable: true
+
+  communication_service_id:
+    display_name: "Communication Service ID (public)"
+    show_in_summary: false
+    copyable: true
+    format: arm_id
+    role: public_alias
+
+  email_service_id:
+    display_name: "Email Service resource ID"
+    show_in_summary: false
+    copyable: true
+    format: arm_id
+
+  domain_id:
+    display_name: "Email domain resource ID"
+    show_in_summary: false
+    copyable: true
+    format: arm_id
+
+  hostname:
+    display_name: "Communication Service hostname"
+    show_in_summary: true
+    copyable: true
+    format: url
+
+  from_sender_domain:
+    display_name: "From sender domain (P2)"
+    show_in_summary: true
+    copyable: true
+
+  mail_from_sender_domain:
+    display_name: "Mail-from sender domain (P1)"
+    show_in_summary: false
+    copyable: true
+
+  sender_usernames:
+    display_name: "Provisioned sender usernames"
+    show_in_summary: false
+    copyable: false
+
+  verification_records:
+    display_name: "DNS verification records"
+    show_in_summary: false
+    copyable: false

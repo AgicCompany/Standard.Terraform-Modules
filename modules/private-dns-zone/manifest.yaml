@@ -1,0 +1,109 @@
+schema_version: "0.1"
+
+metadata:
+  module_name: private-dns-zone
+  module_version: "1.0.0"
+  schema_authored_by: AGIC Infrastructure Team
+  schema_last_updated: "2026-06-19"
+
+catalogue:
+  display_name: "Private DNS Zone"
+  short_description: "Azure Private DNS Zone for name resolution within virtual networks."
+  long_description: |
+    Azure Private DNS Zone providing authoritative name resolution for private
+    resources within linked virtual networks. Typically used to resolve
+    privatelink FQDNs (e.g. privatelink.blob.core.windows.net) for private
+    endpoint-enabled services such as Storage Accounts, Key Vaults, and
+    databases. Virtual network links control which VNets can resolve records;
+    auto-registration optionally publishes VM hostnames into the zone.
+  category: networking
+  subcategory: dns
+  icon: private-dns-zone
+  complexity: low
+  cost_tier: low
+  deprecated: false
+  tags:
+    - networking
+    - dns
+    - private-endpoint
+    - private-link
+
+variables:
+  # --- Deployment-context derived ---
+  resource_group_name:
+    widget: hidden
+    derived_from: { source: deployment_context.resource_group }
+
+  # NOTE: Private DNS zones are a global (non-regional) resource. No location variable.
+
+  # --- Core configuration ---
+  # The zone name is a semantic FQDN (e.g. privatelink.blob.core.windows.net),
+  # not a CAF-generated name — naming engine does not apply here.
+  name:
+    widget: text
+    group: core
+    order: 10
+    placeholder: "privatelink.blob.core.windows.net"
+    help: "Private DNS zone FQDN. For Azure PaaS private endpoints use the standard privatelink.* suffix (e.g. privatelink.vaultcore.azure.net for Key Vault)."
+
+  tags:
+    widget: hidden
+    derived_from: { source: deployment_context.tags }
+
+  # --- Networking ---
+  virtual_network_links:
+    widget: repeater
+    widget_options:
+      mode: keyed_map
+      key_field:
+        label: "Link name"
+        placeholder: "link-vnet-hub"
+      row_fields:
+        virtual_network_id:
+          widget: resource_picker
+          widget_options: { resource_type: virtual_network }
+          help: "Virtual network that will be able to resolve records in this DNS zone."
+        registration_enabled:
+          widget: toggle
+          help: "Automatically register VM DNS hostnames into this zone. Enable only when this zone is the VM hostname zone, not for privatelink zones."
+      add_label: "Add virtual network link"
+    group: networking
+    order: 10
+    help: "Virtual networks linked to this DNS zone for name resolution. VMs in linked networks can resolve zone records without custom DNS server configuration."
+
+dependencies:
+  required_inputs_from_other_resources:
+    - variable: virtual_network_links.virtual_network_id
+      resource_type: virtual_network
+      cardinality: many
+      notes: "One virtual network ID per link entry. Optional — zone can be created without links and linked later."
+  produces_outputs_consumable_by:
+    - output: id
+      resource_type: storage_account
+    - output: id
+      resource_type: key_vault
+
+outputs_display:
+  id:
+    display_name: "Resource ID"
+    show_in_summary: true
+    copyable: true
+    format: arm_id
+
+  name:
+    display_name: "Zone FQDN"
+    show_in_summary: true
+    copyable: true
+
+  virtual_network_link_ids:
+    display_name: "Virtual network link IDs"
+    show_in_summary: false
+    copyable: true
+    format: map
+
+  public_dns_zone_id:
+    display_name: "Resource ID (public)"
+    show_in_summary: false
+    copyable: true
+    format: arm_id
+    role: public_alias
