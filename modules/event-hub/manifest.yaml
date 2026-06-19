@@ -98,7 +98,11 @@ variables:
   event_hubs:
     widget: repeater
     widget_options:
-      fields:
+      mode: keyed_map
+      key_field:
+        label: "Event Hub name"
+        placeholder: "telemetry"
+      row_fields:
         partition_count:
           widget: number
           widget_options: { min: 1, max: 32, step: 1 }
@@ -108,7 +112,7 @@ variables:
           widget_options: { min: 1, max: 7, step: 1 }
           help: "Message retention in days (1-7 for Standard)."
         consumer_groups:
-          widget: object
+          widget: key_value_map
           help: "Additional consumer groups keyed by name. The $Default group is always created."
     group: entities
     order: 10
@@ -117,7 +121,11 @@ variables:
   authorization_rules:
     widget: repeater
     widget_options:
-      fields:
+      mode: keyed_map
+      key_field:
+        label: "Rule name"
+        placeholder: "sender"
+      row_fields:
         listen:
           widget: toggle
         send:

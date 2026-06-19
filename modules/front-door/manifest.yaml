@@ -535,10 +535,9 @@ dependencies:
     # a private_link_service entry (and potentially a cdn_frontdoor_profile entry for
     # the produces side). Recorded in T1-Retrofit-Findings-05-front-door.md.
 
-  # NOTE: Front Door outputs (profile ID, endpoint host names) are globally consumable
-  # by downstream modules. However, cdn_frontdoor_profile is not yet in the T1
-  # resourceType vocabulary. Omitting produces_outputs_consumable_by pending vocab
-  # extension. See findings doc.
+  produces_outputs_consumable_by:
+    - output: id
+      resource_type: cdn_frontdoor_profile
 
 outputs_display:
   id:

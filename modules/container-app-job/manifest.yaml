@@ -288,6 +288,9 @@ variables:
     widget: repeater
     widget_options:
       mode: keyed_map
+      key_field:
+        label: "Secret name"
+        placeholder: "db-password"
       row_fields:
         value:
           widget: text

@@ -72,7 +72,7 @@ dependencies:
   required_inputs_from_other_resources: []
   produces_outputs_consumable_by:
     - output: id
-      resource_type: subnet
+      resource_type: nat_gateway
 
 outputs_display:
   id:

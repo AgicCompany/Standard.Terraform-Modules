@@ -126,7 +126,6 @@ variables:
       key_field:
         label: "Disk name suffix"
         placeholder: "data"
-        help: "Used as part of the managed disk resource name."
       row_fields:
         lun:
           widget: number

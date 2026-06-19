@@ -130,7 +130,8 @@ variables:
           advanced: true
           help: "Kubernetes node labels applied to all nodes in this pool."
         node_taints:
-          widget: code_editor
+          widget: text
+          widget_options: { multiline: true }
           advanced: true
           help: "One taint per line: key=value:effect (e.g. dedicated=gpu:NoSchedule)."
         orchestrator_version:

@@ -128,7 +128,11 @@ variables:
   georeplications:
     widget: repeater
     widget_options:
-      fields:
+      mode: keyed_map
+      key_field:
+        label: "Region"
+        placeholder: "westeurope"
+      row_fields:
         location:
           widget: text
           help: "Azure region for this replica (e.g. westeurope)."

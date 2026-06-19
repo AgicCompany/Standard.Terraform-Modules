@@ -66,6 +66,9 @@ variables:
     widget: repeater
     widget_options:
       mode: keyed_map
+      key_field:
+        label: "Pool name"
+        placeholder: "backend-pool"
       row_fields:
         fqdns:
           widget: text
@@ -84,6 +87,9 @@ variables:
     widget: repeater
     widget_options:
       mode: keyed_map
+      key_field:
+        label: "Settings name"
+        placeholder: "backend-http-settings"
       row_fields:
         port:
           widget: number
@@ -119,6 +125,9 @@ variables:
     widget: repeater
     widget_options:
       mode: keyed_map
+      key_field:
+        label: "Listener name"
+        placeholder: "http-listener"
       row_fields:
         frontend_port_name:
           widget: text
@@ -146,6 +155,9 @@ variables:
     widget: repeater
     widget_options:
       mode: keyed_map
+      key_field:
+        label: "Rule name"
+        placeholder: "routing-rule"
       row_fields:
         rule_type:
           widget: select
@@ -179,6 +191,9 @@ variables:
     widget: repeater
     widget_options:
       mode: keyed_map
+      key_field:
+        label: "Probe name"
+        placeholder: "health-probe"
       row_fields:
         protocol:
           widget: select
@@ -218,6 +233,9 @@ variables:
     widget: repeater
     widget_options:
       mode: keyed_map
+      key_field:
+        label: "Path map name"
+        placeholder: "url-path-map"
       row_fields:
         default_backend_address_pool_name:
           widget: text
@@ -246,6 +264,9 @@ variables:
     widget: repeater
     widget_options:
       mode: keyed_map
+      key_field:
+        label: "Port name"
+        placeholder: "http"
       row_fields:
         port:
           widget: number
@@ -268,6 +289,9 @@ variables:
     widget: repeater
     widget_options:
       mode: keyed_map
+      key_field:
+        label: "Redirect name"
+        placeholder: "http-to-https"
       row_fields:
         redirect_type:
           widget: select
@@ -310,6 +334,9 @@ variables:
     widget: repeater
     widget_options:
       mode: keyed_map
+      key_field:
+        label: "Certificate name"
+        placeholder: "tls-cert"
       row_fields:
         data:
           widget: text

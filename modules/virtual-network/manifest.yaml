@@ -61,10 +61,10 @@ variables:
       key_field:
         label: "Subnet name"
         placeholder: "app"
-        help: "Subnet name — also used as the Azure resource name."
       row_fields:
         address_prefixes:
-          widget: code_editor
+          widget: text
+          widget_options: { multiline: true }
           help: "One CIDR per line. Must fall within the VNet address space."
         service_endpoints:
           widget: multiselect
@@ -104,7 +104,8 @@ variables:
                       placeholder: "Microsoft.App/environments"
                       help: "Service being delegated to (e.g. Microsoft.App/environments, Microsoft.Web/serverFarms)."
                     actions:
-                      widget: code_editor
+                      widget: text
+                      widget_options: { multiline: true }
                       help: "Delegation actions. Leave empty to use the service default."
           help: "Optional. Delegate the subnet to a specific Azure service."
       add_label: "Add subnet"

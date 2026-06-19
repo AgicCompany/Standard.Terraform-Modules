@@ -296,11 +296,9 @@ dependencies:
       cardinality: one
       notes: "Optional diagnostic sink."
 
-  # NOTE: managed_redis / redis_cache is absent from the T1 §5.5.1 resource-type
-  # vocabulary. Adding it requires a schema minor bump. The id output cannot be
-  # registered in produces_outputs_consumable_by until the type is added.
-  # Record as a schema-vocabulary finding.
-  produces_outputs_consumable_by: []
+  produces_outputs_consumable_by:
+    - output: id
+      resource_type: managed_redis
 
 outputs_display:
   id:

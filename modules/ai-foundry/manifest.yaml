@@ -17,7 +17,7 @@ catalogue:
     Creates a hub and one default project. Connect a Storage Account, Key Vault,
     and optionally Application Insights and Container Registry to complete the hub.
     Enable the private endpoint to confine all traffic to the virtual network.
-  category: ai
+  category: ai-ml
   subcategory: ml-platform
   icon: ai-foundry
   complexity: high

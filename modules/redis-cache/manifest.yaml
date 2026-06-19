@@ -315,10 +315,9 @@ dependencies:
       cardinality: one
       notes: "Optional diagnostic sink."
 
-  # NOTE: redis_cache resource type is absent from the T1 §5.5.1 resource-type
-  # vocabulary. The id output cannot be registered in produces_outputs_consumable_by
-  # until the type is added (same constraint as managed-redis).
-  produces_outputs_consumable_by: []
+  produces_outputs_consumable_by:
+    - output: id
+      resource_type: redis_cache
 
 outputs_display:
   id:

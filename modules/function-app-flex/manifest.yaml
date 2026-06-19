@@ -125,7 +125,11 @@ variables:
   always_ready_instances:
     widget: repeater
     widget_options:
-      fields:
+      mode: keyed_map
+      key_field:
+        label: "Function name"
+        placeholder: "HttpTrigger1"
+      row_fields:
         instance_count:
           widget: number
           widget_options: { min: 0, step: 1 }
