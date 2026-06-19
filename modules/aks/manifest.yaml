@@ -1,0 +1,604 @@
+schema_version: "0.1"
+
+metadata:
+  module_name: aks
+  module_version: "4.1.1"
+  schema_authored_by: AGIC Infrastructure Team
+  schema_last_updated: "2026-05-18"
+
+catalogue:
+  display_name: "Azure Kubernetes Service"
+  short_description: "Managed AKS cluster with Azure AD auth, private API server, and maintenance windows."
+  long_description: |
+    Production-grade AKS cluster with security-first defaults:
+    Azure AD authentication, private API server (when authorized_ip_ranges
+    is empty), system-assigned managed identity, Container Insights, and
+    pre-configured maintenance windows for both cluster and node OS upgrades.
+
+    Companion module: aks-node-pool (for additional user node pools).
+  category: compute
+  subcategory: kubernetes
+  icon: aks
+  complexity: high
+  cost_tier: high
+  deprecated: false
+  tags:
+    - kubernetes
+    - aks
+    - container
+    - private-cluster
+
+variables:
+  # --- Deployment-context derived ---
+  resource_group_name:
+    widget: hidden
+    derived_from: { source: deployment_context.resource_group }
+
+  location:
+    widget: hidden
+    derived_from: { source: deployment_context.location }
+
+  name:
+    widget: hidden
+    derived_from: { source: naming.aks_cluster }
+
+  tags:
+    widget: hidden
+    derived_from: { source: deployment_context.tags }
+
+  # --- Core configuration ---
+  kubernetes_version:
+    widget: text
+    group: core
+    order: 10
+    placeholder: "latest"
+    help: "Leave empty for the latest stable version in the region. Otherwise specify e.g. '1.30.5'."
+
+  sku_tier:
+    widget: select
+    widget_options: { derive_from_validation: true }
+    group: core
+    order: 20
+    help: "Free has no SLA. Standard includes Uptime SLA. Premium adds long-term support."
+
+  dns_prefix:
+    widget: hidden
+    derived_from: { source: "naming.aks_dns_prefix(parent=name)" }
+    # Derived from the cluster name per T1.5 §4.4 / §6.2.2 exception (OQ#6, resolved 2026-06-17).
+    # Override via naming_overrides keyed by aks_dns_prefix (standard B path).
+
+  # --- Networking ---
+  network_profile:
+    widget: object  # See Finding 02 §4.5 for object syntax ambiguity
+    widget_options:
+      fields:
+        network_plugin:
+          widget: select
+          widget_options:
+            options: ["azure", "kubenet", "none"]
+        network_plugin_mode:
+          widget: select
+          widget_options:
+            options:
+              - { value: overlay, label: "Azure CNI Overlay (recommended)" }
+              - { value: "", label: "Classic Azure CNI" }
+          help: "Use 'overlay' for Azure CNI Overlay (recommended). Leave empty for classic Azure CNI."
+        network_policy:
+          widget: select
+          widget_options:
+            options:
+              - { value: azure, label: "Azure Network Policy" }
+              - { value: calico, label: "Calico" }
+              - { value: cilium, label: "Cilium" }
+              - { value: "", label: "None (no network policy)" }
+        pod_cidr:
+          widget: text
+          placeholder: "10.244.0.0/16"
+        service_cidr:
+          widget: text
+          placeholder: "10.0.0.0/16"
+        dns_service_ip:
+          widget: text
+          placeholder: "10.0.0.10"
+        outbound_type:
+          widget: select
+          widget_options:
+            options: ["loadBalancer", "userDefinedRouting", "managedNATGateway", "userAssignedNATGateway"]
+        load_balancer_profile:
+          widget: object
+          widget_options:
+            fields:
+              managed_outbound_ip_count:
+                widget: number
+                widget_options: { min: 1, max: 100 }
+              outbound_ip_address_ids:
+                widget: text
+                widget_options: { multiline: true }
+              outbound_ip_prefix_ids:
+                widget: text
+                widget_options: { multiline: true }
+              outbound_ports_allocated:
+                widget: number
+                widget_options: { min: 0, step: 8 }
+              idle_timeout_in_minutes:
+                widget: number
+                widget_options: { min: 4, max: 100 }
+          help: "managed_outbound_ip_count, outbound_ip_address_ids, and outbound_ip_prefix_ids are mutually exclusive."
+          # NOTE: mutual exclusion is not expressible in show_when. See findings.
+    group: networking
+    order: 10
+    advanced: true
+    help: "Network configuration. Defaults to Azure CNI Overlay."
+
+  authorized_ip_ranges:
+    widget: text
+    widget_options: { multiline: true }
+    group: networking
+    order: 20
+    help: "Public IP CIDRs allowed to reach the API server, one per line. Leave empty for a fully private cluster."
+
+  private_dns_zone_id:
+    widget: resource_picker
+    widget_options:
+      resource_type: private_dns_zone
+      sentinels:
+        - { value: "System", label: "System (Azure-managed)" }
+        - { value: "None", label: "None" }
+    group: networking
+    order: 30
+    advanced: true
+    help: "Resource ID, 'System' (Azure-managed), or 'None'. Only applies to private clusters."
+
+  # --- Default node pool ---
+  default_node_pool:
+    widget: object
+    widget_options:
+      fields:
+        name:
+          widget: text
+          placeholder: "system"
+          help: "System node pool name. Added by module v4.x; defaults to 'system'."
+        vm_size:
+          widget: text
+          placeholder: "Standard_D2s_v3"
+        vnet_subnet_id:
+          widget: resource_picker
+          widget_options: { resource_type: subnet }
+        node_count:
+          widget: number
+          widget_options: { min: 1, max: 1000 }
+        min_count:
+          widget: number
+          widget_options: { min: 1, max: 1000 }
+        max_count:
+          widget: number
+          widget_options: { min: 1, max: 1000 }
+        os_disk_size_gb:
+          widget: number
+          widget_options: { min: 30, max: 2048 }
+        os_disk_type:
+          widget: select
+          widget_options:
+            options: ["Managed", "Ephemeral"]
+        os_sku:
+          widget: select
+          widget_options:
+            options: ["AzureLinux", "Ubuntu", "Windows2019", "Windows2022"]
+        zones:
+          widget: multiselect
+          widget_options:
+            options: ["1", "2", "3"]
+          help: "Availability zones. Leave empty for non-zonal subscriptions."
+        max_pods:
+          widget: number
+          widget_options: { min: 10, max: 250 }
+        temporary_name_for_rotation:
+          widget: text
+          placeholder: "tmpnodepool"
+          advanced: true
+        upgrade_settings:
+          widget: object
+          widget_options:
+            fields:
+              max_surge:
+                widget: text
+                placeholder: "33%"
+              drain_timeout_in_minutes:
+                widget: number
+                widget_options: { min: 0, max: 1440 }
+              node_soak_duration_in_minutes:
+                widget: number
+                widget_options: { min: 0, max: 30 }
+    group: node_pool
+    order: 10
+
+  # --- Identity ---
+  enable_system_assigned_identity:
+    widget: toggle
+    group: identity
+    order: 10
+
+  user_assigned_identity_ids:
+    widget: resource_picker
+    widget_options:
+      resource_type: user_assigned_identity
+      multiple: true
+    group: identity
+    order: 20
+    help: "Additional user-assigned identities to attach to the cluster."
+
+  # --- Authentication / RBAC ---
+  rbac_mode:
+    widget: select
+    widget_options: { derive_from_validation: true }
+    group: security
+    order: 10
+    help: "azure = Azure RBAC. kubernetes = Kubernetes RBAC. Azure AD auth is always on."
+
+  admin_group_object_ids:
+    widget: resource_picker
+    widget_options:
+      resource_type: entra_group
+      multiple: true
+    group: security
+    order: 20
+    help: "Azure AD groups whose members get cluster admin."
+
+  workload_identity_enabled:
+    widget: toggle
+    group: security
+    order: 30
+    help: "Enable workload identity for pod-to-Azure-service authentication via OIDC federation."
+
+  # --- Autoscaling ---
+  enable_auto_scaling:
+    widget: toggle
+    group: scaling
+    order: 10
+
+  auto_scaler_profile:
+    widget: object
+    widget_options:
+      fields:
+        balance_similar_node_groups: { widget: toggle }
+        empty_bulk_delete_max: { widget: number }
+        expander:
+          widget: select
+          widget_options:
+            options: ["least-waste", "priority", "most-pods", "random"]
+        max_graceful_termination_sec: { widget: number }
+        max_node_provisioning_time: { widget: text, placeholder: "15m" }
+        max_unready_nodes: { widget: number }
+        max_unready_percentage: { widget: number, widget_options: { min: 0, max: 100 } }
+        new_pod_scale_up_delay: { widget: text, placeholder: "10s" }
+        scale_down_delay_after_add: { widget: text, placeholder: "10m" }
+        scale_down_delay_after_delete: { widget: text }
+        scale_down_delay_after_failure: { widget: text, placeholder: "3m" }
+        scale_down_unneeded: { widget: text, placeholder: "10m" }
+        scale_down_unready: { widget: text, placeholder: "20m" }
+        scale_down_utilization_threshold: { widget: text, placeholder: "0.5" }
+        scan_interval: { widget: text, placeholder: "10s" }
+        skip_nodes_with_local_storage: { widget: toggle }
+        skip_nodes_with_system_pods: { widget: toggle }
+    group: scaling
+    order: 20
+    advanced: true
+    help: "Cluster autoscaler tuning. Leave empty for Azure defaults."
+    show_when:
+      enable_auto_scaling: true
+
+  # --- Upgrades and maintenance ---
+  automatic_upgrade_channel:
+    widget: select
+    widget_options: { derive_from_validation: true }
+    group: maintenance
+    order: 10
+    help: "Auto-upgrade strategy for the cluster control plane."
+
+  # Dedicated maintenance-window widgets were REJECTED (T1 §15.1); modelled as
+  # widget: object + ordered_list repeaters instead. maintenance_window mirrors
+  # the contract worked example (T1 §6.5).
+  maintenance_window:
+    widget: object
+    widget_options:
+      fields:
+        allowed:
+          widget: repeater
+          widget_options:
+            mode: ordered_list
+            row_fields:
+              day:
+                widget: select
+                widget_options:
+                  options: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+              hours:
+                widget: multiselect
+                widget_options:
+                  options: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
+            add_label: "Add allowed window"
+        not_allowed:
+          widget: repeater
+          widget_options:
+            mode: ordered_list
+            row_fields:
+              start: { widget: text, placeholder: "2026-12-24T00:00Z" }
+              end:   { widget: text, placeholder: "2026-12-26T23:59Z" }
+            add_label: "Add blackout window"
+    group: maintenance
+    order: 20
+    help: "General maintenance window (cluster operations)."
+
+  # auto_upgrade and node_os share the azurerm auto-upgrade schedule shape:
+  # scalar schedule fields + a not_allowed blackout list.
+  maintenance_window_auto_upgrade:
+    widget: object
+    widget_options:
+      fields:
+        frequency:
+          widget: select
+          widget_options:
+            options: ["Daily", "Weekly", "AbsoluteMonthly", "RelativeMonthly"]
+        interval:
+          widget: number
+          widget_options: { min: 1 }
+          help: "Number of frequency units between windows."
+        duration:
+          widget: number
+          widget_options: { min: 4, max: 24 }
+          help: "Window length in hours (4-24)."
+        day_of_week:
+          widget: select
+          widget_options:
+            options: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+          show_when: { frequency: ["Weekly", "RelativeMonthly"] }
+        day_of_month:
+          widget: number
+          widget_options: { min: 1, max: 31 }
+          show_when: { frequency: AbsoluteMonthly }
+        week_index:
+          widget: select
+          widget_options:
+            options: ["First", "Second", "Third", "Fourth", "Last"]
+          show_when: { frequency: RelativeMonthly }
+        start_time:
+          widget: text
+          placeholder: "02:00"
+        utc_offset:
+          widget: text
+          placeholder: "+00:00"
+        start_date:
+          widget: text
+          placeholder: "2026-07-01T00:00:00Z"
+          advanced: true
+        not_allowed:
+          widget: repeater
+          widget_options:
+            mode: ordered_list
+            row_fields:
+              start: { widget: text, placeholder: "2026-12-24T00:00Z" }
+              end:   { widget: text, placeholder: "2026-12-26T23:59Z" }
+            add_label: "Add blackout window"
+    group: maintenance
+    order: 30
+    help: "Auto-upgrade maintenance window. Schedule cluster upgrades here."
+
+  maintenance_window_node_os:
+    widget: object
+    widget_options:
+      fields:
+        frequency:
+          widget: select
+          widget_options:
+            options: ["Daily", "Weekly", "AbsoluteMonthly", "RelativeMonthly"]
+        interval:
+          widget: number
+          widget_options: { min: 1 }
+          help: "Number of frequency units between windows."
+        duration:
+          widget: number
+          widget_options: { min: 4, max: 24 }
+          help: "Window length in hours (4-24)."
+        day_of_week:
+          widget: select
+          widget_options:
+            options: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+          show_when: { frequency: ["Weekly", "RelativeMonthly"] }
+        day_of_month:
+          widget: number
+          widget_options: { min: 1, max: 31 }
+          show_when: { frequency: AbsoluteMonthly }
+        week_index:
+          widget: select
+          widget_options:
+            options: ["First", "Second", "Third", "Fourth", "Last"]
+          show_when: { frequency: RelativeMonthly }
+        start_time:
+          widget: text
+          placeholder: "02:00"
+        utc_offset:
+          widget: text
+          placeholder: "+00:00"
+        start_date:
+          widget: text
+          placeholder: "2026-07-01T00:00:00Z"
+          advanced: true
+        not_allowed:
+          widget: repeater
+          widget_options:
+            mode: ordered_list
+            row_fields:
+              start: { widget: text, placeholder: "2026-12-24T00:00Z" }
+              end:   { widget: text, placeholder: "2026-12-26T23:59Z" }
+            add_label: "Add blackout window"
+    group: maintenance
+    order: 40
+    help: "Node OS upgrade maintenance window."
+
+  # --- Observability ---
+  enable_container_insights:
+    widget: toggle
+    group: monitoring
+    order: 10
+
+  log_analytics_workspace_id:
+    widget: resource_picker
+    widget_options: { resource_type: log_analytics_workspace }
+    group: monitoring
+    order: 20
+    help: "Required when Container Insights is enabled."
+    show_when:
+      enable_container_insights: true
+    # NOTE: HCL validation also references this from cross-variable check. See findings.
+
+  diagnostic_settings:
+    widget: object
+    widget_options:
+      fields:
+        name:
+          widget: text
+          placeholder: "diag-<cluster-name>"
+        log_analytics_workspace_id:
+          widget: resource_picker
+          widget_options: { resource_type: log_analytics_workspace }
+        storage_account_id:
+          widget: resource_picker
+          widget_options: { resource_type: storage_account }
+        eventhub_authorization_rule_id:
+          widget: text
+        eventhub_name:
+          widget: text
+        log_analytics_destination_type:
+          widget: select
+          widget_options:
+            options: ["Dedicated", "AzureDiagnostics"]
+        enabled_log_categories:
+          widget: text
+          widget_options: { multiline: true }
+          help: "One category per line. Leave empty for all supported."
+        enabled_metrics:
+          widget: text
+          widget_options: { multiline: true }
+          help: "One metric per line. Leave empty for all supported."
+    group: monitoring
+    order: 30
+    advanced: true
+
+  # --- Add-ons ---
+  key_vault_secrets_provider:
+    widget: object
+    widget_options:
+      fields:
+        secret_rotation_enabled: { widget: toggle }
+        secret_rotation_interval: { widget: text, placeholder: "2m" }
+    group: addons
+    order: 10
+    help: "Key Vault CSI driver. Leave empty to disable."
+
+  # --- Advanced / overrides ---
+  node_resource_group_name:
+    widget: hidden
+    derived_from: { source: "naming.aks_node_resource_group(parent=name)" }
+    # Derived as rg-<cluster_name>-nodes per T1.5 §4.4 / §6.2.2 exception (OQ#6, resolved 2026-06-17).
+    # Override via naming_overrides keyed by aks_node_resource_group (standard B path).
+
+dependencies:
+  required_inputs_from_other_resources:
+    - variable: default_node_pool.vnet_subnet_id
+      resource_type: subnet
+      cardinality: one
+      notes: "System node pool subnet."
+
+    - variable: private_dns_zone_id
+      resource_type: private_dns_zone
+      cardinality: one
+      notes: "Required for fully private clusters (when authorized_ip_ranges is empty), unless the literal 'System' is used."
+
+    - variable: log_analytics_workspace_id
+      resource_type: log_analytics_workspace
+      cardinality: one
+      notes: "Required when enable_container_insights is true."
+
+    - variable: user_assigned_identity_ids
+      resource_type: user_assigned_identity
+      cardinality: many
+      notes: "Optional additional identities."
+
+    - variable: network_profile.load_balancer_profile.outbound_ip_address_ids
+      resource_type: public_ip
+      cardinality: many
+      notes: "Only when load balancer profile uses BYO public IPs."
+
+    - variable: diagnostic_settings.log_analytics_workspace_id
+      resource_type: log_analytics_workspace
+      cardinality: one
+      notes: "Optional diagnostic sink."
+
+  produces_outputs_consumable_by:
+    - output: id
+      resource_type: aks_cluster
+    - output: oidc_issuer_url
+      resource_type: oidc_issuer
+
+outputs_display:
+  id:
+    display_name: "Resource ID"
+    show_in_summary: true
+    copyable: true
+    format: arm_id
+
+  name:
+    display_name: "Cluster name"
+    show_in_summary: true
+    copyable: true
+
+  fqdn:
+    display_name: "Public FQDN"
+    show_in_summary: true
+    copyable: true
+
+  private_fqdn:
+    display_name: "Private FQDN"
+    show_in_summary: true
+    copyable: true
+    # See findings: this output is null for public clusters.
+
+  node_resource_group:
+    display_name: "Node resource group"
+    show_in_summary: true
+    copyable: true
+
+  oidc_issuer_url:
+    display_name: "OIDC issuer URL"
+    show_in_summary: false
+    copyable: true
+    format: url
+
+  principal_id:
+    display_name: "System identity principal ID"
+    show_in_summary: false
+    copyable: true
+    # See findings: AAD principal, not an ARM ID. Cross-cuts with UAI Finding 01 §3.1.
+
+  tenant_id:
+    display_name: "Tenant ID"
+    show_in_summary: false
+    copyable: true
+
+  kubelet_identity:
+    display_name: "Kubelet identity"
+    show_in_summary: false
+    copyable: true
+    # See findings: this output is a nested object, not a scalar.
+
+  public_aks_id:
+    display_name: "Resource ID (public)"
+    show_in_summary: false
+    copyable: true
+    format: arm_id
+    role: public_alias
+
+  public_aks_name:
+    display_name: "Cluster name (public)"
+    show_in_summary: false
+    copyable: true
+    role: public_alias
