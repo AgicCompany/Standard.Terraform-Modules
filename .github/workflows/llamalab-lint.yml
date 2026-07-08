@@ -63,6 +63,13 @@ jobs:
         module: ${{ fromJson(needs.detect-changes.outputs.modules) }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          # The lint tool resolves each sidecar's pinned module_version against a
+          # real git tag (<module>/vX.Y.Z) and introspects that tag's tree. A bare
+          # checkout here defaults to fetch-depth 1 / fetch-tags false, which yields
+          # zero tags and fails every module identically ("pinned tag ... not found").
+          fetch-depth: 0
+          fetch-tags: true
 
       - uses: actions/setup-python@v5
         with:
