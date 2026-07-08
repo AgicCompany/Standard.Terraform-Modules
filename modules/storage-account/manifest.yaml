@@ -1,0 +1,382 @@
+schema_version: "0.1"
+
+metadata:
+  module_name: storage-account
+  module_version: "3.2.0"
+  schema_authored_by: AGIC Infrastructure Team
+  schema_last_updated: "2026-05-18"
+
+catalogue:
+  display_name: "Storage Account"
+  short_description: "Azure Storage Account with private endpoints and secure defaults."
+  long_description: |
+    Azure Storage Account with security-first defaults: private endpoints for
+    blob/file/table/queue subresources, public access disabled, shared key
+    auth disabled, TLS 1.2 enforced, soft delete enabled. Supports optional
+    diagnostic settings with multi-sink output (Log Analytics, storage, Event Hub).
+  category: foundation
+  subcategory: storage
+  icon: storage-account
+  complexity: medium
+  cost_tier: low
+  deprecated: false
+  tags:
+    - storage
+    - blob
+    - file
+    - queue
+    - table
+    - private-endpoint
+
+variables:
+  # --- Deployment-context derived ---
+  resource_group_name:
+    widget: hidden
+    derived_from: { source: deployment_context.resource_group }
+
+  location:
+    widget: hidden
+    derived_from: { source: deployment_context.location }
+
+  name:
+    widget: hidden
+    derived_from: { source: naming.storage_account }
+
+  tags:
+    widget: hidden
+    derived_from: { source: deployment_context.tags }
+
+  # --- Core configuration ---
+  account_tier:
+    widget: select
+    widget_options: { derive_from_validation: true }
+    group: core
+    order: 10
+    help: "Standard is general-purpose. Premium is for low-latency workloads (block/file/page blob specialised SKUs)."
+
+  account_replication_type:
+    widget: select
+    widget_options: { derive_from_validation: true }
+    group: core
+    order: 20
+    help: "LRS = locally redundant. ZRS = zone redundant. GRS/RAGRS = geo-redundant. GZRS/RAGZRS = zone + geo redundant."
+
+  account_kind:
+    widget: select
+    widget_options: { derive_from_validation: true }
+    group: core
+    order: 30
+    help: "StorageV2 is the modern default. BlobStorage / BlockBlobStorage / FileStorage are specialised. Storage is the legacy v1 kind."
+
+  access_tier:
+    widget: select
+    widget_options: { derive_from_validation: true }
+    group: core
+    order: 40
+    help: "Hot for frequent access, Cool for infrequent, Cold for rarely-accessed archival-style data. Applies to BlobStorage and StorageV2 only."
+    # NOTE: could be hidden when account_kind is in {FileStorage, BlockBlobStorage}
+    # via show_when set-inclusion (the shown-set complement); not yet wired.
+
+  # --- Security ---
+  min_tls_version:
+    widget: hidden  # Validation locks this to "1.2"; no user choice. See findings.
+    group: security
+    order: 10
+    derived_from: { source: hcl_default }  # Locked to the module's secure default (T1 v0.5).
+
+  allow_nested_items_to_be_public:
+    widget: toggle
+    group: security
+    order: 20
+    help: "Allow public access at the container level. Strongly discouraged."
+
+  shared_access_key_enabled:
+    widget: toggle
+    group: security
+    order: 30
+    help: "Enable shared key auth. Disabled by default; prefer managed identity."
+
+  # --- Networking: public access ---
+  enable_public_access:
+    widget: toggle
+    group: networking
+    order: 10
+    help: "Allow public network access. When false, the storage account is reachable only via private endpoints."
+
+  network_rules:
+    widget: object
+    widget_options:
+      fields:
+        bypass:
+          widget: multiselect
+          widget_options:
+            options: ["AzureServices", "Logging", "Metrics", "None"]
+        default_action:
+          widget: select
+          widget_options:
+            options: ["Allow", "Deny"]
+        ip_rules:
+          widget: text
+          widget_options: { multiline: true }
+          help: "One CIDR per line."
+        virtual_network_subnet_ids:
+          widget: resource_picker
+          widget_options: { resource_type: subnet }
+    group: networking
+    order: 20
+    advanced: true
+    help: "Network ACLs. Only applied when public access is enabled."
+    show_when:
+      enable_public_access: true
+
+  # --- Networking: private endpoints ---
+  enable_private_endpoint:
+    widget: toggle
+    group: networking
+    order: 30
+    help: "Master switch for private endpoints. When true, enable each subresource separately below."
+
+  enable_blob_private_endpoint:
+    widget: toggle
+    group: networking
+    order: 31
+    show_when:
+      enable_private_endpoint: true
+
+  enable_file_private_endpoint:
+    widget: toggle
+    group: networking
+    order: 32
+    show_when:
+      enable_private_endpoint: true
+
+  enable_table_private_endpoint:
+    widget: toggle
+    group: networking
+    order: 33
+    show_when:
+      enable_private_endpoint: true
+
+  enable_queue_private_endpoint:
+    widget: toggle
+    group: networking
+    order: 34
+    show_when:
+      enable_private_endpoint: true
+
+  subnet_id:
+    widget: resource_picker
+    widget_options: { resource_type: subnet }
+    group: networking
+    order: 40
+    help: "Subnet hosting the private endpoint NICs. Required when any subresource private endpoint is enabled."
+    show_when:
+      enable_private_endpoint: true
+    required_when:
+      enable_private_endpoint: true
+
+  private_dns_zone_ids:
+    widget: key_value_map  # See findings: needs a constrained-key repeater of resource_picker values.
+    group: networking
+    order: 50
+    help: "Map of subresource (blob, file, table, queue) to private DNS zone ID."
+    show_when:
+      enable_private_endpoint: true
+
+  private_endpoint_name_prefix:
+    widget: text
+    group: networking
+    order: 60
+    advanced: true
+    placeholder: "pep-<storage-account-name>"
+    help: "Override the PE and NIC name stem. Default derives from the storage account name."
+    show_when:
+      enable_private_endpoint: true
+    # NOTE: this is a naming concern. T1.5 does not currently produce sub-resource
+    # names (only the primary resource name). See findings.
+
+  private_service_connection_name_prefix:
+    widget: text
+    group: networking
+    order: 70
+    advanced: true
+    placeholder: "psc-<storage-account-name>"
+    help: "Override the private service connection name stem. Final name: '<prefix>-<subresource>'. Default derives from the storage account name."
+    show_when:
+      enable_private_endpoint: true
+    # NOTE: same naming concern as private_endpoint_name_prefix. Added by module
+    # v3.2.0. T1.5 does not yet derive sub-resource names. See findings.
+
+  # --- Features ---
+  enable_versioning:
+    widget: toggle
+    group: features
+    order: 10
+    help: "Enable blob versioning. Not applicable to FileStorage account kind."
+
+  enable_blob_soft_delete:
+    widget: toggle
+    group: features
+    order: 20
+
+  blob_soft_delete_retention_days:
+    widget: number
+    widget_options: { min: 1, max: 365, step: 1 }
+    group: features
+    order: 21
+    show_when:
+      enable_blob_soft_delete: true
+
+  enable_container_soft_delete:
+    widget: toggle
+    group: features
+    order: 30
+
+  container_soft_delete_retention_days:
+    widget: number
+    widget_options: { min: 1, max: 365, step: 1 }
+    group: features
+    order: 31
+    show_when:
+      enable_container_soft_delete: true
+
+  # --- Monitoring ---
+  diagnostic_settings:
+    widget: object  # Diagnostics object (standardised across many modules).
+    widget_options:
+      fields:
+        name:
+          widget: text
+          placeholder: "diag-<storage-account-name>"
+        log_analytics_workspace_id:
+          widget: resource_picker
+          widget_options: { resource_type: log_analytics_workspace }
+        storage_account_id:
+          widget: resource_picker
+          widget_options: { resource_type: storage_account }
+        eventhub_authorization_rule_id:
+          widget: text
+        eventhub_name:
+          widget: text
+        log_analytics_destination_type:
+          widget: select
+          widget_options:
+            options: ["Dedicated", "AzureDiagnostics"]
+        enabled_log_categories:
+          widget: text
+          widget_options: { multiline: true }
+          help: "One category per line. Leave empty for all supported."
+        enabled_metrics:
+          widget: text
+          widget_options: { multiline: true }
+          help: "One metric per line. Leave empty for all supported."
+    group: monitoring
+    order: 10
+    advanced: true
+    help: "Optional. Leave blank to disable diagnostic settings."
+
+dependencies:
+  required_inputs_from_other_resources:
+    - variable: subnet_id
+      resource_type: subnet
+      cardinality: one
+      notes: "Required when any private endpoint is enabled."
+    - variable: private_dns_zone_ids
+      resource_type: private_dns_zone
+      cardinality: many
+      notes: "One DNS zone per enabled subresource (blob, file, table, queue)."
+    - variable: network_rules.virtual_network_subnet_ids
+      resource_type: subnet
+      cardinality: many
+      notes: "Only when public access is enabled and network ACLs are configured."
+    - variable: diagnostic_settings.log_analytics_workspace_id
+      resource_type: log_analytics_workspace
+      cardinality: one
+      notes: "Optional diagnostic sink."
+    - variable: diagnostic_settings.storage_account_id
+      resource_type: storage_account
+      cardinality: one
+      notes: "Optional diagnostic sink. Must be a different storage account."
+
+  produces_outputs_consumable_by:
+    - output: id
+      resource_type: storage_account
+    - output: primary_blob_endpoint
+      resource_type: storage_blob_endpoint
+    - output: primary_file_endpoint
+      resource_type: storage_file_endpoint
+    - output: primary_queue_endpoint
+      resource_type: storage_queue_endpoint
+    - output: primary_table_endpoint
+      resource_type: storage_table_endpoint
+
+outputs_display:
+  id:
+    display_name: "Resource ID"
+    show_in_summary: true
+    copyable: true
+    format: arm_id
+
+  name:
+    display_name: "Storage account name"
+    show_in_summary: true
+    copyable: true
+
+  primary_blob_endpoint:
+    display_name: "Blob endpoint"
+    show_in_summary: true
+    copyable: true
+    format: url
+
+  primary_file_endpoint:
+    display_name: "File endpoint"
+    show_in_summary: false
+    copyable: true
+    format: url
+
+  primary_table_endpoint:
+    display_name: "Table endpoint"
+    show_in_summary: false
+    copyable: true
+    format: url
+
+  primary_queue_endpoint:
+    display_name: "Queue endpoint"
+    show_in_summary: false
+    copyable: true
+    format: url
+
+  primary_location:
+    display_name: "Primary location"
+    show_in_summary: false
+    copyable: true
+
+  private_endpoint_ids:
+    display_name: "Private endpoint IDs"
+    show_in_summary: false
+    copyable: true
+
+  private_ip_addresses:
+    display_name: "Private IP addresses"
+    show_in_summary: true
+    copyable: true
+
+  public_storage_account_id:
+    display_name: "Resource ID (public)"
+    show_in_summary: false
+    copyable: true
+    format: arm_id
+    role: public_alias
+
+  public_storage_account_name:
+    display_name: "Storage account name (public)"
+    show_in_summary: false
+    copyable: true
+    role: public_alias
+
+  public_primary_blob_endpoint:
+    display_name: "Blob endpoint (public)"
+    show_in_summary: false
+    copyable: true
+    format: url
+    role: public_alias

@@ -1,0 +1,160 @@
+schema_version: "0.1"
+
+metadata:
+  module_name: network-security-group
+  module_version: "1.3.0"
+  schema_authored_by: AGIC Infrastructure Team
+  schema_last_updated: "2026-06-19"
+
+catalogue:
+  display_name: "Network Security Group"
+  short_description: "Azure Network Security Group with configurable inbound and outbound security rules."
+  long_description: |
+    Azure Network Security Group (NSG) defining packet-filter rules for
+    subnets and network interfaces. Rules are priority-ordered; lower priority
+    wins. Each rule specifies direction (Inbound/Outbound), access (Allow/Deny),
+    protocol, source and destination port ranges, and address prefixes. Use
+    singular port/address fields for single-range rules; use the list variants
+    (advanced) for multi-range rules. source_address_prefix and
+    source_application_security_group_ids are mutually exclusive per rule.
+  category: networking
+  subcategory: security
+  icon: network-security-group
+  complexity: medium
+  cost_tier: free
+  deprecated: false
+  tags:
+    - networking
+    - security
+    - nsg
+    - firewall
+
+variables:
+  # --- Deployment-context derived ---
+  resource_group_name:
+    widget: hidden
+    derived_from: { source: deployment_context.resource_group }
+
+  location:
+    widget: hidden
+    derived_from: { source: deployment_context.location }
+
+  name:
+    widget: hidden
+    derived_from: { source: naming.network_security_group }
+
+  tags:
+    widget: hidden
+    derived_from: { source: deployment_context.tags }
+
+  # --- Security rules ---
+  # NOTE: source_port_range / source_port_ranges are mutually exclusive per rule
+  # (exactly one required). Same for destination_port_range / destination_port_ranges,
+  # and for source_address_prefix / source_address_prefixes /
+  # source_application_security_group_ids. The sidecar grammar cannot express
+  # intra-row mutual exclusivity; enforcement relies on module-level HCL validation.
+  security_rules:
+    widget: repeater
+    widget_options:
+      mode: keyed_map
+      key_field:
+        label: "Rule name"
+        placeholder: "allow-https-inbound"
+      row_fields:
+        priority:
+          widget: number
+          widget_options: { min: 100, max: 4096, step: 1 }
+          help: "Rule evaluation order. Lower number = higher priority. Must be unique per direction (100–4096)."
+        direction:
+          widget: select
+          widget_options:
+            options: ["Inbound", "Outbound"]
+          help: "Traffic direction this rule applies to."
+        access:
+          widget: select
+          widget_options:
+            options: ["Allow", "Deny"]
+          help: "Whether matching traffic is permitted or blocked."
+        protocol:
+          widget: select
+          widget_options:
+            options: ["Tcp", "Udp", "Icmp", "Esp", "Ah", "*"]
+          help: "IP protocol. Use * to match all protocols."
+        source_port_range:
+          widget: text
+          placeholder: "*"
+          help: "Single source port or range (e.g. 80, 1024-65535, *). Use instead of source_port_ranges."
+        destination_port_range:
+          widget: text
+          placeholder: "443"
+          help: "Single destination port or range (e.g. 443, 8080-8090, *). Use instead of destination_port_ranges."
+        source_address_prefix:
+          widget: text
+          placeholder: "*"
+          help: "Single source CIDR or tag (e.g. 10.0.0.0/8, Internet, VirtualNetwork). Mutually exclusive with source_address_prefixes and source_application_security_group_ids."
+        destination_address_prefix:
+          widget: text
+          placeholder: "VirtualNetwork"
+          help: "Single destination CIDR or tag. Mutually exclusive with destination_address_prefixes and destination_application_security_group_ids."
+        description:
+          widget: text
+          help: "Optional human-readable description for this rule."
+        source_port_ranges:
+          widget: code_editor
+          widget_options: { language: json }
+          advanced: true
+          help: "JSON array of source port ranges when multiple ranges are needed. Mutually exclusive with source_port_range."
+        destination_port_ranges:
+          widget: code_editor
+          widget_options: { language: json }
+          advanced: true
+          help: "JSON array of destination port ranges when multiple ranges are needed. Mutually exclusive with destination_port_range."
+        source_address_prefixes:
+          widget: code_editor
+          widget_options: { language: json }
+          advanced: true
+          help: "JSON array of source CIDRs when multiple prefixes are needed. Mutually exclusive with source_address_prefix."
+        destination_address_prefixes:
+          widget: code_editor
+          widget_options: { language: json }
+          advanced: true
+          help: "JSON array of destination CIDRs when multiple prefixes are needed. Mutually exclusive with destination_address_prefix."
+        source_application_security_group_ids:
+          widget: code_editor
+          widget_options: { language: json }
+          advanced: true
+          help: "JSON array of source Application Security Group resource IDs. Mutually exclusive with source_address_prefix."
+        destination_application_security_group_ids:
+          widget: code_editor
+          widget_options: { language: json }
+          advanced: true
+          help: "JSON array of destination Application Security Group resource IDs. Mutually exclusive with destination_address_prefix."
+      add_label: "Add security rule"
+    group: security
+    order: 10
+    help: "Security rules controlling traffic to and from associated subnets or network interfaces."
+
+dependencies:
+  required_inputs_from_other_resources: []
+  produces_outputs_consumable_by:
+    - output: id
+      resource_type: virtual_network
+
+outputs_display:
+  id:
+    display_name: "Resource ID"
+    show_in_summary: true
+    copyable: true
+    format: arm_id
+
+  name:
+    display_name: "NSG name"
+    show_in_summary: true
+    copyable: true
+
+  public_nsg_id:
+    display_name: "Resource ID (public)"
+    show_in_summary: false
+    copyable: true
+    format: arm_id
+    role: public_alias

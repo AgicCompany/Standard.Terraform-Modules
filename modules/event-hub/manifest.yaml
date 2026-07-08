@@ -1,0 +1,291 @@
+schema_version: "0.1"
+
+metadata:
+  module_name: event-hub
+  module_version: "3.1.0"
+  schema_authored_by: AGIC Infrastructure Team
+  schema_last_updated: "2026-06-19"
+
+catalogue:
+  display_name: "Event Hub Namespace"
+  short_description: "Azure Event Hub namespace with private endpoint and secure defaults."
+  long_description: |
+    Azure Event Hub namespace with security-first defaults: private endpoint enabled, public
+    access disabled, local SAS authentication disabled. Supports event hub and consumer group
+    management, namespace-level authorization rules, auto-inflate, and optional diagnostic
+    settings with multi-sink output.
+  category: messaging
+  subcategory: event-streaming
+  icon: event-hub
+  complexity: medium
+  cost_tier: medium
+  deprecated: false
+  tags:
+    - messaging
+    - event-streaming
+    - kafka
+    - private-endpoint
+    - event-hub
+
+variables:
+  # --- Deployment-context derived ---
+  resource_group_name:
+    widget: hidden
+    derived_from: { source: deployment_context.resource_group }
+
+  location:
+    widget: hidden
+    derived_from: { source: deployment_context.location }
+
+  name:
+    widget: hidden
+    derived_from: { source: naming.event_hub_namespace }
+
+  tags:
+    widget: hidden
+    derived_from: { source: deployment_context.tags }
+
+  # --- Core configuration ---
+  sku:
+    widget: select
+    widget_options: { derive_from_validation: true }
+    group: core
+    order: 10
+    help: "Basic for simple fan-out. Standard for most workloads. Premium for dedicated capacity and private link."
+
+  # Locked to 1.2 by module validation; no user choice.
+  min_tls_version:
+    widget: hidden
+    derived_from: { source: hcl_default }
+
+  # --- Scaling ---
+  capacity:
+    widget: number
+    widget_options: { min: 1, max: 40, step: 1 }
+    group: scaling
+    order: 10
+    help: "Throughput units (Basic/Standard: 1-40, Premium: 1-16)."
+
+  auto_inflate_enabled:
+    widget: toggle
+    group: scaling
+    order: 20
+    help: "Automatically scale throughput units up to the configured maximum. Standard SKU only."
+
+  maximum_throughput_units:
+    widget: number
+    widget_options: { min: 1, max: 40, step: 1 }
+    group: scaling
+    order: 30
+    help: "Maximum throughput units when auto-inflate is enabled (1-40)."
+    show_when:
+      auto_inflate_enabled: true
+
+  # --- Security ---
+  enable_local_auth:
+    widget: toggle
+    group: security
+    order: 10
+    help: "Enable local (SAS key) authentication. Disabled by default — prefer managed identity."
+
+  enable_public_access:
+    widget: toggle
+    group: security
+    order: 20
+    help: "Allow public network access. When false, the namespace is reachable only via private endpoints."
+
+  # --- Entities: event hubs and authorization rules ---
+  event_hubs:
+    widget: repeater
+    widget_options:
+      mode: keyed_map
+      key_field:
+        label: "Event Hub name"
+        placeholder: "telemetry"
+      row_fields:
+        partition_count:
+          widget: number
+          widget_options: { min: 1, max: 32, step: 1 }
+          help: "Number of partitions (1-32, immutable after creation)."
+        message_retention:
+          widget: number
+          widget_options: { min: 1, max: 7, step: 1 }
+          help: "Message retention in days (1-7 for Standard)."
+        consumer_groups:
+          widget: key_value_map
+          help: "Additional consumer groups keyed by name. The $Default group is always created."
+    group: entities
+    order: 10
+    help: "Event Hubs to create within this namespace. Each entry is keyed by hub name."
+
+  authorization_rules:
+    widget: repeater
+    widget_options:
+      mode: keyed_map
+      key_field:
+        label: "Rule name"
+        placeholder: "sender"
+      row_fields:
+        listen:
+          widget: toggle
+        send:
+          widget: toggle
+        manage:
+          widget: toggle
+    group: entities
+    order: 20
+    help: "Namespace-level shared access authorization rules. Each entry is keyed by rule name."
+
+  # --- Networking: private endpoint ---
+  enable_private_endpoint:
+    widget: toggle
+    group: networking
+    order: 10
+    help: "Create a private endpoint for this namespace. Requires subnet_id and private_dns_zone_id."
+
+  subnet_id:
+    widget: resource_picker
+    widget_options: { resource_type: subnet }
+    group: networking
+    order: 20
+    help: "Subnet hosting the private endpoint NIC. Required when enable_private_endpoint is true."
+    show_when:
+      enable_private_endpoint: true
+    required_when:
+      enable_private_endpoint: true
+
+  private_dns_zone_id:
+    widget: resource_picker
+    widget_options: { resource_type: private_dns_zone }
+    group: networking
+    order: 30
+    help: "Private DNS zone for privatelink.servicebus.windows.net. Required when enable_private_endpoint is true."
+    show_when:
+      enable_private_endpoint: true
+    required_when:
+      enable_private_endpoint: true
+
+  # --- Private endpoint name overrides (hidden; naming engine derives defaults) ---
+  private_endpoint_name:
+    widget: hidden
+    derived_from: { source: hcl_default }
+
+  private_service_connection_name:
+    widget: hidden
+    derived_from: { source: hcl_default }
+
+  private_endpoint_nic_name:
+    widget: hidden
+    derived_from: { source: hcl_default }
+
+  # --- Monitoring ---
+  diagnostic_settings:
+    widget: object
+    widget_options:
+      fields:
+        name:
+          widget: text
+          placeholder: "diag-<namespace-name>"
+        log_analytics_workspace_id:
+          widget: resource_picker
+          widget_options: { resource_type: log_analytics_workspace }
+        storage_account_id:
+          widget: resource_picker
+          widget_options: { resource_type: storage_account }
+        eventhub_authorization_rule_id:
+          widget: text
+        eventhub_name:
+          widget: text
+        log_analytics_destination_type:
+          widget: select
+          widget_options:
+            options: ["Dedicated", "AzureDiagnostics"]
+        enabled_log_categories:
+          widget: text
+          widget_options: { multiline: true }
+          help: "One category per line. Leave empty for all supported."
+        enabled_metrics:
+          widget: text
+          widget_options: { multiline: true }
+          help: "One metric per line. Leave empty for all supported."
+    group: monitoring
+    order: 10
+    advanced: true
+    help: "Optional. Leave blank to disable diagnostic settings."
+
+dependencies:
+  required_inputs_from_other_resources:
+    - variable: subnet_id
+      resource_type: subnet
+      cardinality: one
+      notes: "Required when enable_private_endpoint is true."
+    - variable: private_dns_zone_id
+      resource_type: private_dns_zone
+      cardinality: one
+      notes: "Required when enable_private_endpoint is true."
+    - variable: diagnostic_settings.log_analytics_workspace_id
+      resource_type: log_analytics_workspace
+      cardinality: one
+      notes: "Optional diagnostic sink."
+    - variable: diagnostic_settings.storage_account_id
+      resource_type: storage_account
+      cardinality: one
+      notes: "Optional diagnostic sink."
+
+  produces_outputs_consumable_by:
+    - output: id
+      resource_type: event_hub_namespace
+    - output: eventhub_ids
+      resource_type: event_hub_namespace
+      cardinality: many
+
+outputs_display:
+  id:
+    display_name: "Resource ID"
+    show_in_summary: true
+    copyable: true
+    format: arm_id
+
+  name:
+    display_name: "Namespace name"
+    show_in_summary: true
+    copyable: true
+
+  eventhub_ids:
+    display_name: "Event Hub IDs"
+    show_in_summary: false
+    copyable: true
+
+  consumer_group_ids:
+    display_name: "Consumer group IDs"
+    show_in_summary: false
+    copyable: true
+
+  authorization_rule_ids:
+    display_name: "Authorization rule IDs"
+    show_in_summary: false
+    copyable: true
+
+  private_endpoint_id:
+    display_name: "Private endpoint ID"
+    show_in_summary: false
+    copyable: true
+    format: arm_id
+
+  private_ip_address:
+    display_name: "Private IP address"
+    show_in_summary: true
+    copyable: true
+
+  public_namespace_id:
+    display_name: "Resource ID (public)"
+    show_in_summary: false
+    copyable: true
+    format: arm_id
+    role: public_alias
+
+  public_namespace_name:
+    display_name: "Namespace name (public)"
+    show_in_summary: false
+    copyable: true
+    role: public_alias

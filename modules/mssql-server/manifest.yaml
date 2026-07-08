@@ -1,0 +1,294 @@
+schema_version: "0.1"
+
+metadata:
+  module_name: mssql-server
+  module_version: "3.1.1"
+  schema_authored_by: AGIC Infrastructure Team
+  schema_last_updated: "2026-06-19"
+
+catalogue:
+  display_name: "SQL Server"
+  short_description: "Azure SQL logical server with Entra ID authentication, private endpoint, and security-first defaults."
+  long_description: |
+    Azure SQL logical server with security-first defaults: Entra ID (Azure AD)
+    authentication only, TLS 1.2, public access disabled, and private endpoint
+    enabled. Supports mixed SQL and Entra ID authentication modes, configurable
+    connection policy, and optional multi-sink diagnostic settings. Deploy as a
+    parent server for one or more SQL Database instances.
+  category: data
+  subcategory: relational
+  icon: mssql-server
+  complexity: high
+  cost_tier: medium
+  deprecated: false
+  tags:
+    - sql
+    - mssql
+    - sql-server
+    - relational
+    - private-endpoint
+
+variables:
+  # --- Deployment-context derived ---
+  resource_group_name:
+    widget: hidden
+    derived_from: { source: deployment_context.resource_group }
+
+  location:
+    widget: hidden
+    derived_from: { source: deployment_context.location }
+
+  name:
+    widget: hidden
+    derived_from: { source: naming.mssql_server }
+
+  tags:
+    widget: hidden
+    derived_from: { source: deployment_context.tags }
+
+  # --- Core configuration ---
+  # NOTE: version_number has only "12.0" as valid value (equality validation,
+  # not contains — derive_from_validation not applicable). Hidden with hcl_default.
+  version_number:
+    widget: hidden
+    derived_from: { source: hcl_default }
+
+  connection_policy:
+    widget: select
+    widget_options: { derive_from_validation: true }
+    group: core
+    order: 10
+    help: "Connection routing policy. Default = platform-recommended. Proxy = always via gateway. Redirect = direct after initial handshake (lower latency)."
+
+  # --- Security ---
+  azuread_administrator:
+    widget: object
+    widget_options:
+      fields:
+        login_username:
+          widget: text
+          help: "Azure AD login name (UPN or group display name)."
+        object_id:
+          widget: text
+          help: "Object ID of the Azure AD user, group, or service principal."
+    group: security
+    order: 10
+    help: "Azure AD administrator configuration. Required."
+
+  enable_aad_only_auth:
+    widget: toggle
+    group: security
+    order: 20
+    help: "Restrict authentication to Azure AD only. Disable to allow SQL logins alongside Entra ID."
+
+  administrator_login:
+    widget: text
+    group: security
+    order: 30
+    placeholder: "sqladmin"
+    help: "SQL administrator username. Required when Azure AD-only authentication is disabled."
+    show_when:
+      enable_aad_only_auth: false
+
+  administrator_login_password:
+    widget: text
+    sensitive_override: true
+    group: security
+    order: 40
+    help: "SQL administrator password. Min 12 chars; must include upper, lower, digit, and symbol. Required when Azure AD-only auth is disabled."
+    show_when:
+      enable_aad_only_auth: false
+
+  # NOTE: min_tls_version has only "1.2" as valid value (TLS 1.0/1.1 retired).
+  # Hidden with hcl_default.
+  min_tls_version:
+    widget: hidden
+    derived_from: { source: hcl_default }
+
+  # --- Networking ---
+  enable_private_endpoint:
+    widget: toggle
+    group: networking
+    order: 10
+    help: "Create a private endpoint for this SQL server. Recommended for private-network-only access."
+
+  enable_public_access:
+    widget: toggle
+    group: networking
+    order: 20
+    help: "Allow public network access. Disabled by default."
+
+  enable_outbound_networking_restriction:
+    widget: toggle
+    group: networking
+    order: 30
+    help: "Restrict outbound networking from this SQL server."
+
+  subnet_id:
+    widget: resource_picker
+    widget_options: { resource_type: subnet }
+    group: networking
+    order: 40
+    help: "Subnet hosting the private endpoint NIC. Required when enable_private_endpoint is true."
+    show_when:
+      enable_private_endpoint: true
+    required_when:
+      enable_private_endpoint: true
+
+  private_dns_zone_id:
+    widget: resource_picker
+    widget_options: { resource_type: private_dns_zone }
+    group: networking
+    order: 50
+    help: "Private DNS zone for privatelink.database.windows.net. Required when enable_private_endpoint is true."
+    show_when:
+      enable_private_endpoint: true
+    required_when:
+      enable_private_endpoint: true
+
+  private_endpoint_name:
+    widget: text
+    group: networking
+    order: 60
+    advanced: true
+    placeholder: "pep-<server-name>"
+    help: "Override the private endpoint resource name. Defaults to pep-{name}."
+    show_when:
+      enable_private_endpoint: true
+
+  private_service_connection_name:
+    widget: text
+    group: networking
+    order: 70
+    advanced: true
+    placeholder: "psc-<server-name>"
+    help: "Override the private service connection name. Defaults to psc-{name}."
+    show_when:
+      enable_private_endpoint: true
+
+  private_endpoint_nic_name:
+    widget: text
+    group: networking
+    order: 80
+    advanced: true
+    placeholder: "pep-<server-name>-nic"
+    help: "Override the PE network interface name. Defaults to pep-{name}-nic."
+    show_when:
+      enable_private_endpoint: true
+
+  # --- Monitoring ---
+  diagnostic_settings:
+    widget: object
+    widget_options:
+      fields:
+        name:
+          widget: text
+          placeholder: "diag-<server-name>"
+        log_analytics_workspace_id:
+          widget: resource_picker
+          widget_options: { resource_type: log_analytics_workspace }
+        storage_account_id:
+          widget: resource_picker
+          widget_options: { resource_type: storage_account }
+        eventhub_authorization_rule_id:
+          widget: text
+        eventhub_name:
+          widget: text
+        log_analytics_destination_type:
+          widget: select
+          widget_options:
+            options: ["Dedicated", "AzureDiagnostics"]
+        enabled_log_categories:
+          widget: text
+          widget_options: { multiline: true }
+          help: "One category per line. Leave empty for all supported categories."
+        enabled_metrics:
+          widget: text
+          widget_options: { multiline: true }
+          help: "One metric per line. Leave empty for all supported metrics."
+    group: monitoring
+    order: 10
+    advanced: true
+    help: "Optional. Leave blank to disable diagnostic settings. At least one sink destination is required when set."
+
+dependencies:
+  required_inputs_from_other_resources:
+    - variable: subnet_id
+      resource_type: subnet
+      cardinality: one
+      notes: "Required when enable_private_endpoint is true."
+    - variable: private_dns_zone_id
+      resource_type: private_dns_zone
+      cardinality: one
+      notes: "DNS zone for privatelink.database.windows.net. Required when enable_private_endpoint is true."
+    - variable: diagnostic_settings.log_analytics_workspace_id
+      resource_type: log_analytics_workspace
+      cardinality: one
+      notes: "Optional diagnostic sink."
+    - variable: diagnostic_settings.storage_account_id
+      resource_type: storage_account
+      cardinality: one
+      notes: "Optional diagnostic sink."
+
+  produces_outputs_consumable_by:
+    - output: id
+      resource_type: mssql_server
+
+outputs_display:
+  id:
+    display_name: "Resource ID"
+    show_in_summary: true
+    copyable: true
+    format: arm_id
+
+  name:
+    display_name: "SQL Server name"
+    show_in_summary: true
+    copyable: true
+
+  fully_qualified_domain_name:
+    display_name: "FQDN"
+    show_in_summary: true
+    copyable: true
+    format: url
+
+  principal_id:
+    display_name: "Managed identity principal ID"
+    show_in_summary: false
+    copyable: true
+
+  tenant_id:
+    display_name: "Managed identity tenant ID"
+    show_in_summary: false
+    copyable: true
+
+  private_endpoint_id:
+    display_name: "Private endpoint ID"
+    show_in_summary: false
+    copyable: true
+    format: arm_id
+
+  private_ip_address:
+    display_name: "Private IP address"
+    show_in_summary: true
+    copyable: true
+
+  public_sql_server_id:
+    display_name: "Resource ID (public)"
+    show_in_summary: false
+    copyable: true
+    format: arm_id
+    role: public_alias
+
+  public_sql_server_name:
+    display_name: "SQL Server name (public)"
+    show_in_summary: false
+    copyable: true
+    role: public_alias
+
+  public_sql_server_fqdn:
+    display_name: "FQDN (public)"
+    show_in_summary: false
+    copyable: true
+    format: url
+    role: public_alias

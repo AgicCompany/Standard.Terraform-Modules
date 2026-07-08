@@ -1,0 +1,404 @@
+schema_version: "0.1"
+
+metadata:
+  module_name: container-app-job
+  module_version: "1.1.0"
+  schema_authored_by: AGIC Infrastructure Team
+  schema_last_updated: "2026-06-19"
+
+catalogue:
+  display_name: "Container App Job"
+  short_description: "Azure Container App Job with manual, scheduled (cron), or event-driven (KEDA) triggers."
+  long_description: |
+    Azure Container App Job running inside a Container Apps Environment.
+    Supports three mutually exclusive trigger types:
+    - Manual: triggered on-demand via the CLI or API.
+    - Schedule: triggered on a cron expression.
+    - Event: triggered by KEDA scalers (queues, topics, custom sources).
+
+    Supports private registry authentication, secrets (plain or Key Vault
+    references), init containers, and managed identity.
+  category: compute
+  subcategory: containers
+  icon: container-app-job
+  complexity: high
+  cost_tier: low
+  deprecated: false
+  tags:
+    - containers
+    - serverless
+    - container-apps
+    - jobs
+    - batch
+    - keda
+
+variables:
+  # --- Deployment-context derived ---
+  resource_group_name:
+    widget: hidden
+    derived_from: { source: deployment_context.resource_group }
+
+  location:
+    widget: hidden
+    derived_from: { source: deployment_context.location }
+
+  name:
+    widget: hidden
+    derived_from: { source: naming.container_app_job }
+
+  tags:
+    widget: hidden
+    derived_from: { source: deployment_context.tags }
+
+  # --- Core configuration ---
+  container_app_environment_id:
+    widget: resource_picker
+    widget_options: { resource_type: container_app_environment }
+    group: core
+    order: 10
+    help: "Container Apps Environment hosting this job. Required."
+
+  replica_timeout_in_seconds:
+    widget: number
+    widget_options: { min: 1 }
+    group: core
+    order: 20
+    help: "Maximum seconds a replica may run before it is terminated. Required."
+
+  container:
+    widget: object
+    widget_options:
+      fields:
+        image:
+          widget: text
+          placeholder: "myregistry.azurecr.io/myjob:latest"
+          help: "Container image reference."
+        cpu:
+          widget: number
+          widget_options: { min: 0.25, max: 4, step: 0.25 }
+          help: "vCPU allocation (e.g. 0.25, 0.5, 1)."
+        memory:
+          widget: text
+          placeholder: "0.5Gi"
+          help: "Memory allocation (e.g. 0.5Gi, 1Gi, 2Gi)."
+        env:
+          widget: key_value_map
+          help: "Environment variables. Reference secrets via secret_name."
+        command:
+          widget: text
+          widget_options: { multiline: true }
+          help: "Command override, one token per line."
+        args:
+          widget: text
+          widget_options: { multiline: true }
+          help: "Arguments, one per line."
+        liveness_probe:
+          widget: object
+          widget_options:
+            fields:
+              transport:
+                widget: select
+                widget_options:
+                  options: ["HTTP", "HTTPS", "TCP"]
+              port: { widget: number }
+              path: { widget: text, placeholder: "/health" }
+              initial_delay: { widget: number, widget_options: { min: 0 } }
+              interval_seconds: { widget: number, widget_options: { min: 1 } }
+              failure_count_threshold: { widget: number, widget_options: { min: 1 } }
+        readiness_probe:
+          widget: object
+          widget_options:
+            fields:
+              transport:
+                widget: select
+                widget_options:
+                  options: ["HTTP", "HTTPS", "TCP"]
+              port: { widget: number }
+              path: { widget: text, placeholder: "/ready" }
+              initial_delay: { widget: number, widget_options: { min: 0 } }
+              interval_seconds: { widget: number, widget_options: { min: 1 } }
+              failure_count_threshold: { widget: number, widget_options: { min: 1 } }
+        startup_probe:
+          widget: object
+          widget_options:
+            fields:
+              transport:
+                widget: select
+                widget_options:
+                  options: ["HTTP", "HTTPS", "TCP"]
+              port: { widget: number }
+              path: { widget: text, placeholder: "/startup" }
+              initial_delay: { widget: number, widget_options: { min: 0 } }
+              interval_seconds: { widget: number, widget_options: { min: 1 } }
+              failure_count_threshold: { widget: number, widget_options: { min: 1 } }
+    group: core
+    order: 30
+    help: "Main container configuration: image, resources, environment variables, and health probes."
+
+  workload_profile_name:
+    widget: text
+    group: core
+    order: 40
+    advanced: true
+    placeholder: "Consumption"
+    help: "Workload profile from the environment. Leave empty for the Consumption profile."
+
+  replica_retry_limit:
+    widget: number
+    widget_options: { min: 0 }
+    group: core
+    order: 50
+    advanced: true
+    help: "Maximum retries before a replica is considered failed. Leave empty for provider default."
+
+  registries:
+    widget: repeater
+    widget_options:
+      mode: ordered_list
+      row_fields:
+        server:
+          widget: text
+          placeholder: "myregistry.azurecr.io"
+        identity:
+          widget: resource_picker
+          widget_options: { resource_type: user_assigned_identity }
+          help: "UAMI for registry auth. Must be listed in user_assigned_identity_ids."
+        username:
+          widget: text
+          help: "Registry username. Use with password_secret_name."
+        password_secret_name:
+          widget: text
+          help: "Secret name containing the registry password."
+      add_label: "Add registry"
+    group: core
+    order: 60
+    help: "Private registry authentication. Use either 'identity' or 'username + password_secret_name'."
+
+  init_containers:
+    widget: repeater
+    widget_options:
+      mode: ordered_list
+      row_fields:
+        image: { widget: text, placeholder: "myregistry.azurecr.io/init:latest" }
+        name: { widget: text }
+        cpu: { widget: number, widget_options: { min: 0.25, step: 0.25 } }
+        memory: { widget: text, placeholder: "0.5Gi" }
+        command:
+          widget: text
+          widget_options: { multiline: true }
+          help: "Command override, one token per line."
+        args:
+          widget: text
+          widget_options: { multiline: true }
+          help: "Arguments, one per line."
+        env:
+          widget: key_value_map
+          help: "Environment variables."
+      add_label: "Add init container"
+    group: core
+    order: 70
+    advanced: true
+    help: "Init containers to run before the main container."
+
+  # --- Trigger configurations ---
+  # NOTE: exactly one of the three trigger configs must be provided.
+  # There is no HCL trigger_type selector variable; the constraint is
+  # enforced at apply time, not in the form. All three are exposed so
+  # the user can fill in the relevant one.
+
+  manual_trigger_config:
+    widget: object
+    widget_options:
+      fields:
+        parallelism:
+          widget: number
+          widget_options: { min: 1 }
+          help: "Number of replicas to run in parallel per trigger."
+        replica_completion_count:
+          widget: number
+          widget_options: { min: 1 }
+          help: "Number of replicas that must succeed for the job to succeed."
+    group: core
+    order: 80
+    help: "Manual trigger configuration. Fill in when using manual triggers. Leave empty otherwise."
+
+  schedule_trigger_config:
+    widget: object
+    widget_options:
+      fields:
+        cron_expression:
+          widget: text
+          placeholder: "0 * * * *"
+          help: "Cron expression (UTC). Example: '0 * * * *' = every hour."
+        parallelism:
+          widget: number
+          widget_options: { min: 1 }
+        replica_completion_count:
+          widget: number
+          widget_options: { min: 1 }
+    group: core
+    order: 90
+    help: "Schedule trigger (cron) configuration. Fill in when using scheduled triggers. Leave empty otherwise."
+
+  event_trigger_config:
+    widget: object
+    widget_options:
+      fields:
+        parallelism:
+          widget: number
+          widget_options: { min: 1 }
+        replica_completion_count:
+          widget: number
+          widget_options: { min: 1 }
+        scale:
+          widget: object
+          widget_options:
+            fields:
+              min_executions:
+                widget: number
+                widget_options: { min: 0 }
+              max_executions:
+                widget: number
+                widget_options: { min: 1 }
+              polling_interval_in_seconds:
+                widget: number
+                widget_options: { min: 1 }
+    group: core
+    order: 100
+    help: "Event-driven trigger (KEDA) configuration. Fill in when using event triggers. Configure scale rules in Terraform. Leave empty otherwise."
+
+  # --- Identity ---
+  enable_system_assigned_identity:
+    widget: toggle
+    group: identity
+    order: 10
+    help: "Enable system-assigned managed identity on the job."
+
+  user_assigned_identity_ids:
+    widget: resource_picker
+    widget_options:
+      resource_type: user_assigned_identity
+      multiple: true
+    group: identity
+    order: 20
+    help: "User-assigned managed identities. Required for identity-based registry auth."
+
+  # --- Security ---
+  secrets:
+    widget: repeater
+    widget_options:
+      mode: keyed_map
+      key_field:
+        label: "Secret name"
+        placeholder: "db-password"
+      row_fields:
+        value:
+          widget: text
+          help: "Plain secret value. Mutually exclusive with key_vault_secret_id."
+        key_vault_secret_id:
+          widget: text
+          help: "Key Vault secret URI. Mutually exclusive with value."
+        identity:
+          widget: resource_picker
+          widget_options: { resource_type: user_assigned_identity }
+          help: "UAMI to access the Key Vault secret. Optional."
+      add_label: "Add secret"
+    group: security
+    order: 10
+    help: "Job secrets. Key = secret name. Use either 'value' or 'key_vault_secret_id'."
+
+  enable_secret_ignore_changes:
+    widget: toggle
+    group: security
+    order: 20
+    advanced: true
+    help: "When true, Terraform ignores secret changes after initial creation (for out-of-band rotation). WARNING: toggling rebuilds the job."
+
+  # --- Monitoring ---
+  diagnostic_settings:
+    widget: object
+    widget_options:
+      fields:
+        name:
+          widget: text
+          placeholder: "diag-<job-name>"
+        log_analytics_workspace_id:
+          widget: resource_picker
+          widget_options: { resource_type: log_analytics_workspace }
+        storage_account_id:
+          widget: resource_picker
+          widget_options: { resource_type: storage_account }
+        eventhub_authorization_rule_id:
+          widget: text
+        eventhub_name:
+          widget: text
+        log_analytics_destination_type:
+          widget: select
+          widget_options:
+            options: ["Dedicated", "AzureDiagnostics"]
+        enabled_log_categories:
+          widget: text
+          widget_options: { multiline: true }
+          help: "One category per line. Leave empty for all supported."
+        enabled_metrics:
+          widget: text
+          widget_options: { multiline: true }
+          help: "One metric per line. Leave empty for all supported."
+    group: monitoring
+    order: 10
+    advanced: true
+    help: "Optional. Leave blank to disable diagnostic settings."
+
+dependencies:
+  required_inputs_from_other_resources:
+    - variable: container_app_environment_id
+      resource_type: container_app_environment
+      cardinality: one
+      notes: "Container Apps Environment hosting this job. Required."
+
+    - variable: user_assigned_identity_ids
+      resource_type: user_assigned_identity
+      cardinality: many
+      notes: "Required when using identity-based registry auth."
+
+    - variable: diagnostic_settings.log_analytics_workspace_id
+      resource_type: log_analytics_workspace
+      cardinality: one
+      notes: "Optional diagnostic sink."
+
+  produces_outputs_consumable_by:
+    - output: id
+      resource_type: container_app_job
+
+outputs_display:
+  id:
+    display_name: "Resource ID"
+    show_in_summary: true
+    copyable: true
+    format: arm_id
+
+  name:
+    display_name: "Container App Job name"
+    show_in_summary: true
+    copyable: true
+
+  outbound_ip_addresses:
+    display_name: "Outbound IP addresses"
+    show_in_summary: false
+    copyable: true
+
+  event_stream_endpoint:
+    display_name: "Event stream endpoint"
+    show_in_summary: true
+    copyable: true
+    format: url
+
+  principal_id:
+    display_name: "System identity principal ID"
+    show_in_summary: false
+    copyable: true
+
+  tenant_id:
+    display_name: "Tenant ID"
+    show_in_summary: false
+    copyable: true

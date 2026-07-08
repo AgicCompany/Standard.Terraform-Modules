@@ -1,0 +1,139 @@
+schema_version: "0.1"
+
+metadata:
+  module_name: app-service-plan
+  module_version: "1.0.1"
+  schema_authored_by: AGIC Infrastructure Team
+  schema_last_updated: "2026-06-19"
+
+catalogue:
+  display_name: "App Service Plan"
+  short_description: "Azure App Service Plan — compute hosting for web apps, function apps, and API apps."
+  long_description: |
+    Azure App Service Plan providing the compute tier for web apps, function apps,
+    and other App Service-hosted workloads. Supports Linux, Windows, and Windows
+    Container OS types, all SKU tiers from Free through Elastic Premium, manual
+    worker scaling, zone redundancy, and per-app scaling.
+  category: compute
+  subcategory: web
+  icon: app-service-plan
+  complexity: low
+  cost_tier: medium
+  deprecated: false
+  tags:
+    - app-service
+    - web
+    - function-app
+    - hosting-plan
+
+variables:
+  # --- Deployment-context derived ---
+  resource_group_name:
+    widget: hidden
+    derived_from: { source: deployment_context.resource_group }
+
+  location:
+    widget: hidden
+    derived_from: { source: deployment_context.location }
+
+  name:
+    widget: hidden
+    derived_from: { source: naming.app_service_plan }
+
+  tags:
+    widget: hidden
+    derived_from: { source: deployment_context.tags }
+
+  # --- Core configuration ---
+  os_type:
+    widget: select
+    widget_options: { derive_from_validation: true }
+    group: core
+    order: 10
+    help: "Linux is the recommended default. Windows required for ASP.NET and Windows-specific workloads."
+
+  sku_name:
+    widget: select
+    widget_options:
+      options:
+        - { value: "F1",   label: "Free F1" }
+        - { value: "B1",   label: "Basic B1 (1 core, 1.75 GB)" }
+        - { value: "B2",   label: "Basic B2 (2 cores, 3.5 GB)" }
+        - { value: "B3",   label: "Basic B3 (4 cores, 7 GB)" }
+        - { value: "S1",   label: "Standard S1 (1 core, 1.75 GB)" }
+        - { value: "S2",   label: "Standard S2 (2 cores, 3.5 GB)" }
+        - { value: "S3",   label: "Standard S3 (4 cores, 7 GB)" }
+        - { value: "P1v3", label: "Premium v3 P1 (2 cores, 8 GB)" }
+        - { value: "P2v3", label: "Premium v3 P2 (4 cores, 16 GB)" }
+        - { value: "P3v3", label: "Premium v3 P3 (8 cores, 32 GB)" }
+        - { value: "Y1",   label: "Consumption Y1 (function apps only)" }
+        - { value: "EP1",  label: "Elastic Premium EP1 (1 core, 3.5 GB)" }
+        - { value: "EP2",  label: "Elastic Premium EP2 (2 cores, 7 GB)" }
+        - { value: "EP3",  label: "Elastic Premium EP3 (4 cores, 14 GB)" }
+    group: core
+    order: 20
+    help: "Plan SKU. Y1 is for serverless Consumption function apps; EP1–EP3 for Elastic Premium; P*v3 for production web apps."
+
+  # --- Scaling ---
+  worker_count:
+    widget: number
+    widget_options: { min: 1, max: 30 }
+    group: scaling
+    order: 10
+    help: "Number of worker instances. Use Azure Autoscale or KEDA for dynamic scaling beyond this."
+
+  # --- Features ---
+  enable_zone_redundancy:
+    widget: toggle
+    group: features
+    order: 10
+    help: "Distribute workers across availability zones. Requires a zone-enabled region and at least 3 workers."
+
+  enable_per_site_scaling:
+    widget: toggle
+    group: features
+    order: 20
+    advanced: true
+    help: "Allow each app in the plan to scale independently instead of all apps scaling together."
+
+dependencies:
+  required_inputs_from_other_resources: []
+
+  produces_outputs_consumable_by:
+    - output: id
+      resource_type: function_app
+    - output: id
+      resource_type: function_app_flex
+    - output: id
+      resource_type: linux_web_app
+    - output: id
+      resource_type: linux_virtual_machine
+
+outputs_display:
+  id:
+    display_name: "Resource ID"
+    show_in_summary: true
+    copyable: true
+    format: arm_id
+
+  name:
+    display_name: "Plan name"
+    show_in_summary: true
+    copyable: true
+
+  kind:
+    display_name: "Plan kind"
+    show_in_summary: false
+    copyable: false
+
+  reserved:
+    display_name: "Linux plan"
+    show_in_summary: false
+    copyable: false
+
+  public_service_plan_id:
+    display_name: "Resource ID (public)"
+    show_in_summary: false
+    copyable: true
+    format: arm_id
+    role: public_alias

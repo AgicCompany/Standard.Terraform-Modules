@@ -1,0 +1,379 @@
+schema_version: "0.1"
+
+metadata:
+  module_name: redis-cache
+  module_version: "4.0.1"
+  schema_authored_by: AGIC Infrastructure Team
+  schema_last_updated: "2026-06-19"
+
+catalogue:
+  display_name: "Redis Cache"
+  short_description: "Azure Cache for Redis with private endpoint, configurable SKU tiers, and security-first defaults."
+  long_description: |
+    Azure Cache for Redis with security-first defaults: private endpoint enabled,
+    public access disabled, non-SSL port disabled, and TLS 1.2 minimum. Supports
+    Basic, Standard, and Premium SKU tiers with configurable family and capacity.
+    Premium features include availability zones, AOF/RDB persistence, patch
+    scheduling, and replica scaling. Optional multi-sink diagnostic settings.
+  category: data
+  subcategory: cache
+  icon: redis-cache
+  complexity: high
+  cost_tier: medium
+  deprecated: false
+  tags:
+    - redis
+    - cache
+    - redis-cache
+    - private-endpoint
+
+variables:
+  # --- Deployment-context derived ---
+  resource_group_name:
+    widget: hidden
+    derived_from: { source: deployment_context.resource_group }
+
+  location:
+    widget: hidden
+    derived_from: { source: deployment_context.location }
+
+  name:
+    widget: hidden
+    derived_from: { source: naming.redis_cache }
+
+  tags:
+    widget: hidden
+    derived_from: { source: deployment_context.tags }
+
+  # NOTE: redis_version only allows "6" (single-value equality validation).
+  # Hidden with hcl_default.
+  redis_version:
+    widget: hidden
+    derived_from: { source: hcl_default }
+
+  # --- Core configuration ---
+  sku_name:
+    widget: select
+    widget_options: { derive_from_validation: true }
+    group: core
+    order: 10
+    help: "SKU tier. Basic = single node, no SLA. Standard = replicated, SLA. Premium = clustering, persistence, VNet."
+
+  family:
+    widget: select
+    widget_options: { derive_from_validation: true }
+    group: core
+    order: 20
+    help: "SKU family. C = Basic/Standard (cache sizes 0–6). P = Premium (cache sizes 1–5)."
+
+  capacity:
+    widget: number
+    widget_options: { min: 0, max: 6, step: 1 }
+    group: core
+    order: 30
+    help: "Cache size index (0–6 for C family; 1–5 for P family). Higher = larger cache."
+
+  # --- Security ---
+  # NOTE: min_tls_version only allows "1.2" (TLS 1.0/1.1 retired), but uses
+  # contains() validation so derive_from_validation is technically applicable.
+  min_tls_version:
+    widget: select
+    widget_options: { derive_from_validation: true }
+    group: security
+    order: 10
+    help: "Minimum TLS version. Only TLS 1.2 is supported; TLS 1.0 and 1.1 were retired by Azure."
+
+  enable_non_ssl_port:
+    widget: toggle
+    group: security
+    order: 20
+    help: "Enable the non-SSL port (6379). Not recommended; prefer the SSL port (6380)."
+
+  # --- Networking ---
+  enable_private_endpoint:
+    widget: toggle
+    group: networking
+    order: 10
+    help: "Create a private endpoint for this cache. Recommended for private-network-only access."
+
+  enable_public_access:
+    widget: toggle
+    group: networking
+    order: 20
+    help: "Allow public network access. Disabled by default."
+
+  subnet_id:
+    widget: resource_picker
+    widget_options: { resource_type: subnet }
+    group: networking
+    order: 30
+    help: "Subnet hosting the private endpoint NIC. Required when enable_private_endpoint is true."
+    show_when:
+      enable_private_endpoint: true
+    required_when:
+      enable_private_endpoint: true
+
+  private_dns_zone_id:
+    widget: resource_picker
+    widget_options: { resource_type: private_dns_zone }
+    group: networking
+    order: 40
+    help: "Private DNS zone for privatelink.redis.cache.windows.net. Required when enable_private_endpoint is true."
+    show_when:
+      enable_private_endpoint: true
+    required_when:
+      enable_private_endpoint: true
+
+  firewall_rules:
+    widget: repeater
+    widget_options:
+      mode: keyed_map
+      key_field:
+        label: "Rule name"
+        placeholder: "allow-office"
+      row_fields:
+        start_ip:
+          widget: text
+          help: "Start IP address of the allowed range."
+        end_ip:
+          widget: text
+          help: "End IP address of the allowed range."
+      add_label: "Add firewall rule"
+    group: networking
+    order: 50
+    advanced: true
+    help: "Firewall rules. Only applicable when public access is enabled."
+
+  private_endpoint_name:
+    widget: text
+    group: networking
+    order: 60
+    advanced: true
+    placeholder: "pep-<cache-name>"
+    help: "Override the private endpoint resource name. Defaults to pep-{name}."
+    show_when:
+      enable_private_endpoint: true
+
+  private_service_connection_name:
+    widget: text
+    group: networking
+    order: 70
+    advanced: true
+    placeholder: "psc-<cache-name>"
+    help: "Override the private service connection name. Defaults to psc-{name}."
+    show_when:
+      enable_private_endpoint: true
+
+  private_endpoint_nic_name:
+    widget: text
+    group: networking
+    order: 80
+    advanced: true
+    placeholder: "pep-<cache-name>-nic"
+    help: "Override the PE network interface name. Defaults to pep-{name}-nic."
+    show_when:
+      enable_private_endpoint: true
+
+  # --- Features ---
+  redis_configuration:
+    widget: object
+    sensitive_override: true
+    widget_options:
+      fields:
+        maxmemory_policy:
+          widget: select
+          widget_options: { derive_from_validation: true }
+          help: "Eviction policy when memory is full. Default: volatile-lru."
+        maxmemory_reserved:
+          widget: number
+          help: "Memory (MB) reserved for non-cache operations."
+        maxfragmentationmemory_reserved:
+          widget: number
+          help: "Memory (MB) reserved to accommodate memory fragmentation."
+        notify_keyspace_events:
+          widget: text
+          help: "Keyspace notification events to enable (e.g. KEA). Empty string = disabled."
+        aof_backup_enabled:
+          widget: toggle
+          help: "Enable AOF persistence. Premium SKU only."
+        rdb_backup_enabled:
+          widget: toggle
+          help: "Enable RDB snapshot persistence. Premium SKU only."
+        rdb_backup_frequency:
+          widget: number
+          widget_options: { min: 1 }
+          help: "RDB backup frequency in minutes. Premium SKU only."
+        rdb_backup_max_snapshot_count:
+          widget: number
+          widget_options: { min: 1 }
+          help: "Maximum number of RDB snapshots to retain. Premium SKU only."
+        rdb_storage_connection_string:
+          widget: text
+          help: "Storage account connection string for RDB backups. Sensitive. Premium SKU only."
+    group: features
+    order: 10
+    help: "Redis configuration settings. Premium-only fields (AOF, RDB) are ignored for lower SKUs. Marked sensitive due to storage connection string."
+
+  zones:
+    widget: multiselect
+    widget_options:
+      options: ["1", "2", "3"]
+    group: features
+    order: 20
+    help: "Availability zones to deploy across. Premium SKU only."
+
+  # --- Scaling ---
+  replicas_per_master:
+    widget: number
+    widget_options: { min: 1, max: 3, step: 1 }
+    group: scaling
+    order: 10
+    help: "Number of replicas per master shard. Premium SKU only."
+    show_when:
+      sku_name: "Premium"
+
+  replicas_per_primary:
+    widget: number
+    widget_options: { min: 1, max: 3, step: 1 }
+    group: scaling
+    order: 20
+    help: "Number of replicas per primary. Premium SKU only."
+    show_when:
+      sku_name: "Premium"
+
+  # --- Maintenance ---
+  # NOTE: patch_schedule is a single optional object in HCL (not list/map),
+  # so object widget is used here despite guidance listing repeater.
+  patch_schedule:
+    widget: object
+    widget_options:
+      fields:
+        day_of_week:
+          widget: select
+          widget_options:
+            options: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday", "Everyday", "Weekend"]
+          help: "Day on which patching may occur."
+        start_hour_utc:
+          widget: number
+          widget_options: { min: 0, max: 23, step: 1 }
+          help: "UTC hour at which patching may start (0–23). Default: 0."
+    group: maintenance
+    order: 10
+    help: "Patch scheduling for Redis updates. Premium SKU only. Leave blank for automatic patching."
+
+  # --- Monitoring ---
+  diagnostic_settings:
+    widget: object
+    widget_options:
+      fields:
+        name:
+          widget: text
+          placeholder: "diag-<cache-name>"
+        log_analytics_workspace_id:
+          widget: resource_picker
+          widget_options: { resource_type: log_analytics_workspace }
+        storage_account_id:
+          widget: resource_picker
+          widget_options: { resource_type: storage_account }
+        eventhub_authorization_rule_id:
+          widget: text
+        eventhub_name:
+          widget: text
+        log_analytics_destination_type:
+          widget: select
+          widget_options:
+            options: ["Dedicated", "AzureDiagnostics"]
+        enabled_log_categories:
+          widget: text
+          widget_options: { multiline: true }
+          help: "One category per line. Leave empty for all supported categories."
+        enabled_metrics:
+          widget: text
+          widget_options: { multiline: true }
+          help: "One metric per line. Leave empty for all supported metrics."
+    group: monitoring
+    order: 10
+    advanced: true
+    help: "Optional. Leave blank to disable diagnostic settings. At least one sink destination is required when set."
+
+dependencies:
+  required_inputs_from_other_resources:
+    - variable: subnet_id
+      resource_type: subnet
+      cardinality: one
+      notes: "Required when enable_private_endpoint is true."
+    - variable: private_dns_zone_id
+      resource_type: private_dns_zone
+      cardinality: one
+      notes: "DNS zone for privatelink.redis.cache.windows.net. Required when enable_private_endpoint is true."
+    - variable: diagnostic_settings.log_analytics_workspace_id
+      resource_type: log_analytics_workspace
+      cardinality: one
+      notes: "Optional diagnostic sink."
+    - variable: diagnostic_settings.storage_account_id
+      resource_type: storage_account
+      cardinality: one
+      notes: "Optional diagnostic sink."
+
+  produces_outputs_consumable_by:
+    - output: id
+      resource_type: redis_cache
+
+outputs_display:
+  id:
+    display_name: "Resource ID"
+    show_in_summary: true
+    copyable: true
+    format: arm_id
+
+  name:
+    display_name: "Redis Cache name"
+    show_in_summary: true
+    copyable: true
+
+  hostname:
+    display_name: "Hostname"
+    show_in_summary: true
+    copyable: true
+    format: url
+
+  ssl_port:
+    display_name: "SSL port"
+    show_in_summary: true
+    copyable: true
+
+  port:
+    display_name: "Non-SSL port"
+    show_in_summary: false
+    copyable: true
+
+  private_endpoint_id:
+    display_name: "Private endpoint ID"
+    show_in_summary: false
+    copyable: true
+    format: arm_id
+
+  private_ip_address:
+    display_name: "Private IP address"
+    show_in_summary: true
+    copyable: true
+
+  public_redis_id:
+    display_name: "Resource ID (public)"
+    show_in_summary: false
+    copyable: true
+    format: arm_id
+    role: public_alias
+
+  public_redis_name:
+    display_name: "Redis Cache name (public)"
+    show_in_summary: false
+    copyable: true
+    role: public_alias
+
+  public_redis_hostname:
+    display_name: "Hostname (public)"
+    show_in_summary: false
+    copyable: true
+    format: url
+    role: public_alias

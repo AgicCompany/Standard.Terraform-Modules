@@ -1,0 +1,103 @@
+schema_version: "0.1"
+
+metadata:
+  module_name: user-assigned-identity
+  module_version: "1.0.0"
+  schema_authored_by: AGIC Infrastructure Team
+  schema_last_updated: "2026-05-18"
+
+catalogue:
+  display_name: "User-Assigned Managed Identity"
+  short_description: "Azure user-assigned managed identity for workload authentication."
+  long_description: |
+    Creates an Azure User-Assigned Managed Identity. Role assignments,
+    federated credentials, and other configurations are the consumer's
+    responsibility and should follow the principle of least privilege.
+  category: foundation
+  subcategory: identity
+  icon: user-assigned-identity
+  complexity: low
+  cost_tier: free
+  deprecated: false
+  tags:
+    - identity
+    - managed-identity
+    - rbac
+    - workload-identity
+
+variables:
+  resource_group_name:
+    widget: hidden
+    derived_from: { source: deployment_context.resource_group }
+
+  location:
+    widget: hidden
+    derived_from: { source: deployment_context.location }
+
+  name:
+    widget: hidden
+    derived_from: { source: naming.user_assigned_identity }
+
+  tags:
+    widget: hidden
+    derived_from: { source: deployment_context.tags }
+
+dependencies:
+  required_inputs_from_other_resources: []
+  produces_outputs_consumable_by:
+    - output: id
+      resource_type: user_assigned_identity
+
+outputs_display:
+  id:
+    display_name: "Resource ID"
+    show_in_summary: true
+    copyable: true
+    sensitive: false
+    format: arm_id
+
+  name:
+    display_name: "Identity name"
+    show_in_summary: false
+    copyable: true
+    sensitive: false
+
+  principal_id:
+    display_name: "Principal ID (object ID)"
+    show_in_summary: true
+    copyable: true
+    sensitive: false
+
+  client_id:
+    display_name: "Client ID"
+    show_in_summary: true
+    copyable: true
+    sensitive: false
+
+  tenant_id:
+    display_name: "Tenant ID"
+    show_in_summary: false
+    copyable: true
+    sensitive: false
+
+  public_identity_id:
+    display_name: "Resource ID (public)"
+    show_in_summary: false
+    copyable: true
+    sensitive: false
+    format: arm_id
+    role: public_alias
+
+  public_principal_id:
+    display_name: "Principal ID (public)"
+    show_in_summary: false
+    copyable: true
+    sensitive: false
+    role: public_alias
+
+  public_client_id:
+    display_name: "Client ID (public)"
+    show_in_summary: false
+    copyable: true
+    sensitive: false
+    role: public_alias

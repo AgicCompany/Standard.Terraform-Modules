@@ -1,0 +1,187 @@
+schema_version: "0.1"
+
+metadata:
+  module_name: static-web-app
+  module_version: "3.0.0"
+  schema_authored_by: AGIC Infrastructure Team
+  schema_last_updated: "2026-06-19"
+
+catalogue:
+  display_name: "Static Web App"
+  short_description: "Azure Static Web App with private endpoint and secure defaults."
+  long_description: |
+    Azure Static Web App with security-first defaults: private endpoint enabled,
+    public network access disabled, Standard SKU. Supports optional preview environments,
+    configuration file change control, and application settings. Private endpoint
+    connectivity requires Standard SKU and a subnet with private DNS zone for
+    privatelink.azurestaticapps.net.
+  category: compute
+  subcategory: web
+  icon: static-web-app
+  complexity: medium
+  cost_tier: low
+  deprecated: false
+  tags:
+    - compute
+    - web
+    - static
+    - private-endpoint
+
+variables:
+  # --- Deployment-context derived ---
+  resource_group_name:
+    widget: hidden
+    derived_from: { source: deployment_context.resource_group }
+
+  location:
+    widget: hidden
+    derived_from: { source: deployment_context.location }
+
+  name:
+    widget: hidden
+    derived_from: { source: naming.static_web_app }
+
+  tags:
+    widget: hidden
+    derived_from: { source: deployment_context.tags }
+
+  # --- Private endpoint name overrides (naming engine) ---
+  private_endpoint_name:
+    widget: hidden
+    derived_from: { source: naming.private_endpoint(parent=name) }
+
+  private_service_connection_name:
+    widget: hidden
+    derived_from: { source: naming.private_service_connection(parent=name) }
+
+  private_endpoint_nic_name:
+    widget: hidden
+    derived_from: { source: naming.private_endpoint_nic(parent=name) }
+
+  # --- Core configuration ---
+  sku_tier:
+    widget: select
+    widget_options: { derive_from_validation: true }
+    group: core
+    order: 10
+    help: "SKU tier for the Static Web App. Standard is required for private endpoints and disabling public network access."
+
+  sku_size:
+    widget: select
+    widget_options: { derive_from_validation: true }
+    group: core
+    order: 20
+    help: "SKU size. Must match sku_tier."
+
+  app_settings:
+    widget: key_value_map
+    group: core
+    order: 30
+    help: "Application settings exposed as environment variables to the static web app."
+
+  # --- Features ---
+  configuration_file_changes_enabled:
+    widget: toggle
+    group: features
+    order: 10
+    help: "Allow configuration file changes (staticwebapp.config.json). Disable to lock the configuration."
+
+  preview_environments_enabled:
+    widget: toggle
+    group: features
+    order: 20
+    help: "Enable preview environments for pull requests. Each open PR gets its own staging URL."
+
+  # --- Networking ---
+  enable_private_endpoint:
+    widget: toggle
+    group: networking
+    order: 10
+    help: "Create a private endpoint for the Static Web App. Requires Standard SKU. Recommended for production workloads."
+
+  enable_public_access:
+    widget: toggle
+    group: networking
+    order: 20
+    help: "Allow public network access. Disabled by default. Set to true when not using a private endpoint (Free SKU)."
+
+  subnet_id:
+    widget: resource_picker
+    widget_options: { resource_type: subnet }
+    group: networking
+    order: 30
+    help: "Subnet hosting the private endpoint NIC. Required when enable_private_endpoint is true."
+    show_when:
+      enable_private_endpoint: true
+    required_when:
+      enable_private_endpoint: true
+
+  private_dns_zone_id:
+    widget: resource_picker
+    widget_options: { resource_type: private_dns_zone }
+    group: networking
+    order: 40
+    help: "Private DNS zone ID for privatelink.azurestaticapps.net. Required when enable_private_endpoint is true."
+    show_when:
+      enable_private_endpoint: true
+    required_when:
+      enable_private_endpoint: true
+
+dependencies:
+  required_inputs_from_other_resources:
+    - variable: subnet_id
+      resource_type: subnet
+      cardinality: one
+      notes: "Required when enable_private_endpoint is true."
+    - variable: private_dns_zone_id
+      resource_type: private_dns_zone
+      cardinality: one
+      notes: "Required when enable_private_endpoint is true. Must be the zone for privatelink.azurestaticapps.net."
+
+  produces_outputs_consumable_by: []
+  # NOTE: static_web_app is not in the resourceType enum (schema v0.1 controlled
+  # vocabulary). outputs consumable by other modules are not registerable until the
+  # schema vocabulary is extended. See findings.
+
+outputs_display:
+  id:
+    display_name: "Resource ID"
+    show_in_summary: true
+    copyable: true
+    format: arm_id
+
+  name:
+    display_name: "Static Web App name"
+    show_in_summary: true
+    copyable: true
+
+  default_host_name:
+    display_name: "Default hostname"
+    show_in_summary: true
+    copyable: true
+    format: url
+
+  private_endpoint_id:
+    display_name: "Private endpoint ID"
+    show_in_summary: false
+    copyable: true
+    format: arm_id
+
+  private_ip_address:
+    display_name: "Private IP address"
+    show_in_summary: true
+    copyable: true
+
+  public_static_web_app_id:
+    display_name: "Resource ID (public)"
+    show_in_summary: false
+    copyable: true
+    format: arm_id
+    role: public_alias
+
+  public_default_host_name:
+    display_name: "Default hostname (public)"
+    show_in_summary: false
+    copyable: true
+    format: url
+    role: public_alias

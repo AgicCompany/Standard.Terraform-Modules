@@ -1,0 +1,92 @@
+schema_version: "0.1"
+
+metadata:
+  module_name: diagnostic-settings
+  module_version: "1.0.1"
+  schema_authored_by: AGIC Infrastructure Team
+  schema_last_updated: "2026-06-19"
+
+catalogue:
+  display_name: "Diagnostic Settings"
+  short_description: "Azure Monitor diagnostic settings to route logs and metrics to a Log Analytics workspace."
+  long_description: |
+    Azure Monitor diagnostic settings attach to any Azure resource and route its platform
+    logs and metrics to a Log Analytics workspace. Supports explicit log category selection
+    or the 'allLogs' category group, plus configurable metric categories. Requires a target
+    resource ID and a Log Analytics workspace destination.
+  category: monitoring
+  subcategory: diagnostics
+  icon: diagnostic-settings
+  complexity: low
+  cost_tier: low
+  deprecated: false
+  tags:
+    - monitoring
+    - diagnostics
+    - logs
+    - metrics
+    - log-analytics
+
+variables:
+  # --- Deployment-context derived ---
+  name:
+    widget: hidden
+    derived_from: { source: naming.monitor_diagnostic_setting }
+
+  # --- Core configuration ---
+  target_resource_id:
+    widget: text
+    group: core
+    order: 10
+    placeholder: "/subscriptions/.../resourceGroups/.../providers/..."
+    help: "ARM resource ID of the Azure resource to attach diagnostic settings to. Paste the full resource ID."
+
+  # --- Monitoring ---
+  log_analytics_workspace_id:
+    widget: resource_picker
+    widget_options: { resource_type: log_analytics_workspace }
+    group: monitoring
+    order: 10
+    help: "Log Analytics workspace that receives logs and metrics from the target resource."
+
+  log_analytics_destination_type:
+    widget: select
+    widget_options:
+      options: ["Dedicated", "AzureDiagnostics"]
+    group: monitoring
+    order: 20
+    help: "'Dedicated' routes logs to resource-specific tables. 'AzureDiagnostics' uses the legacy single-table mode. Leave blank to use the Azure default."
+
+  enabled_log_categories:
+    widget: text
+    widget_options: { multiline: true }
+    group: monitoring
+    order: 30
+    help: "Log categories to enable, one per line. Leave blank to use the 'allLogs' category group. Specify explicit categories for resource types that do not support category groups."
+
+  metric_categories:
+    widget: text
+    widget_options: { multiline: true }
+    group: monitoring
+    order: 40
+    help: "Metric categories to enable, one per line. Leave blank to use 'AllMetrics'. Specify explicit categories if the target resource uses named metric categories."
+
+dependencies:
+  required_inputs_from_other_resources:
+    - variable: log_analytics_workspace_id
+      resource_type: log_analytics_workspace
+      cardinality: one
+      notes: "Required destination for diagnostic logs and metrics."
+  produces_outputs_consumable_by: []
+
+outputs_display:
+  id:
+    display_name: "Diagnostic setting resource ID"
+    show_in_summary: true
+    copyable: true
+    format: arm_id
+
+  name:
+    display_name: "Diagnostic setting name"
+    show_in_summary: false
+    copyable: true

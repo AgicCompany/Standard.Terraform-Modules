@@ -1,0 +1,110 @@
+schema_version: "0.1"
+
+metadata:
+  module_name: nat-gateway
+  module_version: "1.0.0"
+  schema_authored_by: AGIC Infrastructure Team
+  schema_last_updated: "2026-06-19"
+
+catalogue:
+  display_name: "NAT Gateway"
+  short_description: "Azure NAT Gateway for managed outbound internet connectivity from private subnets."
+  long_description: |
+    Azure NAT Gateway provides scalable, highly available outbound internet
+    connectivity for private subnet resources without exposing inbound attack
+    surface. Assigns a static public IP to all egress traffic from associated
+    subnets, replacing per-VM public IPs or load-balancer SNAT rules for
+    outbound flows.
+  category: networking
+  subcategory: outbound
+  icon: nat-gateway
+  complexity: low
+  cost_tier: low
+  deprecated: false
+  tags:
+    - networking
+    - nat
+    - outbound
+    - egress
+
+variables:
+  # --- Deployment-context derived ---
+  resource_group_name:
+    widget: hidden
+    derived_from: { source: deployment_context.resource_group }
+
+  location:
+    widget: hidden
+    derived_from: { source: deployment_context.location }
+
+  name:
+    widget: hidden
+    derived_from: { source: naming.nat_gateway }
+
+  tags:
+    widget: hidden
+    derived_from: { source: deployment_context.tags }
+
+  # --- Core configuration ---
+  # NOTE: sku_name validation only permits "Standard"; no user choice needed.
+  # Kept hidden with hcl_default rather than a single-option select.
+  sku_name:
+    widget: hidden
+    derived_from: { source: hcl_default }
+
+  idle_timeout_in_minutes:
+    widget: number
+    widget_options: { min: 4, max: 120, step: 1 }
+    group: core
+    order: 10
+    advanced: true
+    help: "TCP idle connection timeout in minutes. Default 4; increase for long-lived connections. Must be between 4 and 120."
+
+  zones:
+    widget: multiselect
+    widget_options:
+      options: ["1", "2", "3"]
+    group: core
+    order: 20
+    help: "Availability zones to deploy the NAT gateway into. Leave empty for no zone constraint (regional)."
+
+dependencies:
+  required_inputs_from_other_resources: []
+  produces_outputs_consumable_by:
+    - output: id
+      resource_type: nat_gateway
+
+outputs_display:
+  id:
+    display_name: "Resource ID"
+    show_in_summary: true
+    copyable: true
+    format: arm_id
+
+  name:
+    display_name: "NAT gateway name"
+    show_in_summary: true
+    copyable: true
+
+  public_ip_address:
+    display_name: "Public IP address"
+    show_in_summary: true
+    copyable: true
+
+  public_ip_id:
+    display_name: "Public IP resource ID"
+    show_in_summary: false
+    copyable: true
+    format: arm_id
+
+  resource_guid:
+    display_name: "Resource GUID"
+    show_in_summary: false
+    copyable: true
+
+  public_nat_gateway_id:
+    display_name: "Resource ID (public)"
+    show_in_summary: false
+    copyable: true
+    format: arm_id
+    role: public_alias

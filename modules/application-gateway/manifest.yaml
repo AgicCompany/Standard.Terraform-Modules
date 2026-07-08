@@ -1,0 +1,471 @@
+schema_version: "0.1"
+
+metadata:
+  module_name: application-gateway
+  module_version: "2.1.0"
+  schema_authored_by: AGIC Infrastructure Team
+  schema_last_updated: "2026-06-19"
+
+catalogue:
+  display_name: "Application Gateway"
+  short_description: "Azure Application Gateway v2 with WAF support, SSL termination, and autoscaling."
+  long_description: |
+    Azure Application Gateway v2 (Standard_v2 or WAF_v2) with TLS 1.2+
+    enforced via a modern predefined SSL policy. Supports autoscaling,
+    availability zones, custom health probes, path-based routing,
+    SSL certificate management (PFX or Key Vault), and redirect configurations.
+
+    Use WAF_v2 and attach a Firewall Policy to enable the Web Application Firewall.
+  category: networking
+  subcategory: load-balancing
+  icon: application-gateway
+  complexity: high
+  cost_tier: high
+  deprecated: false
+  tags:
+    - networking
+    - load-balancer
+    - waf
+    - ssl
+    - ingress
+
+variables:
+  # --- Deployment-context derived ---
+  resource_group_name:
+    widget: hidden
+    derived_from: { source: deployment_context.resource_group }
+
+  location:
+    widget: hidden
+    derived_from: { source: deployment_context.location }
+
+  name:
+    widget: hidden
+    derived_from: { source: naming.application_gateway }
+
+  tags:
+    widget: hidden
+    derived_from: { source: deployment_context.tags }
+
+  # --- Core configuration ---
+  sku_name:
+    widget: select
+    widget_options: { derive_from_validation: true }
+    group: core
+    order: 10
+    help: "SKU name. Use WAF_v2 to enable Web Application Firewall."
+
+  sku_tier:
+    widget: select
+    widget_options: { derive_from_validation: true }
+    group: core
+    order: 20
+    help: "SKU tier. Must match sku_name."
+
+  backend_address_pools:
+    widget: repeater
+    widget_options:
+      mode: keyed_map
+      key_field:
+        label: "Pool name"
+        placeholder: "backend-pool"
+      row_fields:
+        fqdns:
+          widget: text
+          widget_options: { multiline: true }
+          help: "FQDNs for this pool, one per line."
+        ip_addresses:
+          widget: text
+          widget_options: { multiline: true }
+          help: "IP addresses for this pool, one per line."
+      add_label: "Add backend pool"
+    group: core
+    order: 30
+    help: "Backend address pools. Key is the pool name."
+
+  backend_http_settings:
+    widget: repeater
+    widget_options:
+      mode: keyed_map
+      key_field:
+        label: "Settings name"
+        placeholder: "backend-http-settings"
+      row_fields:
+        port:
+          widget: number
+          widget_options: { min: 1, max: 65535 }
+        protocol:
+          widget: select
+          widget_options:
+            options: ["Http", "Https"]
+        cookie_based_affinity:
+          widget: select
+          widget_options:
+            options: ["Enabled", "Disabled"]
+        request_timeout:
+          widget: number
+          widget_options: { min: 1, max: 86400 }
+        probe_name:
+          widget: text
+          help: "Name of a custom health probe. Optional."
+        host_name:
+          widget: text
+          help: "Override the host header. Optional."
+        pick_host_name_from_backend_http_settings:
+          widget: toggle
+        path:
+          widget: text
+          help: "Override the path prefix. Optional."
+      add_label: "Add backend HTTP settings"
+    group: core
+    order: 40
+    help: "Backend HTTP settings. Key is the settings name."
+
+  http_listeners:
+    widget: repeater
+    widget_options:
+      mode: keyed_map
+      key_field:
+        label: "Listener name"
+        placeholder: "http-listener"
+      row_fields:
+        frontend_port_name:
+          widget: text
+          help: "Must match a key in frontend_ports."
+        protocol:
+          widget: select
+          widget_options:
+            options: ["Http", "Https"]
+        host_name:
+          widget: text
+          help: "Single hostname for SNI. Optional."
+        host_names:
+          widget: text
+          widget_options: { multiline: true }
+          help: "Multiple hostnames, one per line. Optional."
+        ssl_certificate_name:
+          widget: text
+          help: "Must match a key in ssl_certificates. Required for HTTPS."
+      add_label: "Add HTTP listener"
+    group: core
+    order: 50
+    help: "HTTP listeners. Key is the listener name."
+
+  request_routing_rules:
+    widget: repeater
+    widget_options:
+      mode: keyed_map
+      key_field:
+        label: "Rule name"
+        placeholder: "routing-rule"
+      row_fields:
+        rule_type:
+          widget: select
+          widget_options:
+            options: ["Basic", "PathBasedRouting"]
+        priority:
+          widget: number
+          widget_options: { min: 1, max: 20000 }
+          help: "Rule priority. Lower = higher priority."
+        http_listener_name:
+          widget: text
+          help: "Must match a key in http_listeners."
+        backend_address_pool_name:
+          widget: text
+          help: "Target backend pool. Required for Basic rules."
+        backend_http_settings_name:
+          widget: text
+          help: "HTTP settings to apply. Required for Basic rules."
+        url_path_map_name:
+          widget: text
+          help: "URL path map for PathBasedRouting rules."
+        redirect_configuration_name:
+          widget: text
+          help: "Redirect configuration. Optional."
+      add_label: "Add routing rule"
+    group: core
+    order: 60
+    help: "Request routing rules. Key is the rule name."
+
+  probes:
+    widget: repeater
+    widget_options:
+      mode: keyed_map
+      key_field:
+        label: "Probe name"
+        placeholder: "health-probe"
+      row_fields:
+        protocol:
+          widget: select
+          widget_options:
+            options: ["Http", "Https"]
+        path:
+          widget: text
+          placeholder: "/health"
+        host:
+          widget: text
+          help: "Probe host. Optional."
+        interval:
+          widget: number
+          widget_options: { min: 1, max: 86400 }
+        timeout:
+          widget: number
+          widget_options: { min: 1, max: 86400 }
+        unhealthy_threshold:
+          widget: number
+          widget_options: { min: 1, max: 20 }
+        pick_host_name_from_backend_http_settings:
+          widget: toggle
+        minimum_servers:
+          widget: number
+          widget_options: { min: 0 }
+        match_status_codes:
+          widget: text
+          widget_options: { multiline: true }
+          help: "Accepted HTTP status codes or ranges (e.g. 200-399), one per line."
+      add_label: "Add health probe"
+    group: core
+    order: 70
+    advanced: true
+    help: "Custom health probes. Key is the probe name."
+
+  url_path_maps:
+    widget: repeater
+    widget_options:
+      mode: keyed_map
+      key_field:
+        label: "Path map name"
+        placeholder: "url-path-map"
+      row_fields:
+        default_backend_address_pool_name:
+          widget: text
+          help: "Default backend pool. Optional."
+        default_backend_http_settings_name:
+          widget: text
+          help: "Default backend HTTP settings. Optional."
+        default_redirect_configuration_name:
+          widget: text
+          help: "Default redirect configuration. Optional."
+      add_label: "Add URL path map"
+    group: core
+    order: 80
+    advanced: true
+    help: "URL path maps for path-based routing. Key is the path map name. Configure path rules via Terraform variables."
+
+  # --- Networking ---
+  subnet_id:
+    widget: resource_picker
+    widget_options: { resource_type: subnet }
+    group: networking
+    order: 10
+    help: "Dedicated subnet for the Application Gateway. Minimum /24 recommended."
+
+  frontend_ports:
+    widget: repeater
+    widget_options:
+      mode: keyed_map
+      key_field:
+        label: "Port name"
+        placeholder: "http"
+      row_fields:
+        port:
+          widget: number
+          widget_options: { min: 1, max: 65535 }
+          help: "Port number."
+      add_label: "Add frontend port"
+    group: networking
+    order: 20
+    help: "Frontend ports. Key is the port name. Defaults: http=80, https=443."
+
+  zones:
+    widget: multiselect
+    widget_options:
+      options: ["1", "2", "3"]
+    group: networking
+    order: 30
+    help: "Availability zones. Leave empty for non-zonal deployments."
+
+  redirect_configurations:
+    widget: repeater
+    widget_options:
+      mode: keyed_map
+      key_field:
+        label: "Redirect name"
+        placeholder: "http-to-https"
+      row_fields:
+        redirect_type:
+          widget: select
+          widget_options:
+            options: ["Permanent", "Found", "SeeOther", "Temporary"]
+        target_listener_name:
+          widget: text
+          help: "Redirect to a listener. Mutually exclusive with target_url."
+        target_url:
+          widget: text
+          help: "Redirect to an external URL. Mutually exclusive with target_listener_name."
+        include_path:
+          widget: toggle
+        include_query_string:
+          widget: toggle
+      add_label: "Add redirect configuration"
+    group: networking
+    order: 40
+    advanced: true
+    help: "Redirect configurations. Key is the configuration name."
+
+  # --- Security ---
+  ssl_policy_name:
+    widget: select
+    widget_options: { derive_from_validation: true }
+    group: security
+    order: 10
+    help: "Predefined SSL policy. Default enforces TLS 1.2+ with modern ciphers (AppGwSslPolicy20220101)."
+
+  firewall_policy_id:
+    widget: resource_picker
+    widget_options: { resource_type: web_application_firewall_policy }
+    group: security
+    order: 20
+    help: "WAF policy to attach. Required for WAF_v2 SKU."
+    show_when:
+      sku_name: "WAF_v2"
+
+  ssl_certificates:
+    widget: repeater
+    widget_options:
+      mode: keyed_map
+      key_field:
+        label: "Certificate name"
+        placeholder: "tls-cert"
+      row_fields:
+        data:
+          widget: text
+          help: "Base64-encoded PFX certificate data. Use with password."
+        password:
+          widget: text
+          help: "PFX certificate password."
+        key_vault_secret_id:
+          widget: text
+          help: "Key Vault secret URI for the certificate. Mutually exclusive with data+password."
+      add_label: "Add SSL certificate"
+    group: security
+    order: 30
+    help: "SSL certificates. Key is the certificate name. Provide either data+password or key_vault_secret_id."
+
+  # --- Scaling ---
+  autoscale:
+    widget: object
+    widget_options:
+      fields:
+        min_capacity:
+          widget: number
+          widget_options: { min: 0, max: 100 }
+          help: "Minimum instance count."
+        max_capacity:
+          widget: number
+          widget_options: { min: 2, max: 125 }
+          help: "Maximum instance count. Optional."
+    group: scaling
+    order: 10
+    help: "Autoscale configuration. Defaults to min=1, max=2."
+
+  # --- Features ---
+  enable_http2:
+    widget: toggle
+    group: features
+    order: 10
+    help: "Enable HTTP/2 support on the Application Gateway."
+
+  # --- Monitoring ---
+  diagnostic_settings:
+    widget: object
+    widget_options:
+      fields:
+        name:
+          widget: text
+          placeholder: "diag-<appgw-name>"
+        log_analytics_workspace_id:
+          widget: resource_picker
+          widget_options: { resource_type: log_analytics_workspace }
+        storage_account_id:
+          widget: resource_picker
+          widget_options: { resource_type: storage_account }
+        eventhub_authorization_rule_id:
+          widget: text
+        eventhub_name:
+          widget: text
+        log_analytics_destination_type:
+          widget: select
+          widget_options:
+            options: ["Dedicated", "AzureDiagnostics"]
+        enabled_log_categories:
+          widget: text
+          widget_options: { multiline: true }
+          help: "One category per line. Leave empty for all supported."
+        enabled_metrics:
+          widget: text
+          widget_options: { multiline: true }
+          help: "One metric per line. Leave empty for all supported."
+    group: monitoring
+    order: 10
+    advanced: true
+    help: "Optional. Leave blank to disable diagnostic settings."
+
+dependencies:
+  required_inputs_from_other_resources:
+    - variable: subnet_id
+      resource_type: subnet
+      cardinality: one
+      notes: "Dedicated subnet for the Application Gateway."
+
+    - variable: diagnostic_settings.log_analytics_workspace_id
+      resource_type: log_analytics_workspace
+      cardinality: one
+      notes: "Optional diagnostic sink."
+
+  produces_outputs_consumable_by:
+    - output: id
+      resource_type: application_gateway
+    - output: public_ip_address
+      resource_type: public_ip
+
+outputs_display:
+  id:
+    display_name: "Resource ID"
+    show_in_summary: true
+    copyable: true
+    format: arm_id
+
+  name:
+    display_name: "Application Gateway name"
+    show_in_summary: true
+    copyable: true
+
+  public_ip_address:
+    display_name: "Public IP address"
+    show_in_summary: true
+    copyable: true
+
+  public_ip_id:
+    display_name: "Public IP Resource ID"
+    show_in_summary: false
+    copyable: true
+    format: arm_id
+
+  backend_address_pool_ids:
+    display_name: "Backend pool IDs"
+    show_in_summary: false
+    copyable: true
+
+  public_appgw_id:
+    display_name: "Resource ID (public)"
+    show_in_summary: false
+    copyable: true
+    format: arm_id
+    role: public_alias
+
+  public_appgw_public_ip:
+    display_name: "Public IP address (public)"
+    show_in_summary: false
+    copyable: true
+    role: public_alias

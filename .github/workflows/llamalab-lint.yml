@@ -1,0 +1,91 @@
+name: LlamaLab Manifest Lint
+
+on:
+  pull_request:
+    paths:
+      - 'modules/**'
+      - 'tools/**'
+
+jobs:
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      modules: ${{ steps.changes.outputs.modules }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Detect modules to lint
+        id: changes
+        run: |
+          # If the tool itself changed, re-lint every module that has a manifest
+          TOOL_CHANGED=$(git diff --name-only origin/main...HEAD -- tools/ | wc -l)
+          if [ "$TOOL_CHANGED" -gt 0 ]; then
+            echo "Tool changed — linting all modules with a manifest"
+            MODULES=$(find modules -name manifest.yaml -maxdepth 2 \
+              | cut -d'/' -f2 | sort -u \
+              | jq -R -s -c 'split("\n") | map(select(. != ""))')
+          else
+            # Modules whose manifest.yaml itself changed
+            MANIFEST_CHANGED=$(git diff --name-only origin/main...HEAD -- 'modules/**/manifest.yaml' \
+              | cut -d'/' -f2 | sort -u)
+
+            # Modules whose .tf files changed without touching the manifest — these
+            # can drift from an existing sidecar just as easily, so lint them too.
+            # Root-level .tf only (mirrors changelog-check.yml), and only modules
+            # that actually have a manifest to check.
+            TF_CHANGED=$(git diff --name-only origin/main...HEAD -- 'modules/**/*.tf' \
+              | grep -E '^modules/[^/]+/[^/]+\.tf$' \
+              | cut -d'/' -f2 | sort -u)
+            TF_CHANGED_WITH_MANIFEST=$(
+              for MODULE in $TF_CHANGED; do
+                if [ -f "modules/$MODULE/manifest.yaml" ]; then
+                  echo "$MODULE"
+                fi
+              done
+            )
+
+            MODULES=$(printf '%s\n%s\n' "$MANIFEST_CHANGED" "$TF_CHANGED_WITH_MANIFEST" \
+              | sort -u \
+              | jq -R -s -c 'split("\n") | map(select(. != ""))')
+          fi
+          echo "modules=$MODULES" >> "$GITHUB_OUTPUT"
+          echo "Modules to lint: $MODULES"
+
+  lint-manifests:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.modules != '[]'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        module: ${{ fromJson(needs.detect-changes.outputs.modules) }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # The lint tool resolves each sidecar's pinned module_version against a
+          # real git tag (<module>/vX.Y.Z) and introspects that tag's tree. A bare
+          # checkout here defaults to fetch-depth 1 / fetch-tags false, which yields
+          # zero tags and fails every module identically ("pinned tag ... not found").
+          fetch-depth: 0
+          fetch-tags: true
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: tools/requirements.txt
+
+      - name: Install lint tool dependencies
+        run: pip install -r tools/requirements.txt
+
+      - name: Lint manifest
+        run: |
+          if [ ! -f "modules/${{ matrix.module }}/manifest.yaml" ]; then
+            echo "manifest.yaml no longer exists for ${{ matrix.module }} (removed in this PR) — skipping"
+            exit 0
+          fi
+          python -m tools.llamalab_lint.cli \
+            --framework . \
+            modules/${{ matrix.module }}/manifest.yaml

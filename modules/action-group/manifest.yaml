@@ -1,0 +1,168 @@
+schema_version: "0.1"
+
+metadata:
+  module_name: action-group
+  module_version: "1.0.0"
+  schema_authored_by: AGIC Infrastructure Team
+  schema_last_updated: "2026-06-19"
+
+catalogue:
+  display_name: "Monitor Action Group"
+  short_description: "Azure Monitor Action Group for alert notifications and automation."
+  long_description: |
+    Azure Monitor Action Group that defines the set of notification and automation
+    actions triggered when an alert fires. Supports email, SMS, webhook, and Azure
+    app push receivers. Multiple receiver types can be configured per group.
+  category: monitoring
+  subcategory: alerting
+  icon: action-group
+  complexity: low
+  cost_tier: free
+  deprecated: false
+  tags:
+    - monitoring
+    - alerting
+    - action-group
+    - notifications
+
+variables:
+  # --- Deployment-context derived ---
+  resource_group_name:
+    widget: hidden
+    derived_from: { source: deployment_context.resource_group }
+
+  name:
+    widget: hidden
+    derived_from: { source: naming.monitor_action_group }
+
+  tags:
+    widget: hidden
+    derived_from: { source: deployment_context.tags }
+
+  # --- Core configuration ---
+  short_name:
+    widget: text
+    group: core
+    order: 10
+    placeholder: "ops-alert"
+    help: "Short name shown in SMS and email notifications. Maximum 12 characters."
+
+  # --- Feature flags ---
+  enabled:
+    widget: toggle
+    group: features
+    order: 10
+    help: "Enable or disable the action group. Disabled groups silently drop alerts."
+
+  # --- Receivers ---
+  email_receivers:
+    widget: repeater
+    widget_options:
+      mode: keyed_map
+      key_field:
+        label: "Receiver name"
+        placeholder: "ops-email"
+      row_fields:
+        email_address:
+          widget: text
+          help: "Email address to notify."
+        use_common_alert_schema:
+          widget: toggle
+          help: "Use the common alert schema payload. Recommended."
+      add_label: "Add email receiver"
+    group: entities
+    order: 10
+    help: "Email addresses to notify when an alert fires."
+
+  sms_receivers:
+    widget: repeater
+    widget_options:
+      mode: keyed_map
+      key_field:
+        label: "Receiver name"
+        placeholder: "ops-sms"
+      row_fields:
+        country_code:
+          widget: text
+          placeholder: "1"
+          help: "Numeric country code (e.g. 1 for USA)."
+        phone_number:
+          widget: text
+          placeholder: "2025550100"
+          help: "Phone number without country code or spaces."
+      add_label: "Add SMS receiver"
+    group: entities
+    order: 20
+    help: "SMS numbers to notify when an alert fires."
+
+  webhook_receivers:
+    widget: repeater
+    widget_options:
+      mode: keyed_map
+      key_field:
+        label: "Receiver name"
+        placeholder: "ops-webhook"
+      row_fields:
+        service_uri:
+          widget: text
+          placeholder: "https://..."
+          help: "Webhook endpoint URL."
+        use_common_alert_schema:
+          widget: toggle
+          help: "Use the common alert schema payload. Recommended."
+        aad_auth:
+          widget: object
+          widget_options:
+            fields:
+              object_id:
+                widget: text
+                help: "AAD application object ID for secured webhook auth."
+              tenant_id:
+                widget: text
+                help: "AAD tenant ID. Defaults to the subscription tenant if omitted."
+          help: "Optional Azure AD authentication for secured webhook endpoints."
+      add_label: "Add webhook receiver"
+    group: entities
+    order: 30
+    help: "Webhook endpoints to invoke when an alert fires."
+
+  azure_app_push_receivers:
+    widget: repeater
+    widget_options:
+      mode: keyed_map
+      key_field:
+        label: "Receiver name"
+        placeholder: "ops-app-push"
+      row_fields:
+        email_address:
+          widget: text
+          help: "Azure account email address linked to the mobile app."
+      add_label: "Add app push receiver"
+    group: entities
+    order: 40
+    help: "Azure mobile app push notification targets."
+
+dependencies:
+  required_inputs_from_other_resources: []
+  produces_outputs_consumable_by:
+    - output: id
+      resource_type: monitor_action_group
+
+outputs_display:
+  id:
+    display_name: "Resource ID"
+    show_in_summary: true
+    copyable: true
+    format: arm_id
+
+  name:
+    display_name: "Action group name"
+    show_in_summary: false
+    copyable: true
+
+  public_action_group_id:
+    display_name: "Resource ID (public)"
+    show_in_summary: false
+    copyable: true
+    format: arm_id
+    role: public_alias

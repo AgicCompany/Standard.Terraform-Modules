@@ -1,0 +1,330 @@
+schema_version: "0.1"
+
+metadata:
+  module_name: linux-virtual-machine
+  module_version: "1.3.0"
+  schema_authored_by: AGIC Infrastructure Team
+  schema_last_updated: "2026-06-19"
+
+catalogue:
+  display_name: "Linux Virtual Machine"
+  short_description: "Azure Linux VM with SSH authentication, managed identity, and optional public IP."
+  long_description: |
+    Linux Virtual Machine with security-first defaults: SSH-key authentication
+    (password auth opt-in), Premium LRS OS disk, optional system-assigned or
+    user-assigned managed identity, configurable additional data disks, optional
+    public IP, and boot diagnostics with managed or custom storage.
+    Networking integrates with an existing Virtual Network subnet.
+  category: compute
+  subcategory: virtual-machines
+  icon: linux-virtual-machine
+  complexity: medium
+  cost_tier: medium
+  deprecated: false
+  tags:
+    - vm
+    - linux
+    - compute
+    - ssh
+
+variables:
+  # --- Deployment-context derived ---
+  resource_group_name:
+    widget: hidden
+    derived_from: { source: deployment_context.resource_group }
+
+  location:
+    widget: hidden
+    derived_from: { source: deployment_context.location }
+
+  name:
+    widget: hidden
+    derived_from: { source: naming.linux_virtual_machine }
+
+  tags:
+    widget: hidden
+    derived_from: { source: deployment_context.tags }
+
+  # --- Sub-resource name overrides (derived from primary name) ---
+  public_ip_name:
+    widget: hidden
+    derived_from: { source: hcl_default }
+
+  nic_name:
+    widget: hidden
+    derived_from: { source: hcl_default }
+
+  managed_disk_name_prefix:
+    widget: hidden
+    derived_from: { source: hcl_default }
+
+  # --- Core configuration ---
+  size:
+    widget: text
+    group: core
+    order: 10
+    placeholder: "Standard_D2s_v5"
+    help: "VM SKU (e.g. Standard_B1s, Standard_D2s_v5, Standard_F4s_v2)."
+
+  admin_username:
+    widget: text
+    group: core
+    order: 20
+    placeholder: "azureuser"
+    help: "Administrator username. May not be 'admin', 'root', or other reserved names."
+
+  source_image_reference:
+    widget: object
+    widget_options:
+      fields:
+        publisher:
+          widget: text
+          placeholder: "Canonical"
+        offer:
+          widget: text
+          placeholder: "0001-com-ubuntu-server-jammy"
+        sku:
+          widget: text
+          placeholder: "22_04-lts-gen2"
+        version:
+          widget: text
+          placeholder: "latest"
+    group: core
+    order: 30
+    help: "Marketplace image to use. Defaults to Ubuntu 22.04 LTS Gen2."
+
+  os_disk:
+    widget: object
+    widget_options:
+      fields:
+        caching:
+          widget: select
+          widget_options:
+            options: ["ReadWrite", "ReadOnly", "None"]
+          help: "ReadWrite recommended for OS disk."
+        storage_account_type:
+          widget: select
+          widget_options:
+            options:
+              - { value: "Premium_LRS",     label: "Premium LRS (default)" }
+              - { value: "Standard_LRS",    label: "Standard LRS" }
+              - { value: "StandardSSD_LRS", label: "Standard SSD LRS" }
+              - { value: "UltraSSD_LRS",    label: "Ultra SSD LRS" }
+          help: "Disk type. Premium_LRS for production workloads."
+        disk_size_gb:
+          widget: number
+          widget_options: { min: 30, max: 4095 }
+          help: "Override OS disk size in GB. Leave empty for image default."
+    group: core
+    order: 40
+    help: "OS disk configuration. Defaults to Premium LRS with ReadWrite caching."
+
+  data_disks:
+    widget: repeater
+    widget_options:
+      mode: keyed_map
+      key_field:
+        label: "Disk name suffix"
+        placeholder: "data"
+      row_fields:
+        lun:
+          widget: number
+          widget_options: { min: 0, max: 63 }
+          help: "Logical unit number — must be unique across all data disks."
+        disk_size_gb:
+          widget: number
+          widget_options: { min: 1, max: 32767 }
+        storage_account_type:
+          widget: select
+          widget_options:
+            options:
+              - { value: "Premium_LRS",     label: "Premium LRS (default)" }
+              - { value: "Standard_LRS",    label: "Standard LRS" }
+              - { value: "StandardSSD_LRS", label: "Standard SSD LRS" }
+              - { value: "UltraSSD_LRS",    label: "Ultra SSD LRS" }
+        caching:
+          widget: select
+          widget_options:
+            options: ["ReadOnly", "ReadWrite", "None"]
+          help: "ReadOnly recommended for data disks."
+      add_label: "Add data disk"
+    group: core
+    order: 50
+    help: "Additional managed data disks to attach. Key becomes the disk name suffix."
+
+  zone:
+    widget: text
+    group: core
+    order: 60
+    placeholder: "1"
+    help: "Availability zone (1, 2, or 3). Leave empty for non-zonal deployment."
+
+  custom_data:
+    widget: text
+    widget_options: { multiline: true }
+    group: core
+    order: 70
+    advanced: true
+    help: "Base64-encoded cloud-init script to run on first boot."
+
+  # --- Networking ---
+  subnet_id:
+    widget: resource_picker
+    widget_options: { resource_type: subnet }
+    group: networking
+    order: 10
+    help: "Subnet for the primary network interface. Required."
+
+  enable_public_ip:
+    widget: toggle
+    group: networking
+    order: 20
+    help: "Create and attach a public IP address to the VM."
+
+  private_ip_address_allocation:
+    widget: select
+    widget_options: { derive_from_validation: true }
+    group: networking
+    order: 30
+    help: "Dynamic assigns an IP from the subnet pool; Static pins the address specified below."
+
+  private_ip_address:
+    widget: text
+    group: networking
+    order: 31
+    placeholder: "10.0.1.10"
+    help: "Static private IP address. Required when allocation method is Static."
+    show_when:
+      private_ip_address_allocation: Static
+
+  # --- Security ---
+  enable_password_auth:
+    widget: toggle
+    group: security
+    order: 10
+    help: "Allow password authentication. Disabled by default — SSH key is the secure default."
+
+  admin_ssh_public_key:
+    widget: text
+    widget_options: { multiline: true }
+    group: security
+    order: 20
+    placeholder: "ssh-rsa AAAA..."
+    help: "SSH public key for the admin user. Required when password authentication is disabled."
+
+  admin_password:
+    widget: text
+    group: security
+    order: 30
+    help: "Admin password. Required when password authentication is enabled."
+    show_when:
+      enable_password_auth: true
+
+  # --- Identity ---
+  enable_system_assigned_identity:
+    widget: toggle
+    group: identity
+    order: 10
+    help: "Enable system-assigned managed identity. Grants the VM an Entra ID principal."
+
+  user_assigned_identity_ids:
+    widget: resource_picker
+    widget_options:
+      resource_type: user_assigned_identity
+      multiple: true
+    group: identity
+    order: 20
+    help: "User-assigned managed identities to attach to the VM."
+
+  # --- Monitoring ---
+  enable_boot_diagnostics:
+    widget: toggle
+    group: monitoring
+    order: 10
+    help: "Capture boot screenshots and serial console output for troubleshooting."
+
+  boot_diagnostics_storage_uri:
+    widget: resource_picker
+    widget_options: { resource_type: storage_account }
+    group: monitoring
+    order: 20
+    advanced: true
+    help: "Storage account for boot diagnostics. Leave empty to use Azure managed storage."
+    show_when:
+      enable_boot_diagnostics: true
+
+dependencies:
+  required_inputs_from_other_resources:
+    - variable: subnet_id
+      resource_type: subnet
+      cardinality: one
+      notes: "Subnet for the primary network interface."
+    - variable: user_assigned_identity_ids
+      resource_type: user_assigned_identity
+      cardinality: many
+      notes: "Optional user-assigned managed identities."
+    - variable: boot_diagnostics_storage_uri
+      resource_type: storage_account
+      cardinality: one
+      notes: "Optional. If null, uses Azure managed storage."
+
+  produces_outputs_consumable_by:
+    - output: id
+      resource_type: linux_virtual_machine
+
+outputs_display:
+  id:
+    display_name: "Resource ID"
+    show_in_summary: true
+    copyable: true
+    format: arm_id
+
+  name:
+    display_name: "Virtual machine name"
+    show_in_summary: true
+    copyable: true
+
+  private_ip_address:
+    display_name: "Private IP address"
+    show_in_summary: true
+    copyable: true
+
+  public_ip_address:
+    display_name: "Public IP address"
+    show_in_summary: true
+    copyable: true
+
+  network_interface_id:
+    display_name: "Network interface ID"
+    show_in_summary: false
+    copyable: true
+    format: arm_id
+
+  principal_id:
+    display_name: "System identity principal ID"
+    show_in_summary: false
+    copyable: true
+
+  tenant_id:
+    display_name: "Tenant ID"
+    show_in_summary: false
+    copyable: true
+
+  public_vm_id:
+    display_name: "Resource ID (public)"
+    show_in_summary: false
+    copyable: true
+    format: arm_id
+    role: public_alias
+
+  public_vm_name:
+    display_name: "Virtual machine name (public)"
+    show_in_summary: false
+    copyable: true
+    role: public_alias
+
+  public_vm_private_ip:
+    display_name: "Private IP address (public)"
+    show_in_summary: false
+    copyable: true
+    role: public_alias

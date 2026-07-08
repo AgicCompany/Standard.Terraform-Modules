@@ -1,0 +1,335 @@
+schema_version: "0.1"
+
+metadata:
+  module_name: managed-redis
+  module_version: "1.2.0"
+  schema_authored_by: AGIC Infrastructure Team
+  schema_last_updated: "2026-06-19"
+
+catalogue:
+  display_name: "Azure Managed Redis"
+  short_description: "Azure Managed Redis instance with private endpoint, Entra ID auth, and security-first defaults."
+  long_description: |
+    Enterprise-grade Azure Managed Redis with security-first defaults: private
+    endpoint enabled, public network access disabled, access key authentication
+    disabled (Entra ID only). Supports Balanced, ComputeOptimized, and
+    MemoryOptimized SKU tiers; OSSCluster/EnterpriseCluster/NoCluster policies;
+    AOF and RDB persistence; Redis module extensions (RediSearch, RedisJSON,
+    RedisBloom, RedisTimeSeries); active-active geo-replication; customer-managed
+    key encryption; and optional multi-sink diagnostic settings.
+  category: data
+  subcategory: cache
+  icon: managed-redis
+  complexity: high
+  cost_tier: medium
+  deprecated: false
+  tags:
+    - redis
+    - cache
+    - managed-redis
+    - private-endpoint
+
+variables:
+  # --- Deployment-context derived ---
+  resource_group_name:
+    widget: hidden
+    derived_from: { source: deployment_context.resource_group }
+
+  location:
+    widget: hidden
+    derived_from: { source: deployment_context.location }
+
+  name:
+    widget: hidden
+    derived_from: { source: naming.redis_cache }
+
+  tags:
+    widget: hidden
+    derived_from: { source: deployment_context.tags }
+
+  # --- Core configuration ---
+  sku_name:
+    widget: text
+    group: core
+    order: 10
+    placeholder: "Balanced_B10"
+    help: "SKU tier and capacity. Format: Balanced_B<n>, ComputeOptimized_X<n>, or MemoryOptimized_M<n>. See Azure Managed Redis documentation for valid sizes."
+    # NOTE: validation uses can(regex(...)), not contains() — derive_from_validation
+    # is not applicable here. T1 §7.1 check 5 enum half deferred.
+
+  high_availability_enabled:
+    widget: toggle
+    group: core
+    order: 20
+    help: "Enable high availability. Cannot be changed after creation (forces replacement)."
+
+  clustering_policy:
+    widget: select
+    widget_options: { derive_from_validation: true }
+    group: core
+    order: 30
+    help: "Clustering policy. OSSCluster uses standard Redis slot-based routing. Cannot be changed after creation (forces replacement)."
+
+  # --- Security ---
+  client_protocol:
+    widget: select
+    widget_options: { derive_from_validation: true }
+    group: security
+    order: 10
+    help: "Client protocol. Encrypted enforces TLS. Plaintext allows unencrypted connections (not recommended)."
+
+  access_keys_authentication_enabled:
+    widget: toggle
+    group: security
+    order: 20
+    help: "Enable access key authentication. Disabled by default; prefer Entra ID-based authentication."
+
+  customer_managed_key:
+    widget: object
+    widget_options:
+      fields:
+        key_vault_key_id:
+          widget: text
+          help: "Versioned Key Vault key resource ID. Requires an identity block with type UserAssigned."
+        identity_id:
+          widget: resource_picker
+          widget_options: { resource_type: user_assigned_identity }
+          help: "User-assigned identity used to access the Key Vault key."
+    group: security
+    order: 30
+    advanced: true
+    help: "Customer-managed encryption key configuration. Requires an identity block with type UserAssigned."
+
+  # --- Networking ---
+  enable_private_endpoint:
+    widget: toggle
+    group: networking
+    order: 10
+    help: "Create a private endpoint for this instance. Required for private-network-only access."
+
+  enable_public_access:
+    widget: toggle
+    group: networking
+    order: 20
+    help: "Allow public network access. Disabled by default; enable only when private endpoint is not used or during migration."
+
+  subnet_id:
+    widget: resource_picker
+    widget_options: { resource_type: subnet }
+    group: networking
+    order: 30
+    help: "Subnet hosting the private endpoint NIC. Required when enable_private_endpoint is true."
+    show_when:
+      enable_private_endpoint: true
+    required_when:
+      enable_private_endpoint: true
+
+  private_dns_zone_id:
+    widget: resource_picker
+    widget_options: { resource_type: private_dns_zone }
+    group: networking
+    order: 40
+    help: "Private DNS zone resource ID for privatelink.redis.azure.net. Required when enable_private_endpoint is true."
+    show_when:
+      enable_private_endpoint: true
+    required_when:
+      enable_private_endpoint: true
+
+  private_endpoint_name:
+    widget: text
+    group: networking
+    order: 50
+    advanced: true
+    placeholder: "pep-<redis-name>"
+    help: "Override the private endpoint resource name. Defaults to pep-{name}."
+    show_when:
+      enable_private_endpoint: true
+
+  private_service_connection_name:
+    widget: text
+    group: networking
+    order: 60
+    advanced: true
+    placeholder: "psc-<redis-name>"
+    help: "Override the private service connection name. Defaults to psc-{name}."
+    show_when:
+      enable_private_endpoint: true
+
+  private_endpoint_nic_name:
+    widget: text
+    group: networking
+    order: 70
+    advanced: true
+    placeholder: "pep-<redis-name>-nic"
+    help: "Override the PE network interface name. Defaults to pep-{name}-nic."
+    show_when:
+      enable_private_endpoint: true
+
+  # --- Features ---
+  eviction_policy:
+    widget: select
+    widget_options: { derive_from_validation: true }
+    group: features
+    order: 10
+    help: "Cache eviction policy. VolatileLRU (default) evicts the least-recently-used key among those with an expiry set."
+
+  geo_replication_group_name:
+    widget: text
+    group: features
+    order: 20
+    help: "Active-active geo-replication group name. All instances sharing this name are linked. Forces replacement. Mutually exclusive with persistence."
+
+  persistence_aof_frequency:
+    widget: text
+    group: features
+    order: 30
+    placeholder: "1s"
+    help: "AOF persistence backup frequency. The only valid value is '1s'. Leave empty to disable. Mutually exclusive with RDB persistence and geo-replication."
+
+  persistence_rdb_frequency:
+    widget: select
+    widget_options: { derive_from_validation: true }
+    group: features
+    order: 40
+    help: "RDB snapshot backup frequency. Leave unset to disable. Mutually exclusive with AOF persistence and geo-replication."
+
+  # --- Identity ---
+  identity:
+    widget: object
+    widget_options:
+      fields:
+        type:
+          widget: select
+          widget_options:
+            options:
+              - { value: "SystemAssigned", label: "System Assigned" }
+              - { value: "UserAssigned", label: "User Assigned" }
+              - { value: "SystemAssigned, UserAssigned", label: "System + User Assigned" }
+        identity_ids:
+          widget: resource_picker
+          widget_options:
+            resource_type: user_assigned_identity
+            multiple: true
+          help: "One or more user-assigned identity resource IDs. Required when type includes UserAssigned."
+    group: identity
+    order: 10
+    help: "Managed identity configuration. Required for customer-managed key encryption."
+
+  # --- Add-ons: Redis modules ---
+  modules:
+    widget: repeater
+    widget_options:
+      mode: ordered_list
+      row_fields:
+        name:
+          widget: select
+          widget_options:
+            options: ["RediSearch", "RedisJSON", "RedisBloom", "RedisTimeSeries"]
+          help: "Redis module to enable."
+        args:
+          widget: text
+          help: "Optional module initialisation arguments."
+      add_label: "Add Redis module"
+    group: addons
+    order: 10
+    help: "Redis modules to enable. Cannot be changed after creation (forces replacement)."
+
+  # --- Monitoring ---
+  diagnostic_settings:
+    widget: object
+    widget_options:
+      fields:
+        name:
+          widget: text
+          placeholder: "diag-<redis-name>"
+        log_analytics_workspace_id:
+          widget: resource_picker
+          widget_options: { resource_type: log_analytics_workspace }
+        storage_account_id:
+          widget: resource_picker
+          widget_options: { resource_type: storage_account }
+        eventhub_authorization_rule_id:
+          widget: text
+        eventhub_name:
+          widget: text
+        log_analytics_destination_type:
+          widget: select
+          widget_options:
+            options: ["Dedicated", "AzureDiagnostics"]
+        enabled_log_categories:
+          widget: text
+          widget_options: { multiline: true }
+          help: "One category per line. Leave empty for all supported categories."
+        enabled_metrics:
+          widget: text
+          widget_options: { multiline: true }
+          help: "One metric per line. Leave empty for all supported metrics."
+    group: monitoring
+    order: 10
+    advanced: true
+    help: "Optional. Leave blank to disable diagnostic settings. At least one sink destination is required when set."
+
+dependencies:
+  required_inputs_from_other_resources:
+    - variable: subnet_id
+      resource_type: subnet
+      cardinality: one
+      notes: "Required when enable_private_endpoint is true."
+    - variable: private_dns_zone_id
+      resource_type: private_dns_zone
+      cardinality: one
+      notes: "DNS zone for privatelink.redis.azure.net. Required when enable_private_endpoint is true."
+    - variable: identity.identity_ids
+      resource_type: user_assigned_identity
+      cardinality: many
+      notes: "Required when identity type includes UserAssigned."
+    - variable: customer_managed_key.identity_id
+      resource_type: user_assigned_identity
+      cardinality: one
+      notes: "Required when customer_managed_key is configured."
+    - variable: diagnostic_settings.log_analytics_workspace_id
+      resource_type: log_analytics_workspace
+      cardinality: one
+      notes: "Optional diagnostic sink."
+    - variable: diagnostic_settings.storage_account_id
+      resource_type: storage_account
+      cardinality: one
+      notes: "Optional diagnostic sink."
+
+  produces_outputs_consumable_by:
+    - output: id
+      resource_type: managed_redis
+
+outputs_display:
+  id:
+    display_name: "Resource ID"
+    show_in_summary: true
+    copyable: true
+    format: arm_id
+
+  name:
+    display_name: "Managed Redis name"
+    show_in_summary: true
+    copyable: true
+
+  hostname:
+    display_name: "Hostname"
+    show_in_summary: true
+    copyable: true
+    format: url
+
+  port:
+    display_name: "Port"
+    show_in_summary: true
+    copyable: true
+
+  private_endpoint_id:
+    display_name: "Private endpoint ID"
+    show_in_summary: false
+    copyable: true
+    format: arm_id
+
+  private_ip_address:
+    display_name: "Private IP address"
+    show_in_summary: true
+    copyable: true

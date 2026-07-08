@@ -1,0 +1,193 @@
+schema_version: "0.1"
+
+metadata:
+  module_name: mssql-database
+  module_version: "1.3.0"
+  schema_authored_by: AGIC Infrastructure Team
+  schema_last_updated: "2026-06-19"
+
+catalogue:
+  display_name: "SQL Database"
+  short_description: "Azure SQL Database with configurable SKU, retention policies, and geo-redundancy."
+  long_description: |
+    Azure SQL Database hosted on an existing SQL Server. Supports the full
+    DTU (Basic/Standard/Premium) and vCore (General Purpose, Business Critical,
+    Hyperscale) SKU families. Configurable point-in-time restore retention,
+    geo-redundant backup, zone redundancy, and read scale-out. Optional
+    diagnostic settings with multi-sink output (Log Analytics, storage,
+    Event Hub).
+  category: data
+  subcategory: relational
+  icon: mssql-database
+  complexity: medium
+  cost_tier: medium
+  deprecated: false
+  tags:
+    - sql
+    - database
+    - mssql
+    - relational
+
+variables:
+  # --- Deployment-context derived ---
+  name:
+    widget: hidden
+    derived_from: { source: naming.mssql_database }
+
+  tags:
+    widget: hidden
+    derived_from: { source: deployment_context.tags }
+
+  # --- Core configuration ---
+  server_id:
+    widget: resource_picker
+    widget_options: { resource_type: mssql_server }
+    group: core
+    order: 10
+    help: "SQL Server to host the database. Required."
+
+  sku_name:
+    widget: text
+    group: core
+    order: 20
+    placeholder: "S0"
+    help: "Database SKU. DTU tiers: Basic, S0–S12, P1–P15. vCore tiers: GP_Gen5_2, BC_Gen5_4, HS_Gen5_2, etc."
+
+  max_size_gb:
+    widget: number
+    widget_options: { min: 1, max: 4096 }
+    group: core
+    order: 30
+    help: "Maximum database size in GB. Default is 2 GB."
+
+  collation:
+    widget: text
+    group: core
+    order: 40
+    advanced: true
+    placeholder: "SQL_Latin1_General_CP1_CI_AS"
+    help: "Database collation. Changing this requires recreating the database."
+
+  license_type:
+    widget: select
+    widget_options: { derive_from_validation: true }
+    group: core
+    order: 50
+    help: "LicenseIncluded = bundled license. BasePrice = Azure Hybrid Benefit (bring your own SQL license)."
+
+  # --- Features ---
+  enable_zone_redundancy:
+    widget: toggle
+    group: features
+    order: 10
+    help: "Distribute database replicas across availability zones. Requires a zone-redundant SKU."
+
+  enable_geo_redundant_backup:
+    widget: toggle
+    group: features
+    order: 20
+    help: "Geo-replicate backups to a paired region. Enabled by default."
+
+  storage_account_type:
+    widget: select
+    widget_options:
+      options:
+        - { value: "Geo",     label: "Geo-redundant (default)" }
+        - { value: "GeoZone", label: "Geo-zone redundant" }
+        - { value: "Local",   label: "Locally redundant" }
+        - { value: "Zone",    label: "Zone redundant" }
+    group: features
+    order: 30
+    help: "Backup storage redundancy class. Use Local or Zone in regions without geo-redundant storage (e.g. Italy North)."
+
+  short_term_retention_days:
+    widget: number
+    widget_options: { min: 1, max: 35, step: 1 }
+    group: features
+    order: 40
+    help: "Point-in-time restore retention window in days (1–35). Default is 7."
+
+  enable_read_scale:
+    widget: toggle
+    group: features
+    order: 50
+    help: "Route read-only connections to a read-only replica. Available on Premium and Business Critical SKUs."
+
+  # --- Monitoring ---
+  diagnostic_settings:
+    widget: object
+    widget_options:
+      fields:
+        name:
+          widget: text
+          placeholder: "diag-<database-name>"
+        log_analytics_workspace_id:
+          widget: resource_picker
+          widget_options: { resource_type: log_analytics_workspace }
+        storage_account_id:
+          widget: resource_picker
+          widget_options: { resource_type: storage_account }
+        eventhub_authorization_rule_id:
+          widget: text
+        eventhub_name:
+          widget: text
+        log_analytics_destination_type:
+          widget: select
+          widget_options:
+            options: ["Dedicated", "AzureDiagnostics"]
+        enabled_log_categories:
+          widget: text
+          widget_options: { multiline: true }
+          help: "One category per line. Leave empty for all supported."
+        enabled_metrics:
+          widget: text
+          widget_options: { multiline: true }
+          help: "One metric per line. Leave empty for all supported."
+    group: monitoring
+    order: 10
+    advanced: true
+    help: "Optional. Leave blank to disable diagnostic settings. At least one sink required when set."
+
+dependencies:
+  required_inputs_from_other_resources:
+    - variable: server_id
+      resource_type: mssql_server
+      cardinality: one
+      notes: "SQL Server to host the database."
+    - variable: diagnostic_settings.log_analytics_workspace_id
+      resource_type: log_analytics_workspace
+      cardinality: one
+      notes: "Optional diagnostic sink."
+    - variable: diagnostic_settings.storage_account_id
+      resource_type: storage_account
+      cardinality: one
+      notes: "Optional diagnostic sink."
+
+  produces_outputs_consumable_by:
+    - output: id
+      resource_type: mssql_database
+
+outputs_display:
+  id:
+    display_name: "Resource ID"
+    show_in_summary: true
+    copyable: true
+    format: arm_id
+
+  name:
+    display_name: "Database name"
+    show_in_summary: true
+    copyable: true
+
+  public_database_id:
+    display_name: "Resource ID (public)"
+    show_in_summary: false
+    copyable: true
+    format: arm_id
+    role: public_alias
+
+  public_database_name:
+    display_name: "Database name (public)"
+    show_in_summary: false
+    copyable: true
+    role: public_alias

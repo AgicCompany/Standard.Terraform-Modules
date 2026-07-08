@@ -1,0 +1,365 @@
+schema_version: "0.1"
+
+metadata:
+  module_name: ai-foundry
+  module_version: "1.0.1"
+  schema_authored_by: AGIC Infrastructure Team
+  schema_last_updated: "2026-06-19"
+
+catalogue:
+  display_name: "Azure AI Foundry"
+  short_description: "Azure AI Foundry hub with a default project, private endpoint support, and CMK encryption."
+  long_description: |
+    Azure AI Foundry hub (formerly Azure Machine Learning workspace) with
+    security-first defaults: public network access disabled, system-assigned
+    managed identity, and optional customer-managed encryption key (CMK).
+
+    Creates a hub and one default project. Connect a Storage Account, Key Vault,
+    and optionally Application Insights and Container Registry to complete the hub.
+    Enable the private endpoint to confine all traffic to the virtual network.
+  category: ai-ml
+  subcategory: ml-platform
+  icon: ai-foundry
+  complexity: high
+  cost_tier: high
+  deprecated: false
+  tags:
+    - ai
+    - machine-learning
+    - foundry
+    - mlops
+    - private-endpoint
+
+variables:
+  # --- Deployment-context derived ---
+  resource_group_name:
+    widget: hidden
+    derived_from: { source: deployment_context.resource_group }
+
+  location:
+    widget: hidden
+    derived_from: { source: deployment_context.location }
+
+  name:
+    widget: hidden
+    derived_from: { source: naming.ai_foundry }
+
+  tags:
+    widget: hidden
+    derived_from: { source: deployment_context.tags }
+
+  # --- Core configuration ---
+  storage_account_id:
+    widget: resource_picker
+    widget_options: { resource_type: storage_account }
+    group: core
+    order: 10
+    help: "Storage Account backing the hub. Required."
+
+  key_vault_id:
+    widget: resource_picker
+    widget_options: { resource_type: key_vault }
+    group: core
+    order: 20
+    help: "Key Vault backing the hub. Required."
+
+  project_name:
+    widget: text
+    group: core
+    order: 30
+    help: "Default project name. Alphanumeric and hyphens only. Max ~32 characters."
+    placeholder: "my-ai-project"
+
+  container_registry_id:
+    widget: resource_picker
+    widget_options: { resource_type: container_registry }
+    group: core
+    order: 40
+    help: "Optional Container Registry linked to the hub."
+
+  description:
+    widget: text
+    group: core
+    order: 50
+    advanced: true
+    help: "Description of the hub."
+
+  friendly_name:
+    widget: text
+    group: core
+    order: 60
+    advanced: true
+    help: "Display name of the hub shown in the portal."
+
+  project_description:
+    widget: text
+    group: core
+    order: 70
+    advanced: true
+    help: "Description of the default project."
+
+  project_friendly_name:
+    widget: text
+    group: core
+    order: 80
+    advanced: true
+    help: "Display name of the default project."
+
+  # --- Identity ---
+  identity_type:
+    widget: select
+    widget_options: { derive_from_validation: true }
+    group: identity
+    order: 10
+    help: "Managed identity type. Use 'SystemAssigned, UserAssigned' to combine both."
+
+  identity_ids:
+    widget: resource_picker
+    widget_options:
+      resource_type: user_assigned_identity
+      multiple: true
+    group: identity
+    order: 20
+    help: "User-assigned managed identity IDs. Required when identity_type is 'UserAssigned' or 'SystemAssigned, UserAssigned'."
+
+  primary_user_assigned_identity:
+    widget: resource_picker
+    widget_options: { resource_type: user_assigned_identity }
+    group: identity
+    order: 30
+    advanced: true
+    help: "Primary UAMI resource ID for CMK encryption. Required when using a user-assigned identity with an encryption key."
+
+  # --- Security ---
+  enable_public_network_access:
+    widget: toggle
+    group: security
+    order: 10
+    help: "Enable public network access on the hub. Disabled by default."
+
+  high_business_impact_enabled:
+    widget: toggle
+    group: security
+    order: 20
+    help: "Enable High Business Impact mode. ForceNew — changing this rebuilds the hub and project."
+
+  encryption:
+    widget: object
+    widget_options:
+      fields:
+        key_id:
+          widget: text
+          help: "Key Vault key identifier URI for the customer-managed encryption key."
+        key_vault_id:
+          widget: resource_picker
+          widget_options: { resource_type: key_vault }
+          help: "Key Vault containing the CMK."
+        user_assigned_identity_id:
+          widget: resource_picker
+          widget_options: { resource_type: user_assigned_identity }
+          help: "UAMI used to access the CMK. Optional."
+    group: security
+    order: 30
+    advanced: true
+    help: "Customer-managed encryption key (CMK). Leave empty for Microsoft-managed keys. ForceNew."
+
+  # --- Networking ---
+  managed_network_isolation_mode:
+    widget: select
+    widget_options:
+      options:
+        - { value: "", label: "None (no managed network)" }
+        - "Disabled"
+        - "AllowOnlyApprovedOutbound"
+        - "AllowInternetOutbound"
+    group: networking
+    order: 10
+    help: "Managed network isolation for the hub. Leave empty to omit the managed_network block."
+
+  enable_private_endpoint:
+    widget: toggle
+    group: networking
+    order: 20
+    help: "Create a private endpoint to the hub. Requires a subnet."
+
+  subnet_id:
+    widget: resource_picker
+    widget_options: { resource_type: subnet }
+    group: networking
+    order: 30
+    help: "Subnet for the private endpoint NIC. Required when private endpoint is enabled."
+    show_when:
+      enable_private_endpoint: true
+    required_when:
+      enable_private_endpoint: true
+
+  private_dns_zone_ids:
+    widget: resource_picker
+    widget_options:
+      resource_type: private_dns_zone
+      multiple: true
+    group: networking
+    order: 40
+    help: "Private DNS zones for the endpoint. AI Foundry typically needs privatelink.api.azureml.ms and privatelink.notebooks.azure.net."
+    show_when:
+      enable_private_endpoint: true
+
+  private_endpoint_name:
+    widget: text
+    group: networking
+    order: 50
+    advanced: true
+    placeholder: "pep-<hub-name>"
+    help: "Override the private endpoint name. Default: pep-<hub-name>."
+    show_when:
+      enable_private_endpoint: true
+
+  # --- Monitoring ---
+  application_insights_id:
+    widget: resource_picker
+    widget_options: { resource_type: application_insights }
+    group: monitoring
+    order: 10
+    help: "Optional Application Insights resource linked to the hub for experiment tracking."
+
+  diagnostic_settings:
+    widget: object
+    widget_options:
+      fields:
+        name:
+          widget: text
+          placeholder: "diag-<hub-name>"
+        log_analytics_workspace_id:
+          widget: resource_picker
+          widget_options: { resource_type: log_analytics_workspace }
+        storage_account_id:
+          widget: resource_picker
+          widget_options: { resource_type: storage_account }
+        eventhub_authorization_rule_id:
+          widget: text
+        eventhub_name:
+          widget: text
+        log_analytics_destination_type:
+          widget: select
+          widget_options:
+            options: ["Dedicated", "AzureDiagnostics"]
+        enabled_log_categories:
+          widget: text
+          widget_options: { multiline: true }
+          help: "One category per line. Leave empty for all supported."
+        enabled_metrics:
+          widget: text
+          widget_options: { multiline: true }
+          help: "One metric per line. Leave empty for all supported."
+    group: monitoring
+    order: 20
+    advanced: true
+    help: "Optional. Leave blank to disable diagnostic settings."
+
+dependencies:
+  required_inputs_from_other_resources:
+    - variable: storage_account_id
+      resource_type: storage_account
+      cardinality: one
+      notes: "Storage backing the hub. Required."
+
+    - variable: key_vault_id
+      resource_type: key_vault
+      cardinality: one
+      notes: "Key Vault backing the hub. Required."
+
+    - variable: container_registry_id
+      resource_type: container_registry
+      cardinality: one
+      notes: "Optional Container Registry linked to the hub."
+
+    - variable: application_insights_id
+      resource_type: application_insights
+      cardinality: one
+      notes: "Optional Application Insights linked to the hub."
+
+    - variable: subnet_id
+      resource_type: subnet
+      cardinality: one
+      notes: "Required when enable_private_endpoint is true."
+
+    - variable: private_dns_zone_ids
+      resource_type: private_dns_zone
+      cardinality: many
+      notes: "Typically privatelink.api.azureml.ms and privatelink.notebooks.azure.net."
+
+    - variable: identity_ids
+      resource_type: user_assigned_identity
+      cardinality: many
+      notes: "Required when identity_type includes UserAssigned."
+
+    - variable: diagnostic_settings.log_analytics_workspace_id
+      resource_type: log_analytics_workspace
+      cardinality: one
+      notes: "Optional diagnostic sink."
+
+  produces_outputs_consumable_by:
+    - output: id
+      resource_type: ai_foundry
+    - output: project_id
+      resource_type: ai_foundry_project
+
+outputs_display:
+  id:
+    display_name: "Hub Resource ID"
+    show_in_summary: true
+    copyable: true
+    format: arm_id
+
+  name:
+    display_name: "Hub name"
+    show_in_summary: true
+    copyable: true
+
+  workspace_id:
+    display_name: "Workspace ID"
+    show_in_summary: true
+    copyable: true
+
+  discovery_url:
+    display_name: "Discovery URL"
+    show_in_summary: true
+    copyable: true
+    format: url
+
+  principal_id:
+    display_name: "System identity principal ID"
+    show_in_summary: false
+    copyable: true
+
+  tenant_id:
+    display_name: "Tenant ID"
+    show_in_summary: false
+    copyable: true
+
+  project_id:
+    display_name: "Default project Resource ID"
+    show_in_summary: true
+    copyable: true
+    format: arm_id
+
+  project_name:
+    display_name: "Default project name"
+    show_in_summary: true
+    copyable: true
+
+  project_workspace_id:
+    display_name: "Default project workspace ID"
+    show_in_summary: false
+    copyable: true
+
+  private_endpoint_id:
+    display_name: "Private endpoint Resource ID"
+    show_in_summary: false
+    copyable: true
+    format: arm_id
+
+  private_endpoint_ip_address:
+    display_name: "Private endpoint IP address"
+    show_in_summary: false
+    copyable: true

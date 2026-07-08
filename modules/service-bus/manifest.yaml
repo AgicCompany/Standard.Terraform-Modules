@@ -1,0 +1,381 @@
+schema_version: "0.1"
+
+metadata:
+  module_name: service-bus
+  module_version: "3.1.0"
+  schema_authored_by: AGIC Infrastructure Team
+  schema_last_updated: "2026-05-18"
+
+catalogue:
+  display_name: "Service Bus Namespace"
+  short_description: "Azure Service Bus namespace with queues, topics, subscriptions, and private endpoint."
+  long_description: |
+    Service Bus messaging namespace with private-first networking, managed
+    identity authentication (SAS keys disabled by default), and TLS 1.2.
+    Queues, topics, and topic subscriptions are declared as map-of-object
+    inputs and rendered as repeater rows in the UI.
+
+    Topics and subscriptions require Standard or Premium SKU.
+  category: messaging
+  subcategory: messaging
+  icon: service-bus
+  complexity: medium
+  cost_tier: low
+  deprecated: false
+  tags:
+    - service-bus
+    - messaging
+    - queue
+    - topic
+    - private-endpoint
+
+variables:
+  # --- Deployment-context derived ---
+  resource_group_name:
+    widget: hidden
+    derived_from: { source: deployment_context.resource_group }
+
+  location:
+    widget: hidden
+    derived_from: { source: deployment_context.location }
+
+  name:
+    widget: hidden
+    derived_from: { source: naming.servicebus_namespace }
+
+  tags:
+    widget: hidden
+    derived_from: { source: deployment_context.tags }
+
+  # --- Core configuration ---
+  sku:
+    widget: select
+    widget_options: { derive_from_validation: true }
+    group: core
+    order: 10
+    help: "Topics and subscriptions require Standard or Premium. Premium adds dedicated capacity and zone redundancy."
+
+  capacity:
+    widget: select
+    widget_options:
+      # capacity validation is contains([0, 1, 2, 4, 8, 16]) - numeric enum.
+      # derive_from_validation should work but the contract only documents string enums.
+      # See findings.
+      derive_from_validation: true
+    group: core
+    order: 20
+    help: "Messaging units. Use 0 for Basic/Standard. Premium requires 1, 2, 4, 8, or 16."
+    show_when:
+      sku: Premium
+    # NOTE: when sku != Premium, capacity must be 0. The HCL validation allows 0
+    # for non-Premium, but the show_when-hidden case omits the variable entirely
+    # and the HCL default (0) applies. Works by accident; see findings.
+
+  # --- Security ---
+  min_tls_version:
+    widget: hidden
+    derived_from: { source: hcl_default }  # Locked to the module's secure default (T1 v0.5; was Finding 02 §4.3).
+
+  enable_local_auth:
+    widget: toggle
+    group: security
+    order: 10
+    help: "Enable SAS-key authentication. Disabled by default; prefer managed identity."
+
+  # --- Networking ---
+  enable_public_access:
+    widget: toggle
+    group: networking
+    order: 10
+
+  enable_private_endpoint:
+    widget: toggle
+    group: networking
+    order: 20
+
+  subnet_id:
+    widget: resource_picker
+    widget_options: { resource_type: subnet }
+    group: networking
+    order: 30
+    help: "Subnet hosting the private endpoint."
+    show_when:
+      enable_private_endpoint: true
+    required_when:
+      enable_private_endpoint: true
+    # NOTE: HCL has cross-variable validation requiring subnet_id when
+    # enable_private_endpoint is true. Same pattern as AKS Finding 4.2.
+
+  private_dns_zone_id:
+    widget: resource_picker
+    widget_options: { resource_type: private_dns_zone }
+    group: networking
+    order: 40
+    help: "Private DNS zone for privatelink.servicebus.windows.net."
+    show_when:
+      enable_private_endpoint: true
+
+  private_endpoint_name:
+    widget: text
+    group: networking
+    order: 50
+    advanced: true
+    placeholder: "pep-<namespace-name>"
+    show_when:
+      enable_private_endpoint: true
+
+  private_service_connection_name:
+    widget: text
+    group: networking
+    order: 51
+    advanced: true
+    placeholder: "psc-<namespace-name>"
+    show_when:
+      enable_private_endpoint: true
+
+  private_endpoint_nic_name:
+    widget: text
+    group: networking
+    order: 52
+    advanced: true
+    placeholder: "pep-<namespace-name>-nic"
+    show_when:
+      enable_private_endpoint: true
+    # NOTE: three separate override variables. storage-account consolidated these
+    # into private_endpoint_name_prefix in v3.0. Service-bus is inconsistent.
+    # See findings - this is a module-library hygiene issue, not a contract issue.
+
+  # --- Queues ---
+  queues:
+    widget: repeater
+    widget_options:
+      mode: keyed_map                 # map(object(...)) - key is the entity identity
+      key_field:
+        label: "Queue name"
+        placeholder: "orders"
+        # The key feeds naming.servicebus_queue at template-generation time.
+      row_fields:
+        max_size_in_megabytes:
+          widget: select
+          widget_options:
+            options: [1024, 2048, 3072, 4096, 5120]
+          help: "Max size. Premium SKU supports up to 81920 MB."
+        default_message_ttl:
+          widget: text
+          placeholder: "P14D"
+          help: "ISO 8601 duration."
+        lock_duration:
+          widget: text
+          placeholder: "PT30S"
+          help: "ISO 8601 duration (5s to 5min)."
+        max_delivery_count:
+          widget: number
+          widget_options: { min: 1, max: 2000 }
+        dead_lettering_on_message_expiration:
+          widget: toggle
+        enable_partitioning:
+          widget: toggle
+          help: "Cannot be changed after queue creation."
+        enable_batched_operations:
+          widget: toggle
+        requires_session:
+          widget: toggle
+          help: "Cannot be changed after queue creation."
+        requires_duplicate_detection:
+          widget: toggle
+          help: "Cannot be changed after queue creation."
+        duplicate_detection_history_time_window:
+          widget: text
+          placeholder: "PT10M"
+          help: "ISO 8601 duration."
+      add_label: "Add queue"
+    group: entities
+    order: 10
+    help: "Queues to create within the namespace."
+
+  # --- Topics (with nested subscriptions) ---
+  topics:
+    widget: repeater
+    widget_options:
+      mode: keyed_map
+      key_field:
+        label: "Topic name"
+        placeholder: "events"
+      row_fields:
+        max_size_in_megabytes:
+          widget: select
+          widget_options:
+            options: [1024, 2048, 3072, 4096, 5120]
+        default_message_ttl:
+          widget: text
+          placeholder: "P14D"
+        enable_partitioning:
+          widget: toggle
+        enable_batched_operations:
+          widget: toggle
+        requires_duplicate_detection:
+          widget: toggle
+        duplicate_detection_history_time_window:
+          widget: text
+          placeholder: "PT10M"
+        subscriptions:
+          # Nested repeater (keyed_map within keyed_map) - the design's headline case.
+          widget: repeater
+          widget_options:
+            mode: keyed_map
+            key_field:
+              label: "Subscription name"
+              placeholder: "billing-consumer"
+            row_fields:
+              max_delivery_count:
+                widget: number
+                widget_options: { min: 1, max: 2000 }
+              lock_duration:
+                widget: text
+                placeholder: "PT30S"
+              default_message_ttl:
+                widget: text
+                placeholder: "P14D"
+              dead_lettering_on_message_expiration:
+                widget: toggle
+              enable_batched_operations:
+                widget: toggle
+              requires_session:
+                widget: toggle
+            add_label: "Add subscription"
+      add_label: "Add topic"
+    group: entities
+    order: 20
+    help: "Topics to create within the namespace. Requires Standard or Premium SKU."
+    show_when:
+      sku: [Standard, Premium]
+
+  # --- Diagnostics ---
+  diagnostic_settings:
+    widget: object
+    widget_options:
+      fields:
+        name:
+          widget: text
+          placeholder: "diag-<namespace-name>"
+        log_analytics_workspace_id:
+          widget: resource_picker
+          widget_options: { resource_type: log_analytics_workspace }
+        storage_account_id:
+          widget: resource_picker
+          widget_options: { resource_type: storage_account }
+        eventhub_authorization_rule_id:
+          widget: text
+        eventhub_name:
+          widget: text
+        log_analytics_destination_type:
+          widget: select
+          widget_options:
+            options: ["Dedicated", "AzureDiagnostics"]
+        enabled_log_categories:
+          widget: text
+          widget_options: { multiline: true }
+          help: "One category per line. Leave empty for all supported."
+        enabled_metrics:
+          widget: text
+          widget_options: { multiline: true }
+          help: "One metric per line. Leave empty for all supported."
+    group: monitoring
+    order: 10
+    advanced: true
+
+dependencies:
+  required_inputs_from_other_resources:
+    - variable: subnet_id
+      resource_type: subnet
+      cardinality: one
+      notes: "Required when enable_private_endpoint = true."
+
+    - variable: private_dns_zone_id
+      resource_type: private_dns_zone
+      cardinality: one
+      notes: "Required when enable_private_endpoint = true."
+
+    - variable: diagnostic_settings.log_analytics_workspace_id
+      resource_type: log_analytics_workspace
+      cardinality: one
+      notes: "Optional diagnostic sink."
+
+  produces_outputs_consumable_by:
+    - output: id
+      resource_type: service_bus_namespace
+    - output: endpoint
+      resource_type: service_bus_endpoint
+    - output: queue_ids
+      resource_type: service_bus_queue
+      # NOTE: queue_ids is a map output. cardinality: many.
+      # See findings on map-of-IDs as a producible resource.
+    - output: topic_ids
+      resource_type: service_bus_topic
+    - output: subscription_ids
+      resource_type: service_bus_subscription
+
+outputs_display:
+  id:
+    display_name: "Resource ID"
+    show_in_summary: true
+    copyable: true
+    format: arm_id
+
+  name:
+    display_name: "Namespace name"
+    show_in_summary: true
+    copyable: true
+
+  endpoint:
+    display_name: "Service Bus endpoint"
+    show_in_summary: true
+    copyable: true
+    format: url
+
+  queue_ids:
+    display_name: "Queue IDs"
+    show_in_summary: false
+    copyable: true
+    # NOTE: this is a map(string) output. See AKS Finding 4.7 for object/map output display.
+
+  topic_ids:
+    display_name: "Topic IDs"
+    show_in_summary: false
+    copyable: true
+
+  subscription_ids:
+    display_name: "Subscription IDs"
+    show_in_summary: false
+    copyable: true
+
+  private_endpoint_id:
+    display_name: "Private endpoint ID"
+    show_in_summary: false
+    copyable: true
+    format: arm_id
+
+  private_ip_address:
+    display_name: "Private IP address"
+    show_in_summary: true
+    copyable: true
+
+  public_servicebus_id:
+    display_name: "Resource ID (public)"
+    show_in_summary: false
+    copyable: true
+    format: arm_id
+    role: public_alias
+
+  public_servicebus_name:
+    display_name: "Namespace name (public)"
+    show_in_summary: false
+    copyable: true
+    role: public_alias
+
+  public_servicebus_endpoint:
+    display_name: "Endpoint (public)"
+    show_in_summary: false
+    copyable: true
+    format: url
+    role: public_alias

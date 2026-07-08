@@ -1,0 +1,114 @@
+schema_version: "0.1"
+
+metadata:
+  module_name: log-analytics-workspace
+  module_version: "1.0.0"
+  schema_authored_by: AGIC Infrastructure Team
+  schema_last_updated: "2026-06-19"
+
+catalogue:
+  display_name: "Log Analytics Workspace"
+  short_description: "Azure Monitor Log Analytics Workspace for centralized log collection and querying."
+  long_description: |
+    Azure Monitor Log Analytics Workspace providing centralized log ingestion,
+    retention, and KQL-based querying across Azure resources. Security-first
+    defaults: internet ingestion and query access both disabled. Workspace ID
+    is consumed by Application Insights, Diagnostic Settings, and other
+    observability resources.
+  category: monitoring
+  subcategory: log-management
+  icon: log-analytics-workspace
+  complexity: low
+  cost_tier: medium
+  deprecated: false
+  tags:
+    - monitoring
+    - log-analytics
+    - observability
+    - kql
+
+variables:
+  # --- Deployment-context derived ---
+  resource_group_name:
+    widget: hidden
+    derived_from: { source: deployment_context.resource_group }
+
+  location:
+    widget: hidden
+    derived_from: { source: deployment_context.location }
+
+  name:
+    widget: hidden
+    derived_from: { source: naming.log_analytics_workspace }
+
+  tags:
+    widget: hidden
+    derived_from: { source: deployment_context.tags }
+
+  # --- Core configuration ---
+  sku:
+    widget: select
+    widget_options: { derive_from_validation: true }
+    group: core
+    order: 10
+    help: "Pricing tier. PerGB2018 is the recommended modern SKU for most workloads. Free tier is capped at 500 MB/day with 7-day retention."
+
+  retention_in_days:
+    widget: number
+    widget_options: { min: 30, max: 730, step: 1 }
+    group: core
+    order: 20
+    help: "Log data retention period in days. Minimum 30, maximum 730 (2 years)."
+
+  daily_quota_gb:
+    widget: number
+    widget_options: { min: -1, step: 1 }
+    group: core
+    order: 30
+    advanced: true
+    help: "Daily ingestion cap in GB. Set -1 for unlimited. Use to prevent unexpected cost overruns."
+
+  # --- Security ---
+  enable_internet_ingestion:
+    widget: toggle
+    group: security
+    order: 10
+    help: "Allow log ingestion from public internet endpoints. Disabled by default; enable only if agents outside private network must forward logs."
+
+  enable_internet_query:
+    widget: toggle
+    group: security
+    order: 20
+    help: "Allow KQL queries from public internet endpoints. Disabled by default; enable only if external dashboards or tools need direct query access."
+
+dependencies:
+  required_inputs_from_other_resources: []
+  produces_outputs_consumable_by:
+    - output: id
+      resource_type: log_analytics_workspace
+    - output: workspace_id
+      resource_type: application_insights
+
+outputs_display:
+  id:
+    display_name: "Resource ID"
+    show_in_summary: true
+    copyable: true
+    format: arm_id
+
+  name:
+    display_name: "Workspace name"
+    show_in_summary: true
+    copyable: true
+
+  workspace_id:
+    display_name: "Workspace GUID"
+    show_in_summary: true
+    copyable: true
+
+  public_workspace_id:
+    display_name: "Resource ID (public)"
+    show_in_summary: false
+    copyable: true
+    format: arm_id
+    role: public_alias
