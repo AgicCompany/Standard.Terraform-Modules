@@ -4,7 +4,7 @@ metadata:
   module_name: app-service-plan
   module_version: "1.0.1"
   schema_authored_by: AGIC Infrastructure Team
-  schema_last_updated: "2026-06-19"
+  schema_last_updated: "2026-07-09"
 
 catalogue:
   display_name: "App Service Plan"
@@ -101,13 +101,7 @@ dependencies:
 
   produces_outputs_consumable_by:
     - output: id
-      resource_type: function_app
-    - output: id
-      resource_type: function_app_flex
-    - output: id
-      resource_type: linux_web_app
-    - output: id
-      resource_type: linux_virtual_machine
+      resource_type: app_service_plan
 
 outputs_display:
   id:

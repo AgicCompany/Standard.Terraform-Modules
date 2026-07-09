@@ -4,7 +4,7 @@ metadata:
   module_name: virtual-network
   module_version: "1.0.0"
   schema_authored_by: AGIC Infrastructure Team
-  schema_last_updated: "2026-06-19"
+  schema_last_updated: "2026-07-09"
 
 catalogue:
   display_name: "Virtual Network"
@@ -144,6 +144,9 @@ dependencies:
       resource_type: virtual_network
     - output: subnet_ids
       resource_type: subnet
+      cardinality: many
+      keys_from: subnets
+      notes: "Map of subnet name -> subnet id. Consumers selecting one subnet pass an output_key."
 
 outputs_display:
   id:

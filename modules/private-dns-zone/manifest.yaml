@@ -4,7 +4,7 @@ metadata:
   module_name: private-dns-zone
   module_version: "1.0.0"
   schema_authored_by: AGIC Infrastructure Team
-  schema_last_updated: "2026-06-19"
+  schema_last_updated: "2026-07-09"
 
 catalogue:
   display_name: "Private DNS Zone"
@@ -79,9 +79,7 @@ dependencies:
       notes: "One virtual network ID per link entry. Optional — zone can be created without links and linked later."
   produces_outputs_consumable_by:
     - output: id
-      resource_type: storage_account
-    - output: id
-      resource_type: key_vault
+      resource_type: private_dns_zone
 
 outputs_display:
   id:
