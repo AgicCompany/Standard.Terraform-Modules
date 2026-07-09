@@ -4,7 +4,7 @@ metadata:
   module_name: aks
   module_version: "4.1.1"
   schema_authored_by: AGIC Infrastructure Team
-  schema_last_updated: "2026-05-18"
+  schema_last_updated: "2026-07-09"
 
 catalogue:
   display_name: "Azure Kubernetes Service"
@@ -535,7 +535,7 @@ dependencies:
 
   produces_outputs_consumable_by:
     - output: id
-      resource_type: aks_cluster
+      resource_type: aks
     - output: oidc_issuer_url
       resource_type: oidc_issuer
 

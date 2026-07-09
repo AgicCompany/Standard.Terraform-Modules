@@ -4,7 +4,7 @@ metadata:
   module_name: route-table
   module_version: "1.2.0"
   schema_authored_by: AGIC Infrastructure Team
-  schema_last_updated: "2026-06-19"
+  schema_last_updated: "2026-07-09"
 
 catalogue:
   display_name: "Route Table"
@@ -87,7 +87,7 @@ dependencies:
   required_inputs_from_other_resources: []
   produces_outputs_consumable_by:
     - output: id
-      resource_type: virtual_network
+      resource_type: route_table
 
 outputs_display:
   id:

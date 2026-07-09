@@ -4,7 +4,7 @@ metadata:
   module_name: aks-node-pool
   module_version: "2.0.0"
   schema_authored_by: AGIC Infrastructure Team
-  schema_last_updated: "2026-06-19"
+  schema_last_updated: "2026-07-09"
 
 catalogue:
   display_name: "AKS Node Pool"
@@ -33,7 +33,7 @@ variables:
   # --- Core ---
   kubernetes_cluster_id:
     widget: resource_picker
-    widget_options: { resource_type: aks_cluster }
+    widget_options: { resource_type: aks }
     group: core
     order: 10
     help: "Resource ID of the AKS cluster to attach node pools to."
@@ -182,7 +182,7 @@ variables:
 dependencies:
   required_inputs_from_other_resources:
     - variable: kubernetes_cluster_id
-      resource_type: aks_cluster
+      resource_type: aks
       cardinality: one
       notes: "The AKS cluster to which node pools are attached."
     - variable: node_pools.vnet_subnet_id
