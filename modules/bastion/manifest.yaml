@@ -110,6 +110,24 @@ variables:
     show_when:
       sku: Standard
 
+composition_contract:
+  version: v1
+  required_resources:
+  - requirement_id: bastion.subnet_id
+    variable: subnet_id
+    role: network_placement
+    necessity: required
+    resource_type: subnet
+    cardinality: one
+    compatible_providers:
+    - virtual-network
+    recommended_provider: virtual-network
+    existing_resource:
+      supported: true
+      discovery_kind: azure-resource-id
+    external_changes:
+      allowed: false
+
 dependencies:
   required_inputs_from_other_resources:
     - variable: subnet_id

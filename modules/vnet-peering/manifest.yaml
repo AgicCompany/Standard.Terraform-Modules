@@ -106,6 +106,42 @@ variables:
     order: 40
     help: "Use the remote VNet's gateway for traffic from the local VNet. Requires allow_gateway_transit on the remote peering."
 
+composition_contract:
+  version: v1
+  required_resources:
+  - requirement_id: vnet-peering.virtual_network_id
+    variable: virtual_network_id
+    role: connection
+    necessity: required
+    resource_type: virtual_network
+    cardinality: one
+    compatible_providers:
+    - virtual-network
+    recommended_provider: virtual-network
+    existing_resource:
+      supported: true
+      discovery_kind: azure-resource-id
+    external_changes:
+      allowed: true
+      capabilities:
+      - create-peering
+  - requirement_id: vnet-peering.remote_virtual_network_id
+    variable: remote_virtual_network_id
+    role: connection
+    necessity: required
+    resource_type: virtual_network
+    cardinality: one
+    compatible_providers:
+    - virtual-network
+    recommended_provider: virtual-network
+    existing_resource:
+      supported: true
+      discovery_kind: azure-resource-id
+    external_changes:
+      allowed: true
+      capabilities:
+      - create-peering
+
 dependencies:
   required_inputs_from_other_resources:
     - variable: virtual_network_id

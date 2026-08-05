@@ -517,6 +517,38 @@ variables:
     advanced: true
     help: "Optional diagnostic settings. Leave empty to disable. At least one of Log Analytics, Storage Account, or Event Hub sink must be set when enabled."
 
+composition_contract:
+  version: v1
+  required_resources:
+  - requirement_id: front-door.diagnostic_settings.log_analytics_workspace_id
+    variable: diagnostic_settings.log_analytics_workspace_id
+    role: resource_binding
+    necessity: optional
+    resource_type: log_analytics_workspace
+    cardinality: one
+    compatible_providers:
+    - log-analytics-workspace
+    recommended_provider: log-analytics-workspace
+    existing_resource:
+      supported: true
+      discovery_kind: azure-resource-id
+    external_changes:
+      allowed: false
+  - requirement_id: front-door.diagnostic_settings.storage_account_id
+    variable: diagnostic_settings.storage_account_id
+    role: resource_binding
+    necessity: optional
+    resource_type: storage_account
+    cardinality: one
+    compatible_providers:
+    - storage-account
+    recommended_provider: storage-account
+    existing_resource:
+      supported: true
+      discovery_kind: azure-resource-id
+    external_changes:
+      allowed: false
+
 dependencies:
   required_inputs_from_other_resources:
     - variable: diagnostic_settings.log_analytics_workspace_id

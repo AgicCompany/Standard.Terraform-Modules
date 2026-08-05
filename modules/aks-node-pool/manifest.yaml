@@ -179,6 +179,41 @@ variables:
     order: 10
     help: "Map of node pool configurations. Each key becomes the pool name (1–12 lowercase alphanumeric starting with a letter; Windows pools ≤ 6 chars)."
 
+composition_contract:
+  version: v1
+  required_resources:
+  - requirement_id: aks-node-pool.kubernetes_cluster_id
+    variable: kubernetes_cluster_id
+    role: resource_binding
+    necessity: required
+    resource_type: aks
+    cardinality: one
+    compatible_providers:
+    - aks
+    recommended_provider: aks
+    existing_resource:
+      supported: true
+      discovery_kind: azure-resource-id
+    external_changes:
+      allowed: true
+      capabilities:
+      - create-node-pool
+  - requirement_id: aks-node-pool.node_pools.vnet_subnet_id
+    variable: node_pools.vnet_subnet_id
+    role: network_placement
+    necessity: optional
+    resource_type: subnet
+    cardinality: many
+    collection_kind: keyed_map
+    compatible_providers:
+    - virtual-network
+    recommended_provider: virtual-network
+    existing_resource:
+      supported: true
+      discovery_kind: azure-resource-id
+    external_changes:
+      allowed: false
+
 dependencies:
   required_inputs_from_other_resources:
     - variable: kubernetes_cluster_id
@@ -188,6 +223,7 @@ dependencies:
     - variable: node_pools.vnet_subnet_id
       resource_type: subnet
       cardinality: many
+      collection_kind: keyed_map
       notes: "Optional per-pool VNet subnet for node placement."
 
   produces_outputs_consumable_by: []

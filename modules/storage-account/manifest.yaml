@@ -14,7 +14,7 @@ catalogue:
     blob/file/table/queue subresources, public access disabled, shared key
     auth disabled, TLS 1.2 enforced, soft delete enabled. Supports optional
     diagnostic settings with multi-sink output (Log Analytics, storage, Event Hub).
-  category: foundation
+  category: data
   subcategory: storage
   icon: storage-account
   complexity: medium
@@ -275,6 +275,80 @@ variables:
     advanced: true
     help: "Optional. Leave blank to disable diagnostic settings."
 
+composition_contract:
+  version: v1
+  required_resources:
+  - requirement_id: storage-account.subnet_id
+    variable: subnet_id
+    role: network_placement
+    necessity: optional
+    resource_type: subnet
+    cardinality: one
+    compatible_providers:
+    - virtual-network
+    recommended_provider: virtual-network
+    existing_resource:
+      supported: true
+      discovery_kind: azure-resource-id
+    external_changes:
+      allowed: false
+  - requirement_id: storage-account.private_dns_zone_ids
+    variable: private_dns_zone_ids
+    role: resource_binding
+    necessity: optional
+    resource_type: private_dns_zone
+    cardinality: many
+    collection_kind: keyed_map
+    compatible_providers:
+    - private-dns-zone
+    recommended_provider: private-dns-zone
+    existing_resource:
+      supported: true
+      discovery_kind: azure-resource-id
+    external_changes:
+      allowed: false
+  - requirement_id: storage-account.network_rules.virtual_network_subnet_ids
+    variable: network_rules.virtual_network_subnet_ids
+    role: resource_binding
+    necessity: optional
+    resource_type: subnet
+    cardinality: many
+    compatible_providers:
+    - virtual-network
+    recommended_provider: virtual-network
+    existing_resource:
+      supported: true
+      discovery_kind: azure-resource-id
+    external_changes:
+      allowed: false
+  - requirement_id: storage-account.diagnostic_settings.log_analytics_workspace_id
+    variable: diagnostic_settings.log_analytics_workspace_id
+    role: resource_binding
+    necessity: optional
+    resource_type: log_analytics_workspace
+    cardinality: one
+    compatible_providers:
+    - log-analytics-workspace
+    recommended_provider: log-analytics-workspace
+    existing_resource:
+      supported: true
+      discovery_kind: azure-resource-id
+    external_changes:
+      allowed: false
+  - requirement_id: storage-account.diagnostic_settings.storage_account_id
+    variable: diagnostic_settings.storage_account_id
+    role: resource_binding
+    necessity: optional
+    resource_type: storage_account
+    cardinality: one
+    compatible_providers: []
+    recommended_provider: null
+    existing_resource:
+      supported: true
+      discovery_kind: azure-resource-id
+    external_changes:
+      allowed: false
+
 dependencies:
   required_inputs_from_other_resources:
     - variable: subnet_id
@@ -284,6 +358,7 @@ dependencies:
     - variable: private_dns_zone_ids
       resource_type: private_dns_zone
       cardinality: many
+      collection_kind: keyed_map
       notes: "One DNS zone per enabled subresource (blob, file, table, queue)."
     - variable: network_rules.virtual_network_subnet_ids
       resource_type: subnet

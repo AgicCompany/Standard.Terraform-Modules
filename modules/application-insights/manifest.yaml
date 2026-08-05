@@ -121,6 +121,24 @@ variables:
     advanced: true
     help: "Store profiler data in your own storage account instead of Microsoft-managed storage."
 
+composition_contract:
+  version: v1
+  required_resources:
+  - requirement_id: application-insights.workspace_id
+    variable: workspace_id
+    role: resource_binding
+    necessity: required
+    resource_type: log_analytics_workspace
+    cardinality: one
+    compatible_providers:
+    - log-analytics-workspace
+    recommended_provider: log-analytics-workspace
+    existing_resource:
+      supported: true
+      discovery_kind: azure-resource-id
+    external_changes:
+      allowed: false
+
 dependencies:
   required_inputs_from_other_resources:
     - variable: workspace_id

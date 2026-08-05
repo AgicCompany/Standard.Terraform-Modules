@@ -253,6 +253,52 @@ variables:
     show_when:
       enable_boot_diagnostics: true
 
+composition_contract:
+  version: v1
+  required_resources:
+  - requirement_id: linux-virtual-machine.subnet_id
+    variable: subnet_id
+    role: network_placement
+    necessity: required
+    resource_type: subnet
+    cardinality: one
+    compatible_providers:
+    - virtual-network
+    recommended_provider: virtual-network
+    existing_resource:
+      supported: true
+      discovery_kind: azure-resource-id
+    external_changes:
+      allowed: false
+  - requirement_id: linux-virtual-machine.user_assigned_identity_ids
+    variable: user_assigned_identity_ids
+    role: resource_binding
+    necessity: optional
+    resource_type: user_assigned_identity
+    cardinality: many
+    compatible_providers:
+    - user-assigned-identity
+    recommended_provider: user-assigned-identity
+    existing_resource:
+      supported: true
+      discovery_kind: azure-resource-id
+    external_changes:
+      allowed: false
+  - requirement_id: linux-virtual-machine.boot_diagnostics_storage_uri
+    variable: boot_diagnostics_storage_uri
+    role: resource_binding
+    necessity: optional
+    resource_type: storage_account
+    cardinality: one
+    compatible_providers:
+    - storage-account
+    recommended_provider: storage-account
+    existing_resource:
+      supported: true
+      discovery_kind: azure-resource-id
+    external_changes:
+      allowed: false
+
 dependencies:
   required_inputs_from_other_resources:
     - variable: subnet_id

@@ -13,7 +13,7 @@ catalogue:
     Creates an Azure User-Assigned Managed Identity. Role assignments,
     federated credentials, and other configurations are the consumer's
     responsibility and should follow the principle of least privilege.
-  category: foundation
+  category: security
   subcategory: identity
   icon: user-assigned-identity
   complexity: low

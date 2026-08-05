@@ -273,6 +273,137 @@ variables:
     advanced: true
     help: "Optional diagnostic settings. Leave blank to disable. At least one destination sink must be provided when set."
 
+composition_contract:
+  version: v1
+  required_resources:
+  - requirement_id: function-app.service_plan_id
+    variable: service_plan_id
+    role: resource_binding
+    necessity: required
+    resource_type: app_service_plan
+    cardinality: one
+    compatible_providers:
+    - app-service-plan
+    recommended_provider: app-service-plan
+    existing_resource:
+      supported: true
+      discovery_kind: azure-resource-id
+    external_changes:
+      allowed: false
+  - requirement_id: function-app.storage_account_name
+    variable: storage_account_name
+    role: resource_binding
+    necessity: required
+    resource_type: storage_account
+    cardinality: one
+    compatible_providers:
+    - storage-account
+    recommended_provider: storage-account
+    existing_resource:
+      supported: true
+      discovery_kind: azure-resource-id
+    external_changes:
+      allowed: false
+  - requirement_id: function-app.vnet_integration_subnet_id
+    variable: vnet_integration_subnet_id
+    role: network_placement
+    necessity: optional
+    resource_type: subnet
+    cardinality: one
+    compatible_providers:
+    - virtual-network
+    recommended_provider: virtual-network
+    existing_resource:
+      supported: true
+      discovery_kind: azure-resource-id
+    external_changes:
+      allowed: false
+  - requirement_id: function-app.subnet_id
+    variable: subnet_id
+    role: network_placement
+    necessity: optional
+    resource_type: subnet
+    cardinality: one
+    compatible_providers:
+    - virtual-network
+    recommended_provider: virtual-network
+    existing_resource:
+      supported: true
+      discovery_kind: azure-resource-id
+    external_changes:
+      allowed: false
+  - requirement_id: function-app.private_dns_zone_id
+    variable: private_dns_zone_id
+    role: resource_binding
+    necessity: optional
+    resource_type: private_dns_zone
+    cardinality: one
+    compatible_providers:
+    - private-dns-zone
+    recommended_provider: private-dns-zone
+    existing_resource:
+      supported: true
+      discovery_kind: azure-resource-id
+    external_changes:
+      allowed: false
+  - requirement_id: function-app.user_assigned_identity_ids
+    variable: user_assigned_identity_ids
+    role: resource_binding
+    necessity: optional
+    resource_type: user_assigned_identity
+    cardinality: many
+    compatible_providers:
+    - user-assigned-identity
+    recommended_provider: user-assigned-identity
+    existing_resource:
+      supported: true
+      discovery_kind: azure-resource-id
+    external_changes:
+      allowed: false
+  - requirement_id: function-app.application_insights_connection_string
+    variable: application_insights_connection_string
+    role: resource_binding
+    necessity: optional
+    resource_type: application_insights
+    cardinality: one
+    compatible_providers:
+    - application-insights
+    - log-analytics-workspace
+    recommended_provider: application-insights
+    existing_resource:
+      supported: true
+      discovery_kind: azure-resource-id
+    external_changes:
+      allowed: false
+  - requirement_id: function-app.diagnostic_settings.log_analytics_workspace_id
+    variable: diagnostic_settings.log_analytics_workspace_id
+    role: resource_binding
+    necessity: optional
+    resource_type: log_analytics_workspace
+    cardinality: one
+    compatible_providers:
+    - log-analytics-workspace
+    recommended_provider: log-analytics-workspace
+    existing_resource:
+      supported: true
+      discovery_kind: azure-resource-id
+    external_changes:
+      allowed: false
+  - requirement_id: function-app.diagnostic_settings.storage_account_id
+    variable: diagnostic_settings.storage_account_id
+    role: resource_binding
+    necessity: optional
+    resource_type: storage_account
+    cardinality: one
+    compatible_providers:
+    - storage-account
+    recommended_provider: storage-account
+    existing_resource:
+      supported: true
+      discovery_kind: azure-resource-id
+    external_changes:
+      allowed: false
+
 dependencies:
   required_inputs_from_other_resources:
     - variable: service_plan_id
