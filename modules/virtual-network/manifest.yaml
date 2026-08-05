@@ -128,15 +128,51 @@ variables:
     advanced: true
     help: "Map of subnet name to route table resource ID. Keys must match subnet names defined above."
 
+composition_contract:
+  version: v1
+  required_resources:
+  - requirement_id: virtual-network.subnet_nsg_associations
+    variable: subnet_nsg_associations
+    role: resource_binding
+    necessity: optional
+    resource_type: network_security_group
+    cardinality: many
+    collection_kind: keyed_map
+    compatible_providers:
+    - network-security-group
+    recommended_provider: network-security-group
+    existing_resource:
+      supported: true
+      discovery_kind: azure-resource-id
+    external_changes:
+      allowed: false
+  - requirement_id: virtual-network.subnet_route_table_associations
+    variable: subnet_route_table_associations
+    role: resource_binding
+    necessity: optional
+    resource_type: route_table
+    cardinality: many
+    collection_kind: keyed_map
+    compatible_providers:
+    - route-table
+    recommended_provider: route-table
+    existing_resource:
+      supported: true
+      discovery_kind: azure-resource-id
+    external_changes:
+      allowed: false
+
 dependencies:
   required_inputs_from_other_resources:
     - variable: subnet_nsg_associations
       resource_type: network_security_group
       cardinality: many
+      collection_kind: keyed_map
       notes: "Optional NSG associations. Keys must match subnet names."
     - variable: subnet_route_table_associations
       resource_type: route_table
       cardinality: many
+      collection_kind: keyed_map
       notes: "Optional route table associations. Keys must match subnet names."
 
   produces_outputs_consumable_by:

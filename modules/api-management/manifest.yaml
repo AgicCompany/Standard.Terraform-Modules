@@ -15,7 +15,7 @@ catalogue:
     injection for gateway-level isolation, system- or user-assigned managed
     identity, optional multi-region deployments (Premium SKU), client certificate
     authentication, and diagnostic settings with multi-sink output.
-  category: foundation
+  category: networking
   subcategory: api-gateway
   icon: api-management
   complexity: high
@@ -256,6 +256,94 @@ variables:
     order: 10
     advanced: true
     help: "Optional. Leave blank to disable diagnostic settings."
+
+composition_contract:
+  version: v1
+  required_resources:
+  - requirement_id: api-management.virtual_network_subnet_id
+    variable: virtual_network_subnet_id
+    role: network_placement
+    necessity: optional
+    resource_type: subnet
+    cardinality: one
+    compatible_providers:
+    - virtual-network
+    recommended_provider: virtual-network
+    existing_resource:
+      supported: true
+      discovery_kind: azure-resource-id
+    external_changes:
+      allowed: false
+  - requirement_id: api-management.subnet_id
+    variable: subnet_id
+    role: network_placement
+    necessity: optional
+    resource_type: subnet
+    cardinality: one
+    compatible_providers:
+    - virtual-network
+    recommended_provider: virtual-network
+    existing_resource:
+      supported: true
+      discovery_kind: azure-resource-id
+    external_changes:
+      allowed: false
+  - requirement_id: api-management.private_dns_zone_id
+    variable: private_dns_zone_id
+    role: resource_binding
+    necessity: optional
+    resource_type: private_dns_zone
+    cardinality: one
+    compatible_providers:
+    - private-dns-zone
+    recommended_provider: private-dns-zone
+    existing_resource:
+      supported: true
+      discovery_kind: azure-resource-id
+    external_changes:
+      allowed: false
+  - requirement_id: api-management.identity_ids
+    variable: identity_ids
+    role: resource_binding
+    necessity: optional
+    resource_type: user_assigned_identity
+    cardinality: many
+    compatible_providers:
+    - user-assigned-identity
+    recommended_provider: user-assigned-identity
+    existing_resource:
+      supported: true
+      discovery_kind: azure-resource-id
+    external_changes:
+      allowed: false
+  - requirement_id: api-management.diagnostic_settings.log_analytics_workspace_id
+    variable: diagnostic_settings.log_analytics_workspace_id
+    role: resource_binding
+    necessity: optional
+    resource_type: log_analytics_workspace
+    cardinality: one
+    compatible_providers:
+    - log-analytics-workspace
+    recommended_provider: log-analytics-workspace
+    existing_resource:
+      supported: true
+      discovery_kind: azure-resource-id
+    external_changes:
+      allowed: false
+  - requirement_id: api-management.diagnostic_settings.storage_account_id
+    variable: diagnostic_settings.storage_account_id
+    role: resource_binding
+    necessity: optional
+    resource_type: storage_account
+    cardinality: one
+    compatible_providers:
+    - storage-account
+    recommended_provider: storage-account
+    existing_resource:
+      supported: true
+      discovery_kind: azure-resource-id
+    external_changes:
+      allowed: false
 
 dependencies:
   required_inputs_from_other_resources:

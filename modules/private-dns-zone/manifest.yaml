@@ -71,11 +71,31 @@ variables:
     order: 10
     help: "Virtual networks linked to this DNS zone for name resolution. VMs in linked networks can resolve zone records without custom DNS server configuration."
 
+composition_contract:
+  version: v1
+  required_resources:
+  - requirement_id: private-dns-zone.virtual_network_links.virtual_network_id
+    variable: virtual_network_links.virtual_network_id
+    role: connection
+    necessity: optional
+    resource_type: virtual_network
+    cardinality: many
+    collection_kind: keyed_map
+    compatible_providers:
+    - virtual-network
+    recommended_provider: virtual-network
+    existing_resource:
+      supported: true
+      discovery_kind: azure-resource-id
+    external_changes:
+      allowed: false
+
 dependencies:
   required_inputs_from_other_resources:
     - variable: virtual_network_links.virtual_network_id
       resource_type: virtual_network
       cardinality: many
+      collection_kind: keyed_map
       notes: "One virtual network ID per link entry. Optional — zone can be created without links and linked later."
   produces_outputs_consumable_by:
     - output: id

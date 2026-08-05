@@ -349,6 +349,52 @@ variables:
     advanced: true
     help: "Optional. Leave blank to disable diagnostic settings."
 
+composition_contract:
+  version: v1
+  required_resources:
+  - requirement_id: container-app-job.container_app_environment_id
+    variable: container_app_environment_id
+    role: resource_binding
+    necessity: required
+    resource_type: container_app_environment
+    cardinality: one
+    compatible_providers:
+    - container-app-environment
+    recommended_provider: container-app-environment
+    existing_resource:
+      supported: true
+      discovery_kind: azure-resource-id
+    external_changes:
+      allowed: false
+  - requirement_id: container-app-job.user_assigned_identity_ids
+    variable: user_assigned_identity_ids
+    role: resource_binding
+    necessity: optional
+    resource_type: user_assigned_identity
+    cardinality: many
+    compatible_providers:
+    - user-assigned-identity
+    recommended_provider: user-assigned-identity
+    existing_resource:
+      supported: true
+      discovery_kind: azure-resource-id
+    external_changes:
+      allowed: false
+  - requirement_id: container-app-job.diagnostic_settings.log_analytics_workspace_id
+    variable: diagnostic_settings.log_analytics_workspace_id
+    role: resource_binding
+    necessity: optional
+    resource_type: log_analytics_workspace
+    cardinality: one
+    compatible_providers:
+    - log-analytics-workspace
+    recommended_provider: log-analytics-workspace
+    existing_resource:
+      supported: true
+      discovery_kind: azure-resource-id
+    external_changes:
+      allowed: false
+
 dependencies:
   required_inputs_from_other_resources:
     - variable: container_app_environment_id

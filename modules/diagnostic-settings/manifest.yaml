@@ -71,6 +71,24 @@ variables:
     order: 40
     help: "Metric categories to enable, one per line. Leave blank to use 'AllMetrics'. Specify explicit categories if the target resource uses named metric categories."
 
+composition_contract:
+  version: v1
+  required_resources:
+  - requirement_id: diagnostic-settings.log_analytics_workspace_id
+    variable: log_analytics_workspace_id
+    role: resource_binding
+    necessity: required
+    resource_type: log_analytics_workspace
+    cardinality: one
+    compatible_providers:
+    - log-analytics-workspace
+    recommended_provider: log-analytics-workspace
+    existing_resource:
+      supported: true
+      discovery_kind: azure-resource-id
+    external_changes:
+      allowed: false
+
 dependencies:
   required_inputs_from_other_resources:
     - variable: log_analytics_workspace_id
