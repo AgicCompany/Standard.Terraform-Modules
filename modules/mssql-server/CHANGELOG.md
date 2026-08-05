@@ -7,6 +7,7 @@ All notable changes to this module will be documented in this file.
 ### Changed
 
 - Internal: moved the `azurerm_monitor_diagnostic_categories` data source from `main.tf` to `data.tf` for file-structure consistency. No interface or behavior change.
+- Capped the `azurerm` provider constraint to `>= 4.x, < 5.0.0` in the module and its examples, pending a deliberate azurerm 5.x migration. No interface or behavior change.
 
 ## [3.1.1] - 2026-06-05
 
