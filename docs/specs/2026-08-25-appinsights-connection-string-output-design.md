@@ -1,3 +1,10 @@
+---
+title: Expose connection_string from modules/application-insights (issue #72)
+date: 2026-08-25
+status: active
+version: 1.0
+---
+
 # Design: expose `connection_string` from `modules/application-insights` (issue #72)
 
 **Date:** 2026-08-25

@@ -1,3 +1,10 @@
+---
+title: application-insights connection_string output — implementation plan (issue #72)
+date: 2026-08-25
+status: active
+version: 1.0
+---
+
 # application-insights `connection_string` Output Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
@@ -8,7 +15,7 @@
 
 **Tech Stack:** Terraform (azurerm >= 4.0.0, < 5.0.0), terraform-docs, Make, llamalab lint (Python).
 
-**Spec:** `docs/superpowers/specs/2026-08-25-appinsights-connection-string-output-design.md`
+**Spec:** `docs/specs/2026-08-25-appinsights-connection-string-output-design.md`
 
 ---
 
