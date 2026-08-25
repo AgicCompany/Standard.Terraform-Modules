@@ -1047,7 +1047,7 @@ Creates an Azure Application Insights resource backed by Log Analytics for APM.
 | `internet_query_enabled` | bool | no | `false` | Allow internet queries |
 | `tags` | map(string) | no | `{}` | Tags |
 
-**Outputs:** `id`, `name`, `app_id`, `public_app_insights_id`, `connection_string` (sensitive; added in v2.1.0 for declarative telemetry wiring). `instrumentation_key` remains removed (v2.0.0) — with local authentication disabled (the default) the connection string is a destination identifier, not a credential.
+**Outputs:** `id`, `name`, `app_id`, `public_app_insights_id`, `connection_string` (sensitive; added in v2.1.0 for declarative telemetry wiring; `null` when local authentication is enabled so the module never exports a credential). `instrumentation_key` remains removed (v2.0.0) — with local authentication disabled (the default) the connection string is a destination identifier, not a credential.
 
 ---
 

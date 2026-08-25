@@ -6,7 +6,7 @@ All notable changes to this module will be documented in this file.
 
 ### Added
 
-- `connection_string` sensitive output for declarative telemetry configuration (Azure Monitor OpenTelemetry). Partially reverses the 2.0.0 removal: with `local_authentication_disabled = true` (the default) the connection string identifies the telemetry destination and is not a credential (ingestion requires Entra ID + RBAC). The value resides in Terraform state regardless of the output; marking it `sensitive` keeps it out of plan/apply display. See MODULE_STANDARDS.md §4 (possession test).
+- `connection_string` sensitive output for declarative telemetry configuration (Azure Monitor OpenTelemetry). Partially reverses the 2.0.0 removal: with `local_authentication_disabled = true` (the default) the connection string identifies the telemetry destination and is not a credential (ingestion requires Entra ID + RBAC). The output is `null` when local authentication is enabled, so the module never exports a credential; retrieve it via data source or Key Vault in that configuration. The value resides in Terraform state regardless of the output; `sensitive` redacts it from normal plan/apply display (it is still revealed by `terraform output -raw`/`-json`). See MODULE_STANDARDS.md §4 (possession test).
 
 ### Changed
 

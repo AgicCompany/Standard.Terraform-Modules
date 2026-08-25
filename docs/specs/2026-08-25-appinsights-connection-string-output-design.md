@@ -2,8 +2,17 @@
 title: Expose connection_string from modules/application-insights (issue #72)
 date: 2026-08-25
 status: active
-version: 1.0
+version: 1.1
 ---
+
+> **Revision 1.1** (Copilot review on PR #73): the output is now **gated** —
+> `null` when local authentication is enabled — instead of documentation-only
+> mitigation, so the module never exports a credential and the §4 possession
+> test is self-enforcing. "Never printed" claims corrected to "redacted from
+> normal plan/apply output" (`terraform output -raw`/`-json` reveal sensitive
+> values). README integration note gained the Entra ingestion prerequisites
+> (Monitoring Metrics Publisher role, `APPLICATIONINSIGHTS_AUTHENTICATION_STRING`
+> or `TokenCredential`).
 
 # Design: expose `connection_string` from `modules/application-insights` (issue #72)
 
@@ -57,11 +66,11 @@ without a separately authorized identity.
 
 **Known conditional case:** the module permits opting in to local authentication
 (`local_authentication_disabled = false`); in that configuration the embedded
-`InstrumentationKey` *is* a usable ingestion credential. Marginal exposure is limited to
-a consumer who both enables local auth and re-exports the output carelessly (the value
-is in their state either way, and the output is sensitive-marked either way). Handled by
-documentation, not by a `precondition` — failing the output when local auth is enabled
-would break legitimate opt-in consumers.
+`InstrumentationKey` *is* a usable ingestion credential. Handled by **gating** (rev
+1.1): the output is `null` when local authentication is enabled, so the module never
+exports a credential — consumers in that configuration retrieve the value via data
+source or Key Vault, the standard credential path. A `precondition` (hard failure) was
+rejected as it would break legitimate opt-in consumers.
 
 ## Changes
 
@@ -71,8 +80,8 @@ Add under `# === Resource-Specific Outputs ===`:
 
 ```hcl
 output "connection_string" {
-  value       = azurerm_application_insights.this.connection_string
-  description = "Application Insights connection string (telemetry destination). Not a credential while local_authentication_disabled = true (the default); treat as a secret if you enable local authentication."
+  value       = var.local_authentication_disabled ? azurerm_application_insights.this.connection_string : null
+  description = "Application Insights connection string (telemetry destination). Null when local authentication is enabled, so the module never exports a credential. Sensitive: redacted from normal plan/apply output, but still stored in state and revealed by 'terraform output -raw'."
   sensitive   = true
 }
 ```

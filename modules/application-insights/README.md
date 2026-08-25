@@ -98,7 +98,7 @@ No modules.
 | Name | Description |
 |------|-------------|
 | <a name="output_app_id"></a> [app\_id](#output\_app\_id) | Application Insights application ID |
-| <a name="output_connection_string"></a> [connection\_string](#output\_connection\_string) | Application Insights connection string (telemetry destination). Not a credential while local\_authentication\_disabled = true (the default); treat as a secret if you enable local authentication. |
+| <a name="output_connection_string"></a> [connection\_string](#output\_connection\_string) | Application Insights connection string (telemetry destination). Null when local authentication is enabled, so the module never exports a credential. Sensitive: redacted from normal plan/apply output, but still stored in state and revealed by 'terraform output -raw'. |
 | <a name="output_id"></a> [id](#output\_id) | Application Insights resource ID |
 | <a name="output_name"></a> [name](#output\_name) | Application Insights name |
 | <a name="output_public_app_insights_id"></a> [public\_app\_insights\_id](#output\_public\_app\_insights\_id) | Application Insights resource ID (for cross-project consumption) |
@@ -116,4 +116,6 @@ No modules.
   }
   ```
 
-  Terraform's sensitivity propagates automatically — any value containing the connection string renders as `(sensitive value)` in plans; use `nonsensitive()` only deliberately and where justified. The connection string identifies the telemetry destination and is not a credential while `local_authentication_disabled = true` (the default): ingestion requires a Microsoft Entra ID token authorized via RBAC. If you enable local authentication, treat this value as a secret.
+  The connection string only selects the telemetry destination — with `local_authentication_disabled = true` (the default) ingestion additionally requires Microsoft Entra authentication on the sender: grant the workload's identity the **Monitoring Metrics Publisher** role on this resource, and either set `APPLICATIONINSIGHTS_AUTHENTICATION_STRING = "Authorization=AAD"` (append `;ClientId=<client-id>` for a user-assigned identity) for codeless App Service/Functions instrumentation, or configure a `TokenCredential` in the SDK/exporter. Without these, ingestion is rejected (401/403).
+
+  Terraform's sensitivity propagates automatically — any value containing the connection string renders as `(sensitive value)` in plans; use `nonsensitive()` only deliberately and where justified. Sensitivity redacts normal plan/apply output only: the value remains in state and is revealed by `terraform output -raw`/`-json`. The output is `null` when local authentication is enabled — in that configuration the embedded instrumentation key is a usable ingestion credential and the module never exports credentials; retrieve it via `data.azurerm_application_insights` or a Key Vault reference instead.

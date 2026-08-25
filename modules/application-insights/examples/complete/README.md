@@ -37,7 +37,7 @@ No inputs.
 
 | Name | Description |
 |------|-------------|
-| <a name="output_connection_string"></a> [connection\_string](#output\_connection\_string) | Demonstrates pass-through without display: Terraform requires sensitive = true on any output derived from a sensitive value, so the string is never printed. |
+| <a name="output_connection_string"></a> [connection\_string](#output\_connection\_string) | Demonstrates sensitive pass-through: Terraform requires sensitive = true on any output derived from a sensitive value. Sensitivity redacts the value from normal plan/apply output only — it remains in state and is revealed by `terraform output -raw connection_string` or `terraform output -json`. |
 | <a name="output_id"></a> [id](#output\_id) | n/a |
 | <a name="output_name"></a> [name](#output\_name) | n/a |
 <!-- END_TF_DOCS -->

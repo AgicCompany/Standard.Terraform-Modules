@@ -16,8 +16,8 @@ output "app_id" {
 }
 
 output "connection_string" {
-  value       = azurerm_application_insights.this.connection_string
-  description = "Application Insights connection string (telemetry destination). Not a credential while local_authentication_disabled = true (the default); treat as a secret if you enable local authentication."
+  value       = var.local_authentication_disabled ? azurerm_application_insights.this.connection_string : null
+  description = "Application Insights connection string (telemetry destination). Null when local authentication is enabled, so the module never exports a credential. Sensitive: redacted from normal plan/apply output, but still stored in state and revealed by 'terraform output -raw'."
   sensitive   = true
 }
 
