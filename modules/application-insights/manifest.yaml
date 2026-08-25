@@ -172,3 +172,8 @@ outputs_display:
     copyable: true
     format: arm_id
     role: public_alias
+
+  # NOTE: connection_string is intentionally omitted. outputs.tf marks it
+  # sensitive=true; T1 §7.1 check 8 (lint.8) forbids displaying sensitive
+  # outputs. Consumers wire it module-to-module in Terraform; it must never
+  # be rendered in the vending-machine UI.

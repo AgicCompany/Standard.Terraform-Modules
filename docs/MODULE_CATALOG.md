@@ -1028,7 +1028,7 @@ Wraps `azurerm_ai_foundry` (hub, AML-workspace flavour with kind = Hub) and a si
 
 ## Monitoring
 
-### application-insights `v2.0.0`
+### application-insights `v2.1.0`
 Creates an Azure Application Insights resource backed by Log Analytics for APM.
 
 | Variable | Type | Required | Default | Description |
@@ -1047,7 +1047,7 @@ Creates an Azure Application Insights resource backed by Log Analytics for APM.
 | `internet_query_enabled` | bool | no | `false` | Allow internet queries |
 | `tags` | map(string) | no | `{}` | Tags |
 
-**Outputs:** `id`, `name`, `app_id`. Secret outputs (`instrumentation_key`, `connection_string`) were removed in v2.0.0 — retrieve via `data.azurerm_application_insights` or Key Vault references.
+**Outputs:** `id`, `name`, `app_id`, `public_app_insights_id`, `connection_string` (sensitive; added in v2.1.0 for declarative telemetry wiring; `null` when local authentication is enabled so the module never exports a credential). `instrumentation_key` remains removed (v2.0.0) — with local authentication disabled (the default) the connection string is a destination identifier, not a credential.
 
 ---
 

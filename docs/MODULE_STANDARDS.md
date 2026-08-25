@@ -128,7 +128,7 @@ When in doubt: if disabling it creates a security risk, default to `true`. If en
 
 ## 4. Output Standards
 
-Outputs are organized by category. Secrets are never exposed as outputs.
+Outputs are organized by category. Credentials are never exposed as outputs.
 
 ### Required Outputs
 
@@ -165,6 +165,8 @@ Never output:
 - Certificates or private keys
 
 If a consumer needs secrets, they retrieve them via data source or Key Vault reference.
+
+The governing test is whether **possession of the value grants access** to the resource or its data. Access keys, SAS tokens, and connection strings with embedded credentials fail this test regardless of any `sensitive` marking and stay forbidden. Values that merely identify a destination and cannot authenticate on their own — for example, the Application Insights connection string while local authentication is disabled — may be exposed as outputs and **must** be marked `sensitive = true`. If a configuration exists in which the value becomes a credential, the output **must be `null` in that configuration** (for Application Insights: `null` when local authentication is enabled) — documentation alone does not satisfy the possession test. Note that `sensitive = true` only redacts normal plan/apply output; the value remains in state and is revealed by `terraform output -raw`/`-json`.
 
 ### Output Naming
 

@@ -54,3 +54,12 @@ output "id" {
 output "name" {
   value = module.application_insights.name
 }
+
+# Demonstrates sensitive pass-through: Terraform requires sensitive = true on any
+# output derived from a sensitive value. Sensitivity redacts the value from normal
+# plan/apply output only — it remains in state and is revealed by
+# `terraform output -raw connection_string` or `terraform output -json`.
+output "connection_string" {
+  value     = module.application_insights.connection_string
+  sensitive = true
+}
