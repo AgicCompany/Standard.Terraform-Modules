@@ -22,7 +22,7 @@ Every module follows this variable order in `variables.tf`:
 4. **Optional: Feature Flags** -- `enable_*` booleans (security features default `true`, functionality features default `false`)
 5. **Tags** -- `tags = map(string)`, default `{}`
 
-Every module outputs at minimum: `id`, `name`. Never output secrets (keys, connection strings, passwords).
+Every module outputs at minimum: `id`, `name`. Never output credentials (access keys, passwords, secret-bearing connection strings). Non-credential identifiers may be exposed as `sensitive` outputs per the possession test in MODULE_STANDARDS.md §4.
 
 ## Module File Structure
 
