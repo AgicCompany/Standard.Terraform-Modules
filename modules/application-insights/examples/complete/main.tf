@@ -54,3 +54,10 @@ output "id" {
 output "name" {
   value = module.application_insights.name
 }
+
+# Demonstrates pass-through without display: Terraform requires sensitive = true
+# on any output derived from a sensitive value, so the string is never printed.
+output "connection_string" {
+  value     = module.application_insights.connection_string
+  sensitive = true
+}
