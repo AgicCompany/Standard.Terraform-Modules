@@ -8,7 +8,7 @@ Creates an Azure Application Insights resource backed by a Log Analytics workspa
 
 ```hcl
 module "application_insights" {
-  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/application-insights?ref=application-insights/v1.0.0"
+  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/application-insights?ref=application-insights/v2.1.0"
 
   resource_group_name = azurerm_resource_group.this.name
   location            = azurerm_resource_group.this.location
@@ -26,13 +26,15 @@ module "application_insights" {
 - Data retention and daily cap configuration
 - Sampling percentage control
 - Local authentication toggle
-- App ID output for cross-project consumption
+- Sensitive `connection_string` output for declarative telemetry wiring
+- Resource ID output for cross-project consumption
 
 ## Security Defaults
 
 - IP masking enabled by default (client IPs are anonymized)
-- Local authentication enabled by default (set `local_authentication_disabled = true` for AAD-only)
-- Internet ingestion and query enabled by default (required for most application telemetry scenarios)
+- Local authentication disabled by default (`local_authentication_disabled = true`); set it to `false` only if API key auth is required
+- Internet ingestion disabled by default (`internet_ingestion_enabled = false`); enable it or use Private Link for telemetry ingestion
+- Internet query disabled by default (`internet_query_enabled = false`)
 
 ## Public Outputs
 
@@ -96,6 +98,7 @@ No modules.
 | Name | Description |
 |------|-------------|
 | <a name="output_app_id"></a> [app\_id](#output\_app\_id) | Application Insights application ID |
+| <a name="output_connection_string"></a> [connection\_string](#output\_connection\_string) | Application Insights connection string (telemetry destination). Not a credential while local\_authentication\_disabled = true (the default); treat as a secret if you enable local authentication. |
 | <a name="output_id"></a> [id](#output\_id) | Application Insights resource ID |
 | <a name="output_name"></a> [name](#output\_name) | Application Insights name |
 | <a name="output_public_app_insights_id"></a> [public\_app\_insights\_id](#output\_public\_app\_insights\_id) | Application Insights resource ID (for cross-project consumption) |
@@ -105,4 +108,12 @@ No modules.
 
 - **Workspace-based only:** This module requires a Log Analytics workspace ID. Classic (standalone) Application Insights is deprecated by Microsoft.
 - **Sampling:** Set `sampling_percentage` below 100 to reduce data volume and costs for high-traffic applications.
-- **Function App / Web App integration:** Pass `output.app_id` to reference this resource from downstream modules. Configure `APPLICATIONINSIGHTS_CONNECTION_STRING` in app settings via the Azure portal or CI/CD pipeline using `az monitor app-insights component show`.
+- **Function App / Web App integration:** Wire telemetry declaratively via the sensitive `connection_string` output:
+
+  ```hcl
+  app_settings = {
+    APPLICATIONINSIGHTS_CONNECTION_STRING = module.application_insights.connection_string
+  }
+  ```
+
+  Terraform's sensitivity propagates automatically — any value containing the connection string renders as `(sensitive value)` in plans; use `nonsensitive()` only deliberately and where justified. The connection string identifies the telemetry destination and is not a credential while `local_authentication_disabled = true` (the default): ingestion requires a Microsoft Entra ID token authorized via RBAC. If you enable local authentication, treat this value as a secret.
