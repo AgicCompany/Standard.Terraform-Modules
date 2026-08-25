@@ -118,6 +118,8 @@ Amend with the possession test:
   that merely identify a destination and cannot authenticate on their own (e.g. the
   Application Insights connection string when local authentication is disabled) may be
   exposed as outputs and **must** be marked `sensitive = true`.
+- Also amend the §4 opening sentence ("Secrets are never exposed as outputs.") to
+  "Credentials are never exposed as outputs." so it doesn't contradict the carve-out.
 
 ### 5. Repo `CLAUDE.md`
 
@@ -128,17 +130,43 @@ MODULE_STANDARDS.md §4."
 
 ### 6. `modules/application-insights/manifest.yaml`
 
-- Bump `metadata.module_version` to `2.1.0` (and `schema_last_updated` to 2026-08-25).
+- **`module_version` stays `2.0.0` in this change.** The llamalab lint CLI resolves the
+  manifest's pinned tag (`tools/llamalab_lint/cli.py`: `DriftError` → exit 2 when
+  `<module>/v<module_version>` doesn't exist), and `.github/workflows/llamalab-lint.yml`
+  lints this module on any PR touching its manifest or root `.tf` files. Bumping to
+  `2.1.0` before the tag exists hard-fails CI. The bump to `2.1.0` (plus
+  `schema_last_updated`) is a **post-tag follow-up commit** — see Release sequencing.
 - **Deliberately do NOT add** `connection_string` to `outputs_display`: llamalab
   `lint.8` hard-errors when a sensitive output is displayed. This is the existing
-  platform guardrail against rendering the value in the vending-machine UI.
+  platform guardrail against rendering the value in the vending-machine UI. Record the
+  omission with an inline comment in `outputs_display`, following the existing
+  precedent in `modules/front-door/manifest.yaml` (`custom_domain_validation_tokens`),
+  so a future coverage sweep doesn't "fix" it and trip lint.8.
 
 ### 7. `modules/application-insights/CHANGELOG.md`
 
-`[2.1.0]` Added entry: `connection_string` sensitive output; note it reverses part of
-the v2.0.0 removal, with the rationale (non-credential under default Entra-only auth,
-sensitive-marked). Also note the README Security Defaults correction (doc fix) and fold
-in the currently `[Unreleased]` azurerm `< 5.0.0` cap note per Keep-a-Changelog flow.
+`[2.1.0] - 2026-08-25` Added entry: `connection_string` sensitive output; note it
+reverses part of the v2.0.0 removal, with the rationale (non-credential under default
+Entra-only auth, sensitive-marked). Also note the README Security Defaults correction
+(doc fix) and fold in the currently `[Unreleased]` azurerm `< 5.0.0` cap note per
+Keep-a-Changelog flow. (Dating the section now is consistent with "update CHANGELOG
+before tagging"; the tag follows on merge — see Release sequencing.)
+
+### 8. `docs/MODULE_CATALOG.md` (hand-maintained; `make docs` does not touch it)
+
+Update the `application-insights` entry: header `v2.0.0` → `v2.1.0`; outputs line
+currently reads "**Outputs:** `id`, `name`, `app_id`. Secret outputs
+(`instrumentation_key`, `connection_string`) were removed in v2.0.0 — retrieve via
+`data.azurerm_application_insights` or Key Vault references." Rewrite to list the real
+outputs (`id`, `name`, `app_id`, `public_app_insights_id`, `connection_string`
+(sensitive, since v2.1.0)) and confine the removal note to `instrumentation_key`.
+
+### 9. Additional README fixes while editing hand-written sections
+
+- Usage block pins `ref=application-insights/v1.0.0` — two majors stale; update to
+  `v2.1.0`.
+- Features line "App ID output for cross-project consumption" is inaccurate (the
+  public alias exposes the resource *id*, not the app_id); correct it.
 
 ## Out of scope
 
@@ -147,8 +175,21 @@ in the currently `[Unreleased]` azurerm `< 5.0.0` cap note per Keep-a-Changelog 
   alone has no non-credential reading.
 - No changes to module security defaults or variables.
 - No `outputs_display` / platform-side changes beyond the version bump.
-- No git tag in this change; `application-insights/v2.1.0` is tagged at release per
-  repo convention (CHANGELOG updated before tagging).
+- No git tag in this change; see Release sequencing.
+
+## Release sequencing
+
+The llamalab lint's tag pinning forces a strict order:
+
+1. **This PR:** everything above except the manifest `module_version` bump (manifest is
+   touched only for the `outputs_display` omission comment). CI's llamalab-lint job
+   lints against the pinned `v2.0.0` tag facts, so the working-tree output addition is
+   invisible to it and the run stays green.
+2. **On merge:** tag `application-insights/v2.1.0`.
+3. **Post-tag follow-up commit:** bump `manifest.yaml` `module_version` to `2.1.0` and
+   `schema_last_updated` to the tag date. From this point the lint pins v2.1.0 facts,
+   which include the sensitive output, and lint.8's guardrail (sensitive output must
+   not be displayed) is actively enforced.
 
 ## Verification
 
@@ -157,6 +198,8 @@ in the currently `[Unreleased]` azurerm `< 5.0.0` cap note per Keep-a-Changelog 
 - `make lint MODULE=application-insights` (tflint)
 - `make docs` — regenerate terraform-docs; confirm the new output appears in the
   generated table
-- llamalab lint (`tools/llamalab_lint`) against the module, confirming lint.8 stays
-  green with the sensitive output absent from `outputs_display`
+- llamalab lint (`tools/llamalab_lint`) against the module: pre-tag it introspects the
+  pinned `v2.0.0` tag, so this run only confirms the manifest edit (comment, unchanged
+  version) parses clean; the lint.8 guardrail becomes active in the post-tag follow-up
+  (see Release sequencing)
 - `pre-commit run` on touched files
