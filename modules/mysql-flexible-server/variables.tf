@@ -61,8 +61,8 @@ variable "administrator_password" {
 
   validation {
     condition = (
-      var.administrator_password == null
-      || (
+      var.administrator_password == null ? true
+      : (
         length(var.administrator_password) >= 12
         && can(regex("[A-Z]", var.administrator_password))
         && can(regex("[a-z]", var.administrator_password))
@@ -230,8 +230,10 @@ variable "diagnostic_settings" {
   validation {
     condition = (
       var.diagnostic_settings == null ? true
-      : (var.diagnostic_settings.log_analytics_destination_type == null
-      || contains(["Dedicated", "AzureDiagnostics"], var.diagnostic_settings.log_analytics_destination_type))
+      : (
+        var.diagnostic_settings.log_analytics_destination_type == null ? true
+        : contains(["Dedicated", "AzureDiagnostics"], var.diagnostic_settings.log_analytics_destination_type)
+      )
     )
     error_message = "log_analytics_destination_type must be \"Dedicated\" or \"AzureDiagnostics\" when set."
   }
