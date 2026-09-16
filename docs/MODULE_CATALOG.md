@@ -698,6 +698,47 @@ Creates an Azure SQL Database on an existing SQL server.
 
 ---
 
+### mssql-managed-instance `v1.0.0`
+Creates an Azure SQL Managed Instance with Entra-only auth, always-on TDE, Advanced Threat Protection and optional diagnostics. Networking (delegated subnet, NSG, route table) is consumer-owned.
+
+| Variable | Type | Required | Default | Description |
+|----------|------|----------|---------|-------------|
+| `resource_group_name` | string | yes | — | Resource group name |
+| `location` | string | yes | — | Azure region |
+| `name` | string | yes | — | Managed instance name (globally unique) |
+| `subnet_id` | string | yes | — | Delegated SQL MI subnet with NSG + route table |
+| `sku_name` | string | yes | — | GP_Gen5, GP_Gen8IM, GP_Gen8IH, BC_Gen5, BC_Gen8IM, BC_Gen8IH |
+| `vcores` | number | yes | — | 4…128 (Gen5 list) |
+| `storage_size_in_gb` | number | yes | — | Multiple of 32 |
+| `azuread_administrator` | object | yes | — | login_username, object_id, principal_type (User/Group/Application), tenant_id? |
+| `license_type` | string | no | `"LicenseIncluded"` | LicenseIncluded or BasePrice |
+| `administrator_login` | string | no | `null` | SQL admin login (mixed auth) |
+| `administrator_login_password` | string | no | `null` | SQL admin password (sensitive, complexity enforced) |
+| `collation` | string | no | `"SQL_Latin1_General_CP1_CI_AS"` | Instance collation |
+| `timezone_id` | string | no | `"UTC"` | Windows time zone ID |
+| `database_format` | string | no | `"SQLServer2022"` | SQLServer2022 or AlwaysUpToDate |
+| `maintenance_configuration_name` | string | no | `"SQL_Default"` | Maintenance window |
+| `storage_account_type` | string | no | `"GRS"` | Backup redundancy: GRS, GZRS, LRS, ZRS |
+| `hybrid_secondary_usage` | string | no | `"Active"` | Active or Passive |
+| `proxy_override` | string | no | `"Default"` | Default, Proxy, Redirect |
+| `dns_zone_partner_id` | string | no | `null` | Partner instance for shared DNS zone |
+| `min_tls_version` | string | no | `"1.2"` | Must be 1.2 |
+| `identity` | object | no | `{ type = "SystemAssigned" }` | type + identity_ids |
+| `customer_managed_key` | object | no | `null` | key_vault_key_id, auto_rotation_enabled |
+| `security_alert_policy` | object | no | `{}` | email_addresses, email_account_admins_enabled, disabled_alerts, retention_days |
+| `timeouts` | object | no | `{}` | create/update/delete (24h) |
+| `enable_aad_only_auth` | bool | no | `true` | Entra-only authentication |
+| `enable_public_data_endpoint` | bool | no | `false` | Public data endpoint |
+| `enable_zone_redundancy` | bool | no | `false` | Zone redundancy |
+| `enable_general_purpose_v2` | bool | no | `false` | Next-gen GP tier |
+| `enable_security_alert_policy` | bool | no | `true` | Advanced Threat Protection |
+| `diagnostic_settings` | object | no | `null` | Multi-sink diagnostics |
+| `tags` | map(string) | no | `{}` | Resource tags |
+
+**Outputs:** `id`, `name`, `fqdn`, `dns_zone`, `principal_id`, `tenant_id`, `transparent_data_encryption_id`, `security_alert_policy_id`, `public_managed_instance_id`, `public_managed_instance_name`, `public_managed_instance_fqdn`
+
+---
+
 ### mysql-flexible-server `v3.1.1`
 Creates an Azure MySQL Flexible Server with configurable databases and server parameters.
 
