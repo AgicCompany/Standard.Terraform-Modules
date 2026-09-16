@@ -2,9 +2,9 @@ schema_version: "0.1"
 
 metadata:
   module_name: storage-account
-  module_version: "3.2.0"
+  module_version: "3.2.1"
   schema_authored_by: AGIC Infrastructure Team
-  schema_last_updated: "2026-05-18"
+  schema_last_updated: "2026-09-16"
 
 catalogue:
   display_name: "Storage Account"
