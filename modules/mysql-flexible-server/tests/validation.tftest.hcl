@@ -33,3 +33,19 @@ run "rejects_bad_log_analytics_destination_type" {
   }
   expect_failures = [var.diagnostic_settings]
 }
+
+run "null_password_is_rejected_cleanly" {
+  command = plan
+  variables {
+    administrator_password = null
+  }
+  expect_failures = [azurerm_mysql_flexible_server.this]
+}
+
+run "rejects_weak_password" {
+  command = plan
+  variables {
+    administrator_password = "weak"
+  }
+  expect_failures = [var.administrator_password]
+}
