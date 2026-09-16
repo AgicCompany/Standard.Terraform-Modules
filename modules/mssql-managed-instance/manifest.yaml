@@ -1,0 +1,504 @@
+schema_version: "0.1"
+
+metadata:
+  module_name: mssql-managed-instance
+  module_version: "1.0.0"
+  schema_authored_by: AGIC Infrastructure Team
+  schema_last_updated: "2026-09-16"
+
+catalogue:
+  display_name: "SQL Managed Instance"
+  short_description: "Azure SQL Managed Instance with Entra-only authentication, always-on TDE, Advanced Threat Protection and security-first defaults."
+  long_description: |
+    Azure SQL Managed Instance with security-first defaults: Microsoft Entra ID
+    (Azure AD) authentication only, TLS 1.2, public data endpoint disabled,
+    transparent data encryption always configured (service- or customer-managed
+    key), and Advanced Threat Protection enabled. Sizing (service tier, vCores,
+    storage) is deliberately required. Requires a dedicated subnet delegated to
+    Microsoft.Sql/managedInstances with a network security group and route table
+    attached. Provisioning takes several hours.
+  category: data
+  subcategory: relational
+  icon: mssql-managed-instance
+  complexity: high
+  cost_tier: high
+  deprecated: false
+  tags:
+    - sql
+    - mssql
+    - managed-instance
+    - relational
+    - vnet-injected
+
+variables:
+  # --- Deployment-context derived ---
+  resource_group_name:
+    widget: hidden
+    derived_from: { source: deployment_context.resource_group }
+
+  location:
+    widget: hidden
+    derived_from: { source: deployment_context.location }
+
+  name:
+    widget: hidden
+    derived_from: { source: naming.mssql_managed_instance }
+
+  tags:
+    widget: hidden
+    derived_from: { source: deployment_context.tags }
+
+  # --- Core configuration ---
+  sku_name:
+    widget: select
+    widget_options: { derive_from_validation: true }
+    group: core
+    order: 10
+    help: "Service tier and hardware generation. GP = General Purpose, BC = Business Critical. Required — no default."
+
+  vcores:
+    widget: select
+    widget_options: { derive_from_validation: true }
+    group: core
+    order: 20
+    help: "Number of vCores. Required — no default."
+
+  storage_size_in_gb:
+    widget: number
+    group: core
+    order: 30
+    placeholder: "32"
+    help: "Maximum storage in GB, multiple of 32. Required — no default."
+
+  license_type:
+    widget: select
+    widget_options: { derive_from_validation: true }
+    group: core
+    order: 40
+    help: "LicenseIncluded = pay-as-you-go. BasePrice = Azure Hybrid Benefit (requires SQL Server licenses with Software Assurance)."
+
+  collation:
+    widget: text
+    group: core
+    order: 50
+    advanced: true
+    help: "Instance collation. Cannot be changed after creation."
+
+  timezone_id:
+    widget: text
+    group: core
+    order: 60
+    advanced: true
+    placeholder: "UTC"
+    help: "Windows time zone ID (e.g. W. Europe Standard Time). Cannot be changed after creation."
+
+  database_format:
+    widget: select
+    widget_options: { derive_from_validation: true }
+    group: core
+    order: 70
+    advanced: true
+    help: "Internal database format tied to the SQL engine version."
+
+  storage_account_type:
+    widget: select
+    widget_options: { derive_from_validation: true }
+    group: core
+    order: 80
+    advanced: true
+    help: "Backup storage redundancy."
+
+  hybrid_secondary_usage:
+    widget: select
+    widget_options: { derive_from_validation: true }
+    group: core
+    order: 90
+    advanced: true
+    help: "Passive marks a DR secondary as license-free under Azure Hybrid Benefit."
+
+  dns_zone_partner_id:
+    widget: text
+    group: core
+    order: 100
+    advanced: true
+    help: "Resource ID of a partner instance whose DNS zone to share (failover-group prerequisite). Set at creation only."
+
+  enable_zone_redundancy:
+    widget: toggle
+    group: core
+    order: 110
+    help: "Spread the instance across availability zones. Extra cost."
+
+  enable_general_purpose_v2:
+    widget: toggle
+    group: core
+    order: 120
+    advanced: true
+    help: "Use the next-gen General Purpose service tier (GP SKUs only)."
+
+  # --- Maintenance ---
+  maintenance_configuration_name:
+    widget: text
+    group: maintenance
+    order: 10
+    advanced: true
+    placeholder: "SQL_Default"
+    help: "Public maintenance window: SQL_Default or SQL_{Location}_MI_{1|2}."
+
+  timeouts:
+    widget: object
+    widget_options:
+      fields:
+        create:
+          widget: text
+          placeholder: "24h"
+        update:
+          widget: text
+          placeholder: "24h"
+        delete:
+          widget: text
+          placeholder: "24h"
+    group: maintenance
+    order: 20
+    advanced: true
+    help: "Operation timeouts. Provisioning takes hours; keep the defaults unless you need a shorter hard limit."
+
+  # --- Security ---
+  azuread_administrator:
+    widget: object
+    widget_options:
+      fields:
+        login_username:
+          widget: text
+          help: "Display name / UPN of the Entra administrator."
+        object_id:
+          widget: text
+          help: "Object ID of the Entra user, group, or application."
+        principal_type:
+          widget: select
+          widget_options:
+            options: ["User", "Group", "Application"]
+        tenant_id:
+          widget: text
+          help: "Only when the administrator is homed in another tenant."
+    group: security
+    order: 10
+    help: "Microsoft Entra ID administrator. Required."
+
+  enable_aad_only_auth:
+    widget: toggle
+    group: security
+    order: 20
+    help: "Restrict authentication to Microsoft Entra ID only. Disable to add a SQL login alongside Entra ID."
+
+  administrator_login:
+    widget: text
+    group: security
+    order: 30
+    placeholder: "sqladmin"
+    help: "SQL administrator username. Required when Entra-only authentication is disabled. Cannot be changed after creation."
+    show_when:
+      enable_aad_only_auth: false
+    required_when:
+      enable_aad_only_auth: false
+
+  administrator_login_password:
+    widget: text
+    sensitive_override: true
+    group: security
+    order: 40
+    help: "SQL administrator password. Min 12 chars; upper, lower, digit and symbol. Required when Entra-only authentication is disabled."
+    show_when:
+      enable_aad_only_auth: false
+    required_when:
+      enable_aad_only_auth: false
+
+  # NOTE: min_tls_version has only "1.2" as valid value (TLS 1.0/1.1 retired).
+  # Hidden with hcl_default.
+  min_tls_version:
+    widget: hidden
+    derived_from: { source: hcl_default }
+
+  customer_managed_key:
+    widget: object
+    widget_options:
+      fields:
+        key_vault_key_id:
+          widget: resource_picker
+          widget_options: { resource_type: key_vault_key }
+          help: "Key Vault key used as the TDE protector. The instance identity needs Get, WrapKey and UnwrapKey on it."
+        auto_rotation_enabled:
+          widget: toggle
+          help: "Follow new key versions automatically (allows a versionless key ID)."
+    group: security
+    order: 50
+    advanced: true
+    help: "Optional customer-managed TDE key. Leave blank for a service-managed key."
+
+  enable_security_alert_policy:
+    widget: toggle
+    group: security
+    order: 60
+    help: "Enable Advanced Threat Protection on the instance."
+
+  security_alert_policy:
+    widget: object
+    widget_options:
+      fields:
+        email_addresses:
+          widget: text
+          widget_options: { multiline: true }
+          help: "One address per line."
+        email_account_admins_enabled:
+          widget: toggle
+        disabled_alerts:
+          widget: text
+          widget_options: { multiline: true }
+          help: "One alert type per line: Sql_Injection, Sql_Injection_Vulnerability, Access_Anomaly, Data_Exfiltration, Unsafe_Action, Brute_Force."
+        retention_days:
+          widget: number
+    group: security
+    order: 70
+    advanced: true
+    help: "Advanced Threat Protection notification settings."
+    show_when:
+      enable_security_alert_policy: true
+
+  # --- Identity ---
+  identity:
+    widget: object
+    widget_options:
+      fields:
+        type:
+          widget: select
+          widget_options:
+            options: ["SystemAssigned", "UserAssigned", "SystemAssigned, UserAssigned"]
+        identity_ids:
+          widget: resource_picker
+          widget_options: { resource_type: user_assigned_identity, multiple: true }
+          help: "Required when type includes UserAssigned."
+    group: identity
+    order: 10
+    help: "Managed identity. A system-assigned identity is required for Entra authentication; a user-assigned identity lets a customer-managed key be bound on first apply."
+
+  # --- Networking ---
+  subnet_id:
+    widget: resource_picker
+    widget_options: { resource_type: subnet }
+    group: networking
+    order: 10
+    help: "Dedicated subnet delegated to Microsoft.Sql/managedInstances with an NSG and route table attached. Required."
+
+  enable_public_data_endpoint:
+    widget: toggle
+    group: networking
+    order: 20
+    help: "Expose the public data endpoint (TCP 3342). Disabled by default."
+
+  proxy_override:
+    widget: select
+    widget_options: { derive_from_validation: true }
+    group: networking
+    order: 30
+    help: "Connection type. Redirect gives lower latency inside the VNet; Proxy routes everything through the gateway."
+
+  # --- Monitoring ---
+  diagnostic_settings:
+    widget: object
+    widget_options:
+      fields:
+        name:
+          widget: text
+          placeholder: "diag-<instance-name>"
+        log_analytics_workspace_id:
+          widget: resource_picker
+          widget_options: { resource_type: log_analytics_workspace }
+        storage_account_id:
+          widget: resource_picker
+          widget_options: { resource_type: storage_account }
+        eventhub_authorization_rule_id:
+          widget: text
+        eventhub_name:
+          widget: text
+        log_analytics_destination_type:
+          widget: select
+          widget_options:
+            options: ["Dedicated", "AzureDiagnostics"]
+        enabled_log_categories:
+          widget: text
+          widget_options: { multiline: true }
+          help: "One category per line. Leave empty for all supported categories."
+        enabled_metrics:
+          widget: text
+          widget_options: { multiline: true }
+          help: "One metric per line. Leave empty for all supported metrics."
+    group: monitoring
+    order: 10
+    advanced: true
+    help: "Optional. Leave blank to disable diagnostic settings. At least one sink destination is required when set."
+
+composition_contract:
+  version: v1
+  required_resources:
+  - requirement_id: mssql-managed-instance.subnet_id
+    variable: subnet_id
+    role: network_placement
+    necessity: required
+    resource_type: subnet
+    cardinality: one
+    compatible_providers:
+    - virtual-network
+    recommended_provider: virtual-network
+    existing_resource:
+      supported: true
+      discovery_kind: azure-resource-id
+    external_changes:
+      allowed: false
+  - requirement_id: mssql-managed-instance.customer_managed_key.key_vault_key_id
+    variable: customer_managed_key.key_vault_key_id
+    role: resource_binding
+    necessity: optional
+    resource_type: key_vault_key
+    cardinality: one
+    compatible_providers:
+    - key-vault
+    recommended_provider: key-vault
+    existing_resource:
+      supported: true
+      discovery_kind: azure-resource-id
+    external_changes:
+      allowed: false
+  - requirement_id: mssql-managed-instance.identity.identity_ids
+    variable: identity.identity_ids
+    role: resource_binding
+    necessity: optional
+    resource_type: user_assigned_identity
+    cardinality: many
+    compatible_providers:
+    - user-assigned-identity
+    recommended_provider: user-assigned-identity
+    existing_resource:
+      supported: true
+      discovery_kind: azure-resource-id
+    external_changes:
+      allowed: false
+  - requirement_id: mssql-managed-instance.diagnostic_settings.log_analytics_workspace_id
+    variable: diagnostic_settings.log_analytics_workspace_id
+    role: resource_binding
+    necessity: optional
+    resource_type: log_analytics_workspace
+    cardinality: one
+    compatible_providers:
+    - log-analytics-workspace
+    recommended_provider: log-analytics-workspace
+    existing_resource:
+      supported: true
+      discovery_kind: azure-resource-id
+    external_changes:
+      allowed: false
+  - requirement_id: mssql-managed-instance.diagnostic_settings.storage_account_id
+    variable: diagnostic_settings.storage_account_id
+    role: resource_binding
+    necessity: optional
+    resource_type: storage_account
+    cardinality: one
+    compatible_providers:
+    - storage-account
+    recommended_provider: storage-account
+    existing_resource:
+      supported: true
+      discovery_kind: azure-resource-id
+    external_changes:
+      allowed: false
+
+dependencies:
+  required_inputs_from_other_resources:
+    - variable: subnet_id
+      resource_type: subnet
+      cardinality: one
+      notes: "Dedicated subnet delegated to Microsoft.Sql/managedInstances with NSG and route table attached. Required."
+    - variable: customer_managed_key.key_vault_key_id
+      resource_type: key_vault_key
+      cardinality: one
+      notes: "Optional customer-managed TDE protector."
+    - variable: identity.identity_ids
+      resource_type: user_assigned_identity
+      cardinality: many
+      notes: "Required when identity.type includes UserAssigned."
+    - variable: diagnostic_settings.log_analytics_workspace_id
+      resource_type: log_analytics_workspace
+      cardinality: one
+      notes: "Optional diagnostic sink."
+    - variable: diagnostic_settings.storage_account_id
+      resource_type: storage_account
+      cardinality: one
+      notes: "Optional diagnostic sink."
+
+  produces_outputs_consumable_by:
+    - output: id
+      resource_type: mssql_managed_instance
+
+outputs_display:
+  id:
+    display_name: "Resource ID"
+    show_in_summary: true
+    copyable: true
+    format: arm_id
+
+  name:
+    display_name: "Managed instance name"
+    show_in_summary: true
+    copyable: true
+
+  fqdn:
+    display_name: "FQDN"
+    show_in_summary: true
+    copyable: true
+    format: url
+
+  dns_zone:
+    display_name: "DNS zone"
+    show_in_summary: false
+    copyable: true
+
+  principal_id:
+    display_name: "Managed identity principal ID"
+    show_in_summary: false
+    copyable: true
+
+  tenant_id:
+    display_name: "Managed identity tenant ID"
+    show_in_summary: false
+    copyable: true
+
+  transparent_data_encryption_id:
+    display_name: "TDE protector ID"
+    show_in_summary: false
+    copyable: true
+    format: arm_id
+
+  security_alert_policy_id:
+    display_name: "Security alert policy ID"
+    show_in_summary: false
+    copyable: true
+    format: arm_id
+
+  public_managed_instance_id:
+    display_name: "Resource ID (public)"
+    show_in_summary: false
+    copyable: true
+    format: arm_id
+    role: public_alias
+
+  public_managed_instance_name:
+    display_name: "Managed instance name (public)"
+    show_in_summary: false
+    copyable: true
+    role: public_alias
+
+  public_managed_instance_fqdn:
+    display_name: "FQDN (public)"
+    show_in_summary: false
+    copyable: true
+    format: url
+    role: public_alias
