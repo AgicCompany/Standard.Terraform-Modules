@@ -183,7 +183,7 @@ Creates bidirectional Azure Virtual Network peering between two VNets.
 
 ---
 
-### storage-account `v3.2.0`
+### storage-account `v3.2.1`
 Creates an Azure Storage Account with secure defaults and optional private endpoints per subresource.
 
 | Variable | Type | Required | Default | Description |
@@ -213,7 +213,7 @@ Creates an Azure Storage Account with secure defaults and optional private endpo
 
 ---
 
-### key-vault `v2.1.0`
+### key-vault `v2.1.1`
 Creates an Azure Key Vault with RBAC authorization and optional private endpoint.
 
 | Variable | Type | Required | Default | Description |
@@ -290,7 +290,7 @@ Creates an Azure Monitor diagnostic setting to route logs and metrics to Log Ana
 
 ## Compute
 
-### aks `v4.1.0`
+### aks `v4.1.2`
 Creates an Azure Kubernetes Service cluster with private-by-default config, Azure AD auth, RBAC, and Container Insights.
 
 | Variable | Type | Required | Default | Description |
@@ -357,7 +357,7 @@ Creates an Azure App Service Plan with configurable OS, SKU, and optional zone r
 
 ---
 
-### linux-web-app `v2.1.0`
+### linux-web-app `v2.2.1`
 Creates an Azure Linux Web App with secure defaults and optional private endpoint.
 
 | Variable | Type | Required | Default | Description |
@@ -385,7 +385,7 @@ Creates an Azure Linux Web App with secure defaults and optional private endpoin
 
 ---
 
-### function-app `v3.0.0`
+### function-app `v3.0.1`
 Creates an Azure Linux Function App with secure defaults and optional private endpoint.
 
 | Variable | Type | Required | Default | Description |
@@ -415,7 +415,7 @@ Creates an Azure Linux Function App with secure defaults and optional private en
 
 ---
 
-### function-app-flex `v1.2.0`
+### function-app-flex `v2.0.1`
 Creates an Azure Flex Consumption (FC1) Function App with private endpoint. Requires a dedicated FC1 App Service Plan (`sku_name = "FC1"`).
 
 | Variable | Type | Required | Default | Description |
@@ -465,7 +465,7 @@ Creates an Azure Container Apps Environment with VNet integration and workload p
 
 ---
 
-### container-app-job `v1.0.0`
+### container-app-job `v1.1.1`
 Creates an Azure Container App Job for event-driven, scheduled, or manually triggered batch workloads.
 
 | Variable | Type | Required | Default | Description |
@@ -495,7 +495,7 @@ Creates an Azure Container App Job for event-driven, scheduled, or manually trig
 
 ---
 
-### container-app `v1.3.0`
+### container-app `v1.3.1`
 Creates an Azure Container App in an existing Container Apps Environment.
 
 | Variable | Type | Required | Default | Description |
@@ -520,7 +520,7 @@ Creates an Azure Container App in an existing Container Apps Environment.
 
 ---
 
-### container-registry `v2.2.0`
+### container-registry `v2.2.1`
 Creates an Azure Container Registry with secure defaults and optional private endpoint.
 
 | Variable | Type | Required | Default | Description |
@@ -651,7 +651,7 @@ Creates an Azure Static Web App with Standard SKU and private endpoint by defaul
 
 ## Data
 
-### mssql-server `v3.1.1`
+### mssql-server `v3.1.2`
 Creates an Azure SQL logical server with Azure AD auth and optional private endpoint.
 
 | Variable | Type | Required | Default | Description |
@@ -676,7 +676,7 @@ Creates an Azure SQL logical server with Azure AD auth and optional private endp
 
 ---
 
-### mssql-database `v1.3.0`
+### mssql-database `v1.3.1`
 Creates an Azure SQL Database on an existing SQL server.
 
 | Variable | Type | Required | Default | Description |
@@ -739,7 +739,7 @@ Creates an Azure SQL Managed Instance with Entra-only auth, always-on TDE, Advan
 
 ---
 
-### mysql-flexible-server `v3.1.1`
+### mysql-flexible-server `v4.0.1`
 Creates an Azure MySQL Flexible Server with configurable databases and server parameters.
 
 | Variable | Type | Required | Default | Description |
@@ -765,7 +765,7 @@ Creates an Azure MySQL Flexible Server with configurable databases and server pa
 
 ---
 
-### postgresql-flexible-server `v5.0.1`
+### postgresql-flexible-server `v5.0.3`
 Creates an Azure PostgreSQL Flexible Server with configurable databases and server parameters.
 
 | Variable | Type | Required | Default | Description |
@@ -791,7 +791,7 @@ Creates an Azure PostgreSQL Flexible Server with configurable databases and serv
 
 ---
 
-### cosmosdb `v3.1.1`
+### cosmosdb `v3.2.1`
 Creates an Azure Cosmos DB account with SQL API databases and optional private endpoint.
 
 | Variable | Type | Required | Default | Description |
@@ -819,7 +819,7 @@ Creates an Azure Cosmos DB account with SQL API databases and optional private e
 
 ---
 
-### redis-cache `v4.0.1`
+### redis-cache `v4.0.2`
 Creates an Azure Cache for Redis with secure defaults and optional private endpoint.
 
 | Variable | Type | Required | Default | Description |
@@ -846,7 +846,7 @@ Creates an Azure Cache for Redis with secure defaults and optional private endpo
 
 ---
 
-### managed-redis `v1.2.0`
+### managed-redis `v1.2.1`
 Creates an Azure Managed Redis (Enterprise) instance with modules, geo-replication, and private endpoint. Requires AzureRM >= 4.54.0.
 
 | Variable | Type | Required | Default | Description |
@@ -878,7 +878,7 @@ Creates an Azure Managed Redis (Enterprise) instance with modules, geo-replicati
 
 ## Networking
 
-### application-gateway `v2.1.0`
+### application-gateway `v2.1.1`
 Creates an Azure Application Gateway (v2) with public IP, L7 load balancing, SSL termination, and optional WAF.
 
 | Variable | Type | Required | Default | Description |
@@ -909,7 +909,7 @@ Creates an Azure Application Gateway (v2) with public IP, L7 load balancing, SSL
 
 ---
 
-### front-door `v1.3.0`
+### front-door `v1.3.1`
 Creates an Azure Front Door profile with endpoints, origins, custom domains, WAF, and rule sets.
 
 | Variable | Type | Required | Default | Description |
@@ -931,7 +931,7 @@ Creates an Azure Front Door profile with endpoints, origins, custom domains, WAF
 
 ---
 
-### api-management `v2.3.0`
+### api-management `v2.3.1`
 Creates an Azure API Management service with VNet integration, multi-region support, and optional private endpoint.
 
 | Variable | Type | Required | Default | Description |
@@ -960,7 +960,7 @@ Creates an Azure API Management service with VNet integration, multi-region supp
 
 ## Messaging
 
-### service-bus `v3.1.0`
+### service-bus `v3.1.1`
 Creates an Azure Service Bus namespace with queues, topics, and optional private endpoint.
 
 | Variable | Type | Required | Default | Description |
@@ -983,7 +983,7 @@ Creates an Azure Service Bus namespace with queues, topics, and optional private
 
 ---
 
-### event-hub `v3.1.0`
+### event-hub `v3.1.1`
 Creates an Azure Event Hub namespace with event hubs, consumer groups, and optional private endpoint.
 
 | Variable | Type | Required | Default | Description |
