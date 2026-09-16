@@ -59,6 +59,11 @@ resource "azurerm_mssql_managed_instance" "this" {
       condition     = strcontains(var.identity.type, "UserAssigned") == (length(var.identity.identity_ids) > 0)
       error_message = "identity.identity_ids must be non-empty when identity.type includes UserAssigned, and empty otherwise."
     }
+
+    precondition {
+      condition     = !var.enable_zone_redundancy || contains(["ZRS", "GZRS"], var.storage_account_type)
+      error_message = "enable_zone_redundancy requires storage_account_type to be \"ZRS\" or \"GZRS\" (zone-redundant backup storage)."
+    }
   }
 
   tags = var.tags

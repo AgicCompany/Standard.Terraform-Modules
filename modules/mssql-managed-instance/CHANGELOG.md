@@ -19,3 +19,4 @@ All notable changes to this module will be documented in this file.
 - `sku_name`, `vcores` and `storage_size_in_gb` are **required with no defaults** by design: an instance takes hours to (re)provision, so sizing must be explicit.
 - Networking prerequisites (delegated subnet, NSG, route table) are consumer-owned and passed via `subnet_id`.
 - Vulnerability assessment is intentionally not wrapped (needs a storage access key input; superseded by Defender for SQL express configuration).
+- Requires azurerm `>= 4.68.0` (needs `azure_active_directory_administrator`, `database_format`, `hybrid_secondary_usage`, computed `administrator_login` and `general_purpose_v2_enabled`); this is stricter than the library-wide `>= 4.0.0` floor.

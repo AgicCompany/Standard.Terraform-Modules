@@ -57,7 +57,7 @@ variable "azuread_administrator" {
     principal_type = string
     tenant_id      = optional(string)
   })
-  description = "Microsoft Entra ID administrator. principal_type must be User, Group, or Application. tenant_id only when the administrator is homed in another tenant."
+  description = "Microsoft Entra ID administrator. principal_type must be User, Group, or Application. tenant_id only when the administrator is homed in another tenant. The instance identity needs the Directory Readers role in Entra ID for logins to work (see README)."
 
   validation {
     condition     = contains(["User", "Group", "Application"], var.azuread_administrator.principal_type)
@@ -239,7 +239,7 @@ variable "timeouts" {
 variable "enable_aad_only_auth" {
   type        = bool
   default     = true
-  description = "Restrict authentication to Microsoft Entra ID only. When false, administrator_login and administrator_login_password are required."
+  description = "Restrict authentication to Microsoft Entra ID only. When false, administrator_login and administrator_login_password are required. Switching from true to false after creation forces instance replacement (see README Notes)."
 }
 
 variable "enable_public_data_endpoint" {

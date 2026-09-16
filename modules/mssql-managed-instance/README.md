@@ -74,11 +74,31 @@ Use the `virtual-network`, `network-security-group` and `route-table` modules, a
 When `customer_managed_key` is set:
 
 - The Key Vault must have soft delete and purge protection enabled.
-- The instance identity (system-assigned principal, or the user-assigned identity in `identity.identity_ids`) needs `Get`, `WrapKey` and `UnwrapKey` on the key — the *Key Vault Crypto Service Encryption User* role on RBAC vaults. Grant it **before** the instance is created (user-assigned identity), or in a second apply (system-assigned).
+- The instance identity (system-assigned principal, or the user-assigned identity in `identity.identity_ids`) needs `Get`, `WrapKey` and `UnwrapKey` on the key — the *Key Vault Crypto Service Encryption User* role on RBAC vaults. Grant it **before** the instance is created. With a system-assigned identity only, the principal does not exist until the instance does, so the first apply fails at the TDE resource; use a user-assigned identity for customer-managed keys (see `examples/complete`).
 - Use a versioned key ID unless `auto_rotation_enabled = true`; with auto-rotation a versionless ID is allowed and the deploying principal must be able to read the latest key version.
 - TDE can never be removed once enabled. Setting `customer_managed_key` back to `null` switches to a service-managed key in place.
 
 See `examples/complete` for a full Key Vault + user-assigned identity wiring.
+
+## Microsoft Entra Prerequisite
+
+The instance's managed identity needs the **Directory Readers** role in Microsoft Entra ID (or the narrower `User.Read.All`, `GroupMember.Read.All` and `Application.Read.All` Graph permissions) before Entra logins work. Creating the instance with the administrator set succeeds without it, but sign-ins fail until a Privileged Role Administrator grants the role to the identity. With the default Entra-only authentication and no SQL login, an instance without this role has no working login path.
+
+## Notes
+
+Operations that **force replacement** of the instance (hours of downtime and data loss — plan them as migrations):
+
+- Flipping `enable_aad_only_auth` from `true` to `false` and supplying `administrator_login`: Azure generates a login name when the instance is created Entra-only, and `administrator_login` cannot change afterwards. Decide the authentication mode before the first apply.
+- Removing a system-assigned identity (`identity.type` from `SystemAssigned` or `SystemAssigned, UserAssigned` to `UserAssigned`).
+- Changing `database_format` from `AlwaysUpToDate` back to `SQLServer2022`.
+- Setting `dns_zone_partner_id` after creation.
+- Changing `collation`, `timezone_id` or `subnet_id`.
+
+Other constraints checked before apply:
+
+- `enable_zone_redundancy = true` requires `storage_account_type` of `ZRS` or `GZRS` (precondition).
+- `enable_general_purpose_v2 = true` is only valid with `GP_*` SKUs (rejected by the provider at plan). Zone redundancy on the next-gen General Purpose tier is not generally available.
+- `hybrid_secondary_usage = "Passive"` only has an effect with `license_type = "BasePrice"`.
 
 ## Public Outputs
 
@@ -108,13 +128,13 @@ terraform test
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.10.0 |
-| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | >= 4.0.0, < 5.0.0 |
+| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | >= 4.68.0, < 5.0.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | >= 4.0.0, < 5.0.0 |
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | >= 4.68.0, < 5.0.0 |
 
 ## Modules
 
@@ -135,13 +155,13 @@ No modules.
 |------|-------------|------|---------|:--------:|
 | <a name="input_administrator_login"></a> [administrator\_login](#input\_administrator\_login) | SQL admin username. Required when enable\_aad\_only\_auth = false. Changing it forces a new instance. | `string` | `null` | no |
 | <a name="input_administrator_login_password"></a> [administrator\_login\_password](#input\_administrator\_login\_password) | SQL admin password. Required when enable\_aad\_only\_auth = false. When non-null: min 12 chars; must include upper, lower, digit, and symbol. | `string` | `null` | no |
-| <a name="input_azuread_administrator"></a> [azuread\_administrator](#input\_azuread\_administrator) | Microsoft Entra ID administrator. principal\_type must be User, Group, or Application. tenant\_id only when the administrator is homed in another tenant. | <pre>object({<br/>    login_username = string<br/>    object_id      = string<br/>    principal_type = string<br/>    tenant_id      = optional(string)<br/>  })</pre> | n/a | yes |
+| <a name="input_azuread_administrator"></a> [azuread\_administrator](#input\_azuread\_administrator) | Microsoft Entra ID administrator. principal\_type must be User, Group, or Application. tenant\_id only when the administrator is homed in another tenant. The instance identity needs the Directory Readers role in Entra ID for logins to work (see README). | <pre>object({<br/>    login_username = string<br/>    object_id      = string<br/>    principal_type = string<br/>    tenant_id      = optional(string)<br/>  })</pre> | n/a | yes |
 | <a name="input_collation"></a> [collation](#input\_collation) | Instance collation. Changing it forces a new instance. | `string` | `"SQL_Latin1_General_CP1_CI_AS"` | no |
 | <a name="input_customer_managed_key"></a> [customer\_managed\_key](#input\_customer\_managed\_key) | Customer-managed TDE protector key in Azure Key Vault. null = service-managed key. The instance identity needs Get, WrapKey and UnwrapKey on the key. Use a versioned key ID unless auto\_rotation\_enabled = true. | <pre>object({<br/>    key_vault_key_id      = string<br/>    auto_rotation_enabled = optional(bool, false)<br/>  })</pre> | `null` | no |
 | <a name="input_database_format"></a> [database\_format](#input\_database\_format) | Internal database format tied to the SQL engine version: SQLServer2022 or AlwaysUpToDate. | `string` | `"SQLServer2022"` | no |
 | <a name="input_diagnostic_settings"></a> [diagnostic\_settings](#input\_diagnostic\_settings) | Optional diagnostic settings. null disables. Supports multi-sink (Log Analytics, storage account, Event Hub). enabled\_log\_categories = null -> all categories the resource supports. enabled\_metrics = null -> all metrics the resource supports. At least one of log\_analytics\_workspace\_id, storage\_account\_id, or eventhub\_authorization\_rule\_id is required when the object is non-null. | <pre>object({<br/>    name                           = optional(string)<br/>    log_analytics_workspace_id     = optional(string)<br/>    storage_account_id             = optional(string)<br/>    eventhub_authorization_rule_id = optional(string)<br/>    eventhub_name                  = optional(string)<br/>    log_analytics_destination_type = optional(string)<br/>    enabled_log_categories         = optional(list(string))<br/>    enabled_metrics                = optional(list(string))<br/>  })</pre> | `null` | no |
 | <a name="input_dns_zone_partner_id"></a> [dns\_zone\_partner\_id](#input\_dns\_zone\_partner\_id) | ID of another SQL Managed Instance whose DNS zone this instance shares (prerequisite for a failover group). Set at creation only. | `string` | `null` | no |
-| <a name="input_enable_aad_only_auth"></a> [enable\_aad\_only\_auth](#input\_enable\_aad\_only\_auth) | Restrict authentication to Microsoft Entra ID only. When false, administrator\_login and administrator\_login\_password are required. | `bool` | `true` | no |
+| <a name="input_enable_aad_only_auth"></a> [enable\_aad\_only\_auth](#input\_enable\_aad\_only\_auth) | Restrict authentication to Microsoft Entra ID only. When false, administrator\_login and administrator\_login\_password are required. Switching from true to false after creation forces instance replacement (see README Notes). | `bool` | `true` | no |
 | <a name="input_enable_general_purpose_v2"></a> [enable\_general\_purpose\_v2](#input\_enable\_general\_purpose\_v2) | Use the next-gen General Purpose service tier (GP SKUs only). | `bool` | `false` | no |
 | <a name="input_enable_public_data_endpoint"></a> [enable\_public\_data\_endpoint](#input\_enable\_public\_data\_endpoint) | Enable the public data endpoint (TCP 3342). Disabled by default. | `bool` | `false` | no |
 | <a name="input_enable_security_alert_policy"></a> [enable\_security\_alert\_policy](#input\_enable\_security\_alert\_policy) | Enable Advanced Threat Protection (security alert policy) on the instance. | `bool` | `true` | no |

@@ -178,6 +178,15 @@ run "rejects_identity_ids_without_user_assigned" {
   expect_failures = [azurerm_mssql_managed_instance.this]
 }
 
+run "rejects_zone_redundancy_with_geo_backup_storage" {
+  command = plan
+  variables {
+    enable_zone_redundancy = true
+    storage_account_type   = "GRS"
+  }
+  expect_failures = [azurerm_mssql_managed_instance.this]
+}
+
 # --- behaviour --------------------------------------------------------------
 
 run "secure_defaults" {
@@ -287,5 +296,24 @@ run "diagnostics_created_with_sink" {
   assert {
     condition     = azurerm_monitor_diagnostic_setting.this[0].name == "diag-sqlmi-test-weu-001"
     error_message = "diagnostic setting name must default to diag-<name>"
+  }
+}
+
+run "user_assigned_only_identity" {
+  command = plan
+  variables {
+    identity = {
+      type         = "UserAssigned"
+      identity_ids = ["/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/id-sqlmi"]
+    }
+  }
+
+  assert {
+    condition     = azurerm_mssql_managed_instance.this.service_principal_type == null
+    error_message = "service principal must not be set without a system-assigned identity"
+  }
+  assert {
+    condition     = azurerm_mssql_managed_instance.this.identity[0].identity_ids == toset(["/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/id-sqlmi"])
+    error_message = "identity_ids must be forwarded"
   }
 }
