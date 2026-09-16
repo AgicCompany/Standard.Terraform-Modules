@@ -137,3 +137,14 @@ run "rejects_diagnostics_without_sink" {
   }
   expect_failures = [var.diagnostic_settings]
 }
+
+run "rejects_bad_log_analytics_destination_type" {
+  command = plan
+  variables {
+    diagnostic_settings = {
+      log_analytics_workspace_id     = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg/providers/Microsoft.OperationalInsights/workspaces/law-x"
+      log_analytics_destination_type = "Foo"
+    }
+  }
+  expect_failures = [var.diagnostic_settings]
+}
