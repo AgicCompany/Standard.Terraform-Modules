@@ -113,8 +113,10 @@ variable "diagnostic_settings" {
   validation {
     condition = (
       var.diagnostic_settings == null ? true
-      : (var.diagnostic_settings.log_analytics_destination_type == null
-      || contains(["Dedicated", "AzureDiagnostics"], var.diagnostic_settings.log_analytics_destination_type))
+      : (
+        var.diagnostic_settings.log_analytics_destination_type == null ? true
+        : contains(["Dedicated", "AzureDiagnostics"], var.diagnostic_settings.log_analytics_destination_type)
+      )
     )
     error_message = "log_analytics_destination_type must be \"Dedicated\" or \"AzureDiagnostics\" when set."
   }
