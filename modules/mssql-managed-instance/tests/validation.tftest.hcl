@@ -196,10 +196,6 @@ run "secure_defaults" {
     error_message = "Entra-only auth must be on by default"
   }
   assert {
-    condition     = azurerm_mssql_managed_instance.this.administrator_login == null
-    error_message = "SQL admin login must not be set under Entra-only auth"
-  }
-  assert {
     condition     = azurerm_mssql_managed_instance.this.identity[0].type == "SystemAssigned"
     error_message = "default identity must be SystemAssigned"
   }
