@@ -9,12 +9,6 @@ variables {
   name                    = "redis-test-weu-001"
   sku_name                = "Balanced_B10"
   enable_private_endpoint = false
-  # Non-null identity works around a pre-existing, out-of-scope crash in
-  # main.tf's customer_managed_key lifecycle.precondition (same TF 1.10
-  # non-short-circuit && issue, but outside this batch's fix scope).
-  identity = {
-    type = "SystemAssigned"
-  }
 }
 
 run "diagnostics_without_destination_type_do_not_crash" {
@@ -37,4 +31,19 @@ run "rejects_bad_log_analytics_destination_type" {
     }
   }
   expect_failures = [var.diagnostic_settings]
+}
+
+run "defaults_with_null_identity_do_not_crash" {
+  command = plan
+}
+
+run "rejects_cmk_without_user_assigned_identity" {
+  command = plan
+  variables {
+    customer_managed_key = {
+      key_vault_key_id = "https://kv-x.vault.azure.net/keys/k/0123456789abcdef0123456789abcdef"
+      identity_id      = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/id-x"
+    }
+  }
+  expect_failures = [azurerm_managed_redis.this]
 }
