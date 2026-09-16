@@ -60,3 +60,25 @@ run "rejects_bad_log_analytics_destination_type" {
   }
   expect_failures = [var.diagnostic_settings]
 }
+
+run "redirect_rule_without_backend_does_not_crash" {
+  command = plan
+  variables {
+    redirect_configurations = {
+      redirect1 = {
+        redirect_type        = "Permanent"
+        target_listener_name = "listener1"
+      }
+    }
+    request_routing_rules = {
+      redirect_rule = {
+        priority                    = 100
+        http_listener_name          = "listener1"
+        redirect_configuration_name = "redirect1"
+      }
+    }
+  }
+  # No assert needed: the run passing means the backend_address_pool_name /
+  # backend_http_settings_name preconditions evaluated without crashing for
+  # a redirect rule that sets neither. (Formerly crashed on Terraform 1.10.)
+}
