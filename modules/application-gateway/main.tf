@@ -194,7 +194,7 @@ resource "azurerm_application_gateway" "this" {
     precondition {
       condition = alltrue([
         for rule in values(var.request_routing_rules) :
-        rule.backend_address_pool_name == null || contains(keys(var.backend_address_pools), rule.backend_address_pool_name)
+        rule.backend_address_pool_name == null ? true : contains(keys(var.backend_address_pools), rule.backend_address_pool_name)
       ])
       error_message = "All request_routing_rules must reference a backend_address_pool_name that exists in backend_address_pools (or be null)."
     }
@@ -202,7 +202,7 @@ resource "azurerm_application_gateway" "this" {
     precondition {
       condition = alltrue([
         for rule in values(var.request_routing_rules) :
-        rule.backend_http_settings_name == null || contains(keys(var.backend_http_settings), rule.backend_http_settings_name)
+        rule.backend_http_settings_name == null ? true : contains(keys(var.backend_http_settings), rule.backend_http_settings_name)
       ])
       error_message = "All request_routing_rules must reference a backend_http_settings_name that exists in backend_http_settings (or be null)."
     }

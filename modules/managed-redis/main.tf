@@ -92,7 +92,16 @@ resource "azurerm_managed_redis" "this" {
 
     # CMK requires UserAssigned identity
     precondition {
-      condition     = var.customer_managed_key == null || (var.identity != null && contains(split(",", replace(var.identity.type, " ", "")), "UserAssigned") && length(coalesce(var.identity.identity_ids, [])) > 0)
+      condition = (
+        var.customer_managed_key == null ? true
+        : (
+          var.identity == null ? false
+          : (
+            contains(split(",", replace(var.identity.type, " ", "")), "UserAssigned")
+            && length(coalesce(var.identity.identity_ids, [])) > 0
+          )
+        )
+      )
       error_message = "customer_managed_key requires identity with type containing 'UserAssigned' and at least one identity_ids entry."
     }
   }

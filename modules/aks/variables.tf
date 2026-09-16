@@ -217,7 +217,7 @@ variable "maintenance_window" {
   description = "General maintenance window. Defaults to Saturday+Sunday 00:00-06:00 UTC. Set to null to let Azure schedule at its discretion."
 
   validation {
-    condition = var.maintenance_window == null || alltrue([
+    condition = var.maintenance_window == null ? true : alltrue([
       for a in var.maintenance_window.allowed :
       contains(["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"], a.day)
     ])
@@ -251,25 +251,27 @@ variable "maintenance_window_auto_upgrade" {
   description = "Auto-upgrade maintenance window. Defaults to Weekly Sunday 02:00 UTC, 4h duration. Set to null to disable."
 
   validation {
-    condition     = var.maintenance_window_auto_upgrade == null || contains(["Daily", "Weekly", "AbsoluteMonthly", "RelativeMonthly"], var.maintenance_window_auto_upgrade.frequency)
+    condition     = var.maintenance_window_auto_upgrade == null ? true : contains(["Daily", "Weekly", "AbsoluteMonthly", "RelativeMonthly"], var.maintenance_window_auto_upgrade.frequency)
     error_message = "frequency must be Daily, Weekly, AbsoluteMonthly, or RelativeMonthly."
   }
 
   validation {
-    condition     = var.maintenance_window_auto_upgrade == null || (var.maintenance_window_auto_upgrade.duration >= 4 && var.maintenance_window_auto_upgrade.duration <= 24)
+    condition     = var.maintenance_window_auto_upgrade == null ? true : (var.maintenance_window_auto_upgrade.duration >= 4 && var.maintenance_window_auto_upgrade.duration <= 24)
     error_message = "duration must be between 4 and 24 hours."
   }
 
   validation {
-    condition = var.maintenance_window_auto_upgrade == null || var.maintenance_window_auto_upgrade.day_of_week == null || contains(
-      ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
-      var.maintenance_window_auto_upgrade.day_of_week
+    condition = var.maintenance_window_auto_upgrade == null ? true : (
+      var.maintenance_window_auto_upgrade.day_of_week == null ? true : contains(
+        ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+        var.maintenance_window_auto_upgrade.day_of_week
+      )
     )
     error_message = "day_of_week must be a day name (Monday-Sunday)."
   }
 
   validation {
-    condition     = var.maintenance_window_auto_upgrade == null || var.maintenance_window_auto_upgrade.start_time == null || can(regex("^([01][0-9]|2[0-3]):[0-5][0-9]$", var.maintenance_window_auto_upgrade.start_time))
+    condition     = var.maintenance_window_auto_upgrade == null ? true : (var.maintenance_window_auto_upgrade.start_time == null ? true : can(regex("^([01][0-9]|2[0-3]):[0-5][0-9]$", var.maintenance_window_auto_upgrade.start_time)))
     error_message = "start_time must be in HH:MM format (00:00-23:59, e.g. \"02:00\")."
   }
 }
@@ -300,25 +302,27 @@ variable "maintenance_window_node_os" {
   description = "Node OS upgrade maintenance window. Defaults to Weekly Saturday 02:00 UTC, 4h duration. Set to null to disable."
 
   validation {
-    condition     = var.maintenance_window_node_os == null || contains(["Daily", "Weekly", "AbsoluteMonthly", "RelativeMonthly"], var.maintenance_window_node_os.frequency)
+    condition     = var.maintenance_window_node_os == null ? true : contains(["Daily", "Weekly", "AbsoluteMonthly", "RelativeMonthly"], var.maintenance_window_node_os.frequency)
     error_message = "frequency must be Daily, Weekly, AbsoluteMonthly, or RelativeMonthly."
   }
 
   validation {
-    condition     = var.maintenance_window_node_os == null || (var.maintenance_window_node_os.duration >= 4 && var.maintenance_window_node_os.duration <= 24)
+    condition     = var.maintenance_window_node_os == null ? true : (var.maintenance_window_node_os.duration >= 4 && var.maintenance_window_node_os.duration <= 24)
     error_message = "duration must be between 4 and 24 hours."
   }
 
   validation {
-    condition = var.maintenance_window_node_os == null || var.maintenance_window_node_os.day_of_week == null || contains(
-      ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
-      var.maintenance_window_node_os.day_of_week
+    condition = var.maintenance_window_node_os == null ? true : (
+      var.maintenance_window_node_os.day_of_week == null ? true : contains(
+        ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+        var.maintenance_window_node_os.day_of_week
+      )
     )
     error_message = "day_of_week must be a day name (Monday-Sunday)."
   }
 
   validation {
-    condition     = var.maintenance_window_node_os == null || var.maintenance_window_node_os.start_time == null || can(regex("^([01][0-9]|2[0-3]):[0-5][0-9]$", var.maintenance_window_node_os.start_time))
+    condition     = var.maintenance_window_node_os == null ? true : (var.maintenance_window_node_os.start_time == null ? true : can(regex("^([01][0-9]|2[0-3]):[0-5][0-9]$", var.maintenance_window_node_os.start_time)))
     error_message = "start_time must be in HH:MM format (00:00-23:59, e.g. \"02:00\")."
   }
 }
@@ -364,8 +368,10 @@ variable "diagnostic_settings" {
   validation {
     condition = (
       var.diagnostic_settings == null ? true
-      : (var.diagnostic_settings.log_analytics_destination_type == null
-      || contains(["Dedicated", "AzureDiagnostics"], var.diagnostic_settings.log_analytics_destination_type))
+      : (
+        var.diagnostic_settings.log_analytics_destination_type == null ? true
+        : contains(["Dedicated", "AzureDiagnostics"], var.diagnostic_settings.log_analytics_destination_type)
+      )
     )
     error_message = "log_analytics_destination_type must be \"Dedicated\" or \"AzureDiagnostics\" when set."
   }

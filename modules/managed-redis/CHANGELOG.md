@@ -4,6 +4,17 @@ All notable changes to this module will be documented in this file.
 
 ## [Unreleased]
 
+## [1.2.1] - 2026-09-16
+
+### Fixed
+
+- `diagnostic_settings` validation crashed `terraform plan` on Terraform 1.10–1.12 (which do not short-circuit `||` in validation conditions) whenever a sink was set without `log_analytics_destination_type`. Rewritten as nested ternaries; no interface or behavior change.
+- `customer_managed_key` precondition crashed `terraform plan` on Terraform 1.10–1.12 whenever `identity` was left at its `null` default (i.e. the default configuration). Rewritten as nested ternaries; no interface or behavior change.
+
+### Added
+
+- Offline `terraform test` regression suite (`tests/validation.tftest.hcl`, mocked provider).
+
 ### Changed
 
 - Internal: moved the `azurerm_monitor_diagnostic_categories` data source from `main.tf` to `data.tf` for file-structure consistency. No interface or behavior change.
