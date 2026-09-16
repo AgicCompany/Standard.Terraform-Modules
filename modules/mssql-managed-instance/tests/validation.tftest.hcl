@@ -148,3 +148,148 @@ run "rejects_bad_log_analytics_destination_type" {
   }
   expect_failures = [var.diagnostic_settings]
 }
+
+# --- resource preconditions -------------------------------------------------
+
+run "requires_sql_admin_when_not_aad_only" {
+  command = plan
+  variables {
+    enable_aad_only_auth = false
+  }
+  expect_failures = [azurerm_mssql_managed_instance.this]
+}
+
+run "rejects_user_assigned_without_identity_ids" {
+  command = plan
+  variables {
+    identity = { type = "UserAssigned" }
+  }
+  expect_failures = [azurerm_mssql_managed_instance.this]
+}
+
+run "rejects_identity_ids_without_user_assigned" {
+  command = plan
+  variables {
+    identity = {
+      type         = "SystemAssigned"
+      identity_ids = ["/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/id-x"]
+    }
+  }
+  expect_failures = [azurerm_mssql_managed_instance.this]
+}
+
+# --- behaviour --------------------------------------------------------------
+
+run "secure_defaults" {
+  command = plan
+
+  assert {
+    condition     = azurerm_mssql_managed_instance.this.public_data_endpoint_enabled == false
+    error_message = "public data endpoint must be disabled by default"
+  }
+  assert {
+    condition     = azurerm_mssql_managed_instance.this.minimum_tls_version == "1.2"
+    error_message = "minimum TLS must be 1.2"
+  }
+  assert {
+    condition     = azurerm_mssql_managed_instance.this.azure_active_directory_administrator[0].azuread_authentication_only_enabled == true
+    error_message = "Entra-only auth must be on by default"
+  }
+  assert {
+    condition     = azurerm_mssql_managed_instance.this.administrator_login == null
+    error_message = "SQL admin login must not be set under Entra-only auth"
+  }
+  assert {
+    condition     = azurerm_mssql_managed_instance.this.identity[0].type == "SystemAssigned"
+    error_message = "default identity must be SystemAssigned"
+  }
+  assert {
+    condition     = azurerm_mssql_managed_instance.this.service_principal_type == "SystemAssigned"
+    error_message = "service principal must be set when identity includes SystemAssigned"
+  }
+  assert {
+    condition     = azurerm_mssql_managed_instance_transparent_data_encryption.this.key_vault_key_id == null
+    error_message = "TDE must default to service-managed key"
+  }
+  assert {
+    condition     = length(azurerm_mssql_managed_instance_security_alert_policy.this) == 1
+    error_message = "security alert policy must be created by default"
+  }
+  assert {
+    condition     = length(azurerm_monitor_diagnostic_setting.this) == 0
+    error_message = "diagnostic setting must not be created when diagnostic_settings is null"
+  }
+}
+
+run "customer_managed_key_wires_tde" {
+  command = plan
+  variables {
+    identity = {
+      type         = "SystemAssigned, UserAssigned"
+      identity_ids = ["/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg/providers/Microsoft.ManagedIdentity/userAssignedIdentities/id-sqlmi"]
+    }
+    customer_managed_key = {
+      key_vault_key_id      = "https://kv-x.vault.azure.net/keys/sqlmi-tde/0123456789abcdef0123456789abcdef"
+      auto_rotation_enabled = true
+    }
+  }
+
+  assert {
+    condition     = azurerm_mssql_managed_instance_transparent_data_encryption.this.key_vault_key_id == "https://kv-x.vault.azure.net/keys/sqlmi-tde/0123456789abcdef0123456789abcdef"
+    error_message = "TDE must use the customer-managed key"
+  }
+  assert {
+    condition     = azurerm_mssql_managed_instance_transparent_data_encryption.this.auto_rotation_enabled == true
+    error_message = "auto rotation must be passed through"
+  }
+}
+
+run "mixed_auth_passes_sql_admin" {
+  command = plan
+  variables {
+    enable_aad_only_auth         = false
+    administrator_login          = "sqladmin"
+    administrator_login_password = "Str0ng!Passw0rd#2026"
+  }
+
+  assert {
+    condition     = azurerm_mssql_managed_instance.this.administrator_login == "sqladmin"
+    error_message = "SQL admin login must be forwarded when Entra-only auth is off"
+  }
+  assert {
+    condition     = azurerm_mssql_managed_instance.this.azure_active_directory_administrator[0].azuread_authentication_only_enabled == false
+    error_message = "Entra-only flag must be off"
+  }
+}
+
+run "alert_policy_can_be_disabled" {
+  command = plan
+  variables {
+    enable_security_alert_policy = false
+  }
+
+  assert {
+    condition     = length(azurerm_mssql_managed_instance_security_alert_policy.this) == 0
+    error_message = "security alert policy must not be created when disabled"
+  }
+}
+
+run "diagnostics_created_with_sink" {
+  command = plan
+  variables {
+    diagnostic_settings = {
+      log_analytics_workspace_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg/providers/Microsoft.OperationalInsights/workspaces/law-x"
+      enabled_log_categories     = ["ResourceUsageStats"]
+      enabled_metrics            = []
+    }
+  }
+
+  assert {
+    condition     = length(azurerm_monitor_diagnostic_setting.this) == 1
+    error_message = "diagnostic setting must be created"
+  }
+  assert {
+    condition     = azurerm_monitor_diagnostic_setting.this[0].name == "diag-sqlmi-test-weu-001"
+    error_message = "diagnostic setting name must default to diag-<name>"
+  }
+}
