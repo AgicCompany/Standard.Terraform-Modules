@@ -4,6 +4,16 @@ All notable changes to this module will be documented in this file.
 
 ## [Unreleased]
 
+## [1.1.1] - 2026-09-16
+
+### Fixed
+
+- `diagnostic_settings` validation crashed `terraform plan` on Terraform 1.10–1.12 (which do not short-circuit `||` in validation conditions) whenever a sink was set without `log_analytics_destination_type`. Rewritten as nested ternaries; no interface or behavior change.
+
+### Added
+
+- Offline `terraform test` regression suite (`tests/validation.tftest.hcl`, mocked provider).
+
 ### Changed
 
 - Capped the `azurerm` provider constraint to `>= 4.x, < 5.0.0` in the module and its examples, pending a deliberate azurerm 5.x migration. No interface or behavior change.
