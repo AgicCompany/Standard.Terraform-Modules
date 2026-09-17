@@ -446,7 +446,7 @@ Creates an Azure Flex Consumption (FC1) Function App with private endpoint. Requ
 
 ---
 
-### container-app-environment `v1.0.0`
+### container-app-environment `v2.0.1`
 Creates an Azure Container Apps Environment with VNet integration and workload profiles.
 
 | Variable | Type | Required | Default | Description |
