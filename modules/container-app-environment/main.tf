@@ -5,9 +5,11 @@ resource "azurerm_container_app_environment" "this" {
 
   log_analytics_workspace_id = var.log_analytics_workspace_id
 
-  infrastructure_subnet_id       = var.infrastructure_subnet_id
-  internal_load_balancer_enabled = var.enable_internal_load_balancer
-  zone_redundancy_enabled        = var.enable_zone_redundancy
+  infrastructure_subnet_id = var.infrastructure_subnet_id
+  # azurerm rejects these two whenever they are set without a subnet, even
+  # when false -- only forward them once infrastructure_subnet_id is given.
+  internal_load_balancer_enabled = var.infrastructure_subnet_id != null ? var.enable_internal_load_balancer : null
+  zone_redundancy_enabled        = var.infrastructure_subnet_id != null ? var.enable_zone_redundancy : null
 
   dynamic "workload_profile" {
     for_each = var.workload_profiles

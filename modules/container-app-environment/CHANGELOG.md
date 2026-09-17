@@ -4,6 +4,10 @@ All notable changes to this module will be documented in this file.
 
 ## [Unreleased]
 
+### Fixed
+
+- The environment now plans without `infrastructure_subnet_id`. `internal_load_balancer_enabled` and `zone_redundancy_enabled` were always forwarded (as `false`), and the provider rejects them whenever they are set without a subnet — so the minimum-viable configuration promised in 2.0.0 never actually worked. Both are now `null` unless a subnet is given. Regression covered by `tests/validation.tftest.hcl`.
+
 ### Changed
 
 - Capped the `azurerm` provider constraint to `>= 4.x, < 5.0.0` in the module and its examples, pending a deliberate azurerm 5.x migration. No interface or behavior change.
