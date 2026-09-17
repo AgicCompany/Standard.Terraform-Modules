@@ -4,7 +4,7 @@ metadata:
   module_name: vnet-peering
   module_version: "1.0.0"
   schema_authored_by: AGIC Infrastructure Team
-  schema_last_updated: "2026-06-19"
+  schema_last_updated: "2026-09-17"
 
 catalogue:
   display_name: "VNet Peering"
@@ -46,12 +46,11 @@ variables:
     widget: hidden
     derived_from: { source: deployment_context.resource_group }
 
-  # NOTE: virtual_network_name must be resolved from the VNet resource_picker selection
-  # at composition time. The grammar's derived_from vocabulary has no picker-attribute
-  # source; hcl_default is used here as a placeholder. See findings.
+  # Derived from the selected local VNet's resource id (composed edge or
+  # existing resource alike).
   virtual_network_name:
     widget: hidden
-    derived_from: { source: hcl_default }
+    derived_from: { source: arm_id.virtual_network_id.name }
 
   virtual_network_id:
     widget: resource_picker
@@ -61,18 +60,15 @@ variables:
     help: "Resource ID of the local virtual network. The peering is created from this VNet's perspective."
 
   # --- Networking: remote VNet ---
-  # NOTE: same derived_from limitation as virtual_network_name above.
+  # Both derived from the selected remote VNet's resource id, so a remote VNet
+  # in another resource group or subscription needs no extra input.
   remote_virtual_network_name:
     widget: hidden
-    derived_from: { source: hcl_default }
+    derived_from: { source: arm_id.remote_virtual_network_id.name }
 
   remote_virtual_network_resource_group_name:
-    widget: text
-    group: networking
-    order: 25
-    advanced: true
-    placeholder: "rg-remote-network"
-    help: "Resource group name of the remote virtual network. Required when the remote VNet is in a different resource group or subscription."
+    widget: hidden
+    derived_from: { source: arm_id.remote_virtual_network_id.resource_group }
 
   remote_virtual_network_id:
     widget: resource_picker
