@@ -38,16 +38,13 @@ variables:
     derived_from: { source: deployment_context.tags }
 
   # --- Networking: local VNet ---
-  # NOTE: virtual_network_resource_group_name is assumed to be the deployment resource
-  # group. Cross-subscription peering (where the local VNet is in a different RG)
-  # is a contract gap — the grammar has no way to derive this from the resource_picker
-  # selection. See findings.
+  # Both derived from the selected local VNet's resource id (composed edge or
+  # existing resource alike), so a local VNet outside the deployment resource
+  # group peers correctly.
   virtual_network_resource_group_name:
     widget: hidden
-    derived_from: { source: deployment_context.resource_group }
+    derived_from: { source: arm_id.virtual_network_id.resource_group }
 
-  # Derived from the selected local VNet's resource id (composed edge or
-  # existing resource alike).
   virtual_network_name:
     widget: hidden
     derived_from: { source: arm_id.virtual_network_id.name }
