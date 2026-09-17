@@ -14,6 +14,9 @@ reference.
 | [aks-microservices](aks-microservices/) | AKS cluster with user node pool, ACR, workload identity, Key Vault, Log Analytics |
 | [serverless-event-driven](serverless-event-driven/) | Flex Consumption Function App + Service Bus + Cosmos DB + Storage + App Insights |
 | [networking-hub-baseline](networking-hub-baseline/) | VNet with NSG, route table, NAT gateway, Bastion, private DNS zone |
+| [container-apps-basic](container-apps-basic/) | VNet-integrated Container Apps environment + app, ACR, workload identity, Log Analytics |
+| [linux-vm-jumpbox](linux-vm-jumpbox/) | Single Linux VM behind Bastion with its own VNet and NSG, SSH key only |
+| [static-web-api](static-web-api/) | Static Web App + Flex Consumption Function App API, Storage, App Insights |
 
 ## Validating
 
