@@ -20,6 +20,7 @@ reference.
 | [sql-web-app](sql-web-app/) | App Service web app + Azure SQL (Entra-only), Key Vault, App Insights — SQL twin of web-app-db |
 | [windows-vm-jumpbox](windows-vm-jumpbox/) | Single Windows VM behind Bastion with its own VNet and NSG |
 | [container-apps-jobs](container-apps-jobs/) | Container Apps environment with a cron-triggered job, ACR, workload identity |
+| [hub-spoke-peering](hub-spoke-peering/) | Hub + spoke VNets peered both ways, route table and NSG for the spoke |
 
 ## Validating
 
