@@ -4,7 +4,7 @@ metadata:
   module_name: aks
   module_version: "4.1.2"
   schema_authored_by: AGIC Infrastructure Team
-  schema_last_updated: "2026-09-16"
+  schema_last_updated: "2026-09-17"
 
 catalogue:
   display_name: "Azure Kubernetes Service"
@@ -164,6 +164,7 @@ variables:
         vnet_subnet_id:
           widget: resource_picker
           widget_options: { resource_type: subnet }
+          help: "Subnet for the system node pool. Required: the cluster must be placed in an explicitly chosen subnet, never an AKS-managed VNet."
         node_count:
           widget: number
           widget_options: { min: 1, max: 1000 }
@@ -507,7 +508,7 @@ composition_contract:
   - requirement_id: aks.default_node_pool.vnet_subnet_id
     variable: default_node_pool.vnet_subnet_id
     role: network_placement
-    necessity: optional
+    necessity: required
     resource_type: subnet
     cardinality: one
     compatible_providers:
@@ -593,7 +594,7 @@ dependencies:
     - variable: default_node_pool.vnet_subnet_id
       resource_type: subnet
       cardinality: one
-      notes: "System node pool subnet."
+      notes: "System node pool subnet. Required — networking is company-managed; additional node pools inherit it unless given their own."
 
     - variable: private_dns_zone_id
       resource_type: private_dns_zone
