@@ -1,0 +1,126 @@
+{
+  "aks_aks": {
+    "default_node_pool": {},
+    "dns_prefix": "aks-myapp-dev-weu-001",
+    "location": "westeurope",
+    "maintenance_window": {
+      "allowed": [
+        {
+          "day": "Saturday",
+          "hours": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        },
+        {
+          "day": "Sunday",
+          "hours": [
+            0,
+            1,
+            2,
+            3,
+            4,
+            5
+          ]
+        }
+      ]
+    },
+    "maintenance_window_auto_upgrade": {
+      "day_of_week": "Sunday",
+      "duration": 4,
+      "frequency": "Weekly",
+      "interval": 1,
+      "start_time": "02:00"
+    },
+    "maintenance_window_node_os": {
+      "day_of_week": "Saturday",
+      "duration": 4,
+      "frequency": "Weekly",
+      "interval": 1,
+      "start_time": "02:00"
+    },
+    "name": "aks-myapp-dev-weu-001",
+    "node_resource_group_name": "rg-aks-myapp-dev-weu-001-nodes",
+    "resource_group_name": "rg-myapp-dev-weu-001",
+    "tags": {
+      "environment": "dev",
+      "managed-by": "terraform",
+      "owner": "platform-team"
+    }
+  },
+  "aks_node_pool_userpool": {
+    "node_pools": {
+      "user": {
+        "mode": "User",
+        "node_count": 2,
+        "vm_size": "Standard_D2s_v3"
+      }
+    }
+  },
+  "container_registry_acr": {
+    "enable_private_endpoint": false,
+    "location": "westeurope",
+    "name": "crmyappdevweu001",
+    "resource_group_name": "rg-myapp-dev-weu-001",
+    "tags": {
+      "environment": "dev",
+      "managed-by": "terraform",
+      "owner": "platform-team"
+    }
+  },
+  "key_vault_kv": {
+    "enable_private_endpoint": false,
+    "location": "westeurope",
+    "name": "kvmyappdevweu001",
+    "resource_group_name": "rg-myapp-dev-weu-001",
+    "tags": {
+      "environment": "dev",
+      "managed-by": "terraform",
+      "owner": "platform-team"
+    }
+  },
+  "log_analytics_workspace_logs": {
+    "location": "westeurope",
+    "name": "log-myapp-dev-weu-001",
+    "resource_group_name": "rg-myapp-dev-weu-001",
+    "tags": {
+      "environment": "dev",
+      "managed-by": "terraform",
+      "owner": "platform-team"
+    }
+  },
+  "user_assigned_identity_uami": {
+    "location": "westeurope",
+    "name": "id-myapp-dev-weu-001",
+    "resource_group_name": "rg-myapp-dev-weu-001",
+    "tags": {
+      "environment": "dev",
+      "managed-by": "terraform",
+      "owner": "platform-team"
+    }
+  },
+  "virtual_network_vnet": {
+    "address_space": [
+      "10.0.0.0/16"
+    ],
+    "location": "westeurope",
+    "name": "vnet-myapp-dev-weu-001",
+    "resource_group_name": "rg-myapp-dev-weu-001",
+    "subnets": {
+      "aks": {
+        "address_prefixes": [
+          "10.0.1.0/24"
+        ]
+      }
+    },
+    "tags": {
+      "environment": "dev",
+      "managed-by": "terraform",
+      "owner": "platform-team"
+    }
+  }
+}

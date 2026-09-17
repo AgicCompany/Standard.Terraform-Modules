@@ -93,6 +93,10 @@ A library of reusable, production-ready Terraform modules for Microsoft Azure. A
 | [application-insights](modules/application-insights) | Application Insights with workspace-based configuration |
 | [action-group](modules/action-group) | Action group with email, SMS, and webhook receivers |
 
+## Starter templates
+
+Ready-to-use roots under [`templates/`](templates/) composing these modules into common patterns — [web app + DB](templates/web-app-db/), [AKS microservices](templates/aks-microservices/), [serverless / event-driven](templates/serverless-event-driven/), [networking / hub baseline](templates/networking-hub-baseline/). See [templates/README.md](templates/README.md).
+
 ## Documentation
 
 - [Module Standards](docs/MODULE_STANDARDS.md) — Structure, conventions, and defaults
