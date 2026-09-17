@@ -1,0 +1,70 @@
+{
+  "network_security_group_nsg": {
+    "location": "westeurope",
+    "name": "nsg-myapp-dev-weu-001",
+    "resource_group_name": "rg-myapp-dev-weu-001",
+    "tags": {
+      "environment": "dev",
+      "managed-by": "terraform",
+      "owner": "platform-team"
+    }
+  },
+  "route_table_rt": {
+    "location": "westeurope",
+    "name": "rt-myapp-dev-weu-001",
+    "resource_group_name": "rg-myapp-dev-weu-001",
+    "tags": {
+      "environment": "dev",
+      "managed-by": "terraform",
+      "owner": "platform-team"
+    }
+  },
+  "virtual_network_hub": {
+    "address_space": [
+      "10.0.0.0/16"
+    ],
+    "location": "westeurope",
+    "name": "vnet-myapp-dev-weu-001",
+    "resource_group_name": "rg-myapp-dev-weu-001",
+    "subnets": {
+      "shared": {
+        "address_prefixes": [
+          "10.0.1.0/24"
+        ]
+      }
+    },
+    "tags": {
+      "environment": "dev",
+      "managed-by": "terraform",
+      "owner": "platform-team"
+    }
+  },
+  "virtual_network_spoke": {
+    "address_space": [
+      "10.1.0.0/16"
+    ],
+    "location": "westeurope",
+    "name": "vnet-myapp-dev-weu-002",
+    "resource_group_name": "rg-myapp-dev-weu-001",
+    "subnets": {
+      "workload": {
+        "address_prefixes": [
+          "10.1.1.0/24"
+        ]
+      }
+    },
+    "tags": {
+      "environment": "dev",
+      "managed-by": "terraform",
+      "owner": "platform-team"
+    }
+  },
+  "vnet_peering_peering": {
+    "name": "peer-myapp-dev-weu-001",
+    "tags": {
+      "environment": "dev",
+      "managed-by": "terraform",
+      "owner": "platform-team"
+    }
+  }
+}
