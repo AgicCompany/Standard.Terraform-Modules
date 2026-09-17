@@ -4,6 +4,8 @@ All notable changes to this module will be documented in this file.
 
 ## [Unreleased]
 
+## [2.0.1] - 2026-09-17
+
 ### Fixed
 
 - The environment now plans without `infrastructure_subnet_id`. `internal_load_balancer_enabled` and `zone_redundancy_enabled` were always forwarded (as `false`), and the provider rejects them whenever they are set without a subnet — so the minimum-viable configuration promised in 2.0.0 never actually worked. Both are now `null` unless a subnet is given. Regression covered by `tests/validation.tftest.hcl`.
