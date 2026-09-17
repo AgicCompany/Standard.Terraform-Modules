@@ -1,0 +1,82 @@
+{
+  "container_app_environment_env": {
+    "location": "westeurope",
+    "name": "cae-myapp-dev-weu-001",
+    "resource_group_name": "rg-myapp-dev-weu-001",
+    "tags": {
+      "environment": "dev",
+      "managed-by": "terraform",
+      "owner": "platform-team"
+    }
+  },
+  "container_app_job_job": {
+    "container": {
+      "cpu": 0.25,
+      "image": "mcr.microsoft.com/k8se/quickstart-jobs:latest",
+      "memory": "0.5Gi"
+    },
+    "location": "westeurope",
+    "name": "caj-myapp-dev-weu-001",
+    "replica_timeout_in_seconds": 1800,
+    "resource_group_name": "rg-myapp-dev-weu-001",
+    "schedule_trigger_config": {
+      "cron_expression": "0 2 * * *"
+    },
+    "tags": {
+      "environment": "dev",
+      "managed-by": "terraform",
+      "owner": "platform-team"
+    }
+  },
+  "container_registry_acr": {
+    "enable_private_endpoint": false,
+    "location": "westeurope",
+    "name": "crmyappdevweu001",
+    "resource_group_name": "rg-myapp-dev-weu-001",
+    "tags": {
+      "environment": "dev",
+      "managed-by": "terraform",
+      "owner": "platform-team"
+    }
+  },
+  "log_analytics_workspace_logs": {
+    "location": "westeurope",
+    "name": "log-myapp-dev-weu-001",
+    "resource_group_name": "rg-myapp-dev-weu-001",
+    "tags": {
+      "environment": "dev",
+      "managed-by": "terraform",
+      "owner": "platform-team"
+    }
+  },
+  "user_assigned_identity_uami": {
+    "location": "westeurope",
+    "name": "id-myapp-dev-weu-001",
+    "resource_group_name": "rg-myapp-dev-weu-001",
+    "tags": {
+      "environment": "dev",
+      "managed-by": "terraform",
+      "owner": "platform-team"
+    }
+  },
+  "virtual_network_vnet": {
+    "address_space": [
+      "10.0.0.0/16"
+    ],
+    "location": "westeurope",
+    "name": "vnet-myapp-dev-weu-001",
+    "resource_group_name": "rg-myapp-dev-weu-001",
+    "subnets": {
+      "aca": {
+        "address_prefixes": [
+          "10.0.0.0/23"
+        ]
+      }
+    },
+    "tags": {
+      "environment": "dev",
+      "managed-by": "terraform",
+      "owner": "platform-team"
+    }
+  }
+}

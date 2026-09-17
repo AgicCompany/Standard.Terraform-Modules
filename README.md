@@ -95,7 +95,7 @@ A library of reusable, production-ready Terraform modules for Microsoft Azure. A
 
 ## Starter templates
 
-Ready-to-use roots under [`templates/`](templates/) composing these modules into common patterns — [web app + DB](templates/web-app-db/), [AKS microservices](templates/aks-microservices/), [serverless / event-driven](templates/serverless-event-driven/), [networking / hub baseline](templates/networking-hub-baseline/), [Container Apps basic](templates/container-apps-basic/), [Linux VM jump box](templates/linux-vm-jumpbox/), [static web app + API](templates/static-web-api/). See [templates/README.md](templates/README.md).
+Ready-to-use roots under [`templates/`](templates/) composing these modules into common patterns — [web app + DB](templates/web-app-db/), [AKS microservices](templates/aks-microservices/), [serverless / event-driven](templates/serverless-event-driven/), [networking / hub baseline](templates/networking-hub-baseline/), [Container Apps basic](templates/container-apps-basic/), [Linux VM jump box](templates/linux-vm-jumpbox/), [static web app + API](templates/static-web-api/), [SQL web app](templates/sql-web-app/), [Windows VM jump box](templates/windows-vm-jumpbox/), [Container Apps jobs](templates/container-apps-jobs/). See [templates/README.md](templates/README.md).
 
 ## Documentation
 

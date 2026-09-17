@@ -1,0 +1,78 @@
+{
+  "app_service_plan_plan": {
+    "location": "westeurope",
+    "name": "asp-myapp-dev-weu-001",
+    "resource_group_name": "rg-myapp-dev-weu-001",
+    "sku_name": "P1v3",
+    "tags": {
+      "environment": "dev",
+      "managed-by": "terraform",
+      "owner": "platform-team"
+    }
+  },
+  "application_insights_insights": {
+    "location": "westeurope",
+    "name": "appi-myapp-dev-weu-001",
+    "resource_group_name": "rg-myapp-dev-weu-001",
+    "tags": {
+      "environment": "dev",
+      "managed-by": "terraform",
+      "owner": "platform-team"
+    }
+  },
+  "key_vault_kv": {
+    "enable_private_endpoint": false,
+    "location": "westeurope",
+    "name": "kvmyappdevweu001",
+    "resource_group_name": "rg-myapp-dev-weu-001",
+    "tags": {
+      "environment": "dev",
+      "managed-by": "terraform",
+      "owner": "platform-team"
+    }
+  },
+  "linux_web_app_webapp": {
+    "enable_private_endpoint": false,
+    "location": "westeurope",
+    "name": "app-myapp-dev-weu-001",
+    "resource_group_name": "rg-myapp-dev-weu-001",
+    "tags": {
+      "environment": "dev",
+      "managed-by": "terraform",
+      "owner": "platform-team"
+    }
+  },
+  "log_analytics_workspace_logs": {
+    "location": "westeurope",
+    "name": "log-myapp-dev-weu-001",
+    "resource_group_name": "rg-myapp-dev-weu-001",
+    "tags": {
+      "environment": "dev",
+      "managed-by": "terraform",
+      "owner": "platform-team"
+    }
+  },
+  "mssql_database_db": {
+    "name": "sqldb-myapp-dev-weu-001",
+    "tags": {
+      "environment": "dev",
+      "managed-by": "terraform",
+      "owner": "platform-team"
+    }
+  },
+  "mssql_server_sql": {
+    "azuread_administrator": {
+      "login_username": "sql-admins",
+      "object_id": "00000000-0000-0000-0000-000000000000"
+    },
+    "enable_private_endpoint": false,
+    "location": "westeurope",
+    "name": "sql-myapp-dev-weu-001",
+    "resource_group_name": "rg-myapp-dev-weu-001",
+    "tags": {
+      "environment": "dev",
+      "managed-by": "terraform",
+      "owner": "platform-team"
+    }
+  }
+}
