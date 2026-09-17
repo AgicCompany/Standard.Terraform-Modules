@@ -4,7 +4,7 @@ metadata:
   module_name: mssql-managed-instance
   module_version: "1.0.0"
   schema_authored_by: AGIC Infrastructure Team
-  schema_last_updated: "2026-09-16"
+  schema_last_updated: "2026-09-17"
 
 catalogue:
   display_name: "SQL Managed Instance"
@@ -224,9 +224,8 @@ variables:
     widget_options:
       fields:
         key_vault_key_id:
-          widget: resource_picker
-          widget_options: { resource_type: key_vault_key }
-          help: "Key Vault key used as the TDE protector. The instance identity needs Get, WrapKey and UnwrapKey on it."
+          widget: text
+          help: "Key Vault key resource ID used as the TDE protector. The instance identity needs Get, WrapKey and UnwrapKey on it."
         auto_rotation_enabled:
           widget: toggle
           help: "Follow new key versions automatically (allows a versionless key ID)."
@@ -354,20 +353,6 @@ composition_contract:
       discovery_kind: azure-resource-id
     external_changes:
       allowed: false
-  - requirement_id: mssql-managed-instance.customer_managed_key.key_vault_key_id
-    variable: customer_managed_key.key_vault_key_id
-    role: resource_binding
-    necessity: optional
-    resource_type: key_vault_key
-    cardinality: one
-    compatible_providers:
-    - key-vault
-    recommended_provider: key-vault
-    existing_resource:
-      supported: true
-      discovery_kind: azure-resource-id
-    external_changes:
-      allowed: false
   - requirement_id: mssql-managed-instance.identity.identity_ids
     variable: identity.identity_ids
     role: resource_binding
@@ -417,10 +402,6 @@ dependencies:
       resource_type: subnet
       cardinality: one
       notes: "Dedicated subnet delegated to Microsoft.Sql/managedInstances with NSG and route table attached. Required."
-    - variable: customer_managed_key.key_vault_key_id
-      resource_type: key_vault_key
-      cardinality: one
-      notes: "Optional customer-managed TDE protector."
     - variable: identity.identity_ids
       resource_type: user_assigned_identity
       cardinality: many
