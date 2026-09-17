@@ -36,7 +36,8 @@
       "environment": "dev",
       "managed-by": "terraform",
       "owner": "platform-team"
-    }
+    },
+    "virtual_network_links": {}
   },
   "route_table_rt": {
     "location": "westeurope",

@@ -8,12 +8,14 @@ variable "private_dns_zone_pdns" {}
 module "virtual_network_vnet" {
   source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/virtual-network?ref=virtual-network/v1.0.0"
 
-  resource_group_name = var.virtual_network_vnet.resource_group_name
-  location            = var.virtual_network_vnet.location
-  name                = var.virtual_network_vnet.name
-  tags                = var.virtual_network_vnet.tags
-  address_space       = var.virtual_network_vnet.address_space
-  subnets             = var.virtual_network_vnet.subnets
+  resource_group_name             = var.virtual_network_vnet.resource_group_name
+  location                        = var.virtual_network_vnet.location
+  name                            = var.virtual_network_vnet.name
+  tags                            = var.virtual_network_vnet.tags
+  address_space                   = var.virtual_network_vnet.address_space
+  subnets                         = var.virtual_network_vnet.subnets
+  subnet_nsg_associations         = { "workload" = module.network_security_group_nsg.id }
+  subnet_route_table_associations = { "workload" = module.route_table_rt.id }
 }
 module "network_security_group_nsg" {
   source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/network-security-group?ref=network-security-group/v1.3.0"
@@ -51,9 +53,10 @@ module "bastion_bastion" {
 module "private_dns_zone_pdns" {
   source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/private-dns-zone?ref=private-dns-zone/v1.0.0"
 
-  resource_group_name = var.private_dns_zone_pdns.resource_group_name
-  name                = var.private_dns_zone_pdns.name
-  tags                = var.private_dns_zone_pdns.tags
+  resource_group_name   = var.private_dns_zone_pdns.resource_group_name
+  name                  = var.private_dns_zone_pdns.name
+  tags                  = var.private_dns_zone_pdns.tags
+  virtual_network_links = merge(var.private_dns_zone_pdns.virtual_network_links, { "hub" = merge(try(var.private_dns_zone_pdns.virtual_network_links["hub"], {}), { virtual_network_id = module.virtual_network_vnet.id }) })
 }
 
 output "virtual_network_vnet_id" {

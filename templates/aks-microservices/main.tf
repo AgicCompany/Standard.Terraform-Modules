@@ -33,7 +33,7 @@ module "aks_aks" {
 module "aks_node_pool_userpool" {
   source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/aks-node-pool?ref=aks-node-pool/v2.0.0"
 
-  node_pools            = var.aks_node_pool_userpool.node_pools
+  node_pools            = merge(var.aks_node_pool_userpool.node_pools, { "user" = merge(try(var.aks_node_pool_userpool.node_pools["user"], {}), { vnet_subnet_id = module.virtual_network_vnet.subnet_ids["aks"] }) })
   kubernetes_cluster_id = module.aks_aks.id
 }
 module "container_registry_acr" {

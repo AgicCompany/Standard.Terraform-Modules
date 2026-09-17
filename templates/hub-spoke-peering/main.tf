@@ -17,12 +17,14 @@ module "virtual_network_hub" {
 module "virtual_network_spoke" {
   source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/virtual-network?ref=virtual-network/v1.0.0"
 
-  resource_group_name = var.virtual_network_spoke.resource_group_name
-  location            = var.virtual_network_spoke.location
-  name                = var.virtual_network_spoke.name
-  tags                = var.virtual_network_spoke.tags
-  address_space       = var.virtual_network_spoke.address_space
-  subnets             = var.virtual_network_spoke.subnets
+  resource_group_name             = var.virtual_network_spoke.resource_group_name
+  location                        = var.virtual_network_spoke.location
+  name                            = var.virtual_network_spoke.name
+  tags                            = var.virtual_network_spoke.tags
+  address_space                   = var.virtual_network_spoke.address_space
+  subnets                         = var.virtual_network_spoke.subnets
+  subnet_route_table_associations = { "workload" = module.route_table_rt.id }
+  subnet_nsg_associations         = { "workload" = module.network_security_group_nsg.id }
 }
 module "vnet_peering_peering" {
   source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/vnet-peering?ref=vnet-peering/v1.0.0"

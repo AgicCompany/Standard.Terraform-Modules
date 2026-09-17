@@ -43,14 +43,13 @@ Per each module's `composition_contract`:
 - `aks.default_node_pool.vnet_subnet_id` → subnet on `virtual-network` (#1)
 - `aks-node-pool.kubernetes_cluster_id` → `aks` (#2)
 
-The user node pool (#3) is deliberately not given its own
-`node_pools.<key>.vnet_subnet_id`: AKS places an additional pool in the
-cluster subnet when it is omitted. Set it explicitly in `terraform.tfvars`
-if a pool needs a different subnet.
-
 ## Recommended optional bindings
 
 Not required by the contract, but standard for this pattern:
+
+- `aks-node-pool.node_pools.vnet_subnet_id` (`map_key: user`) → `aks` subnet on
+  `virtual-network` (#1) — a pool inherits the cluster subnet when omitted;
+  wired so the user pool sits explicitly in the same subnet.
 
 - `aks.user_assigned_identity_ids` → `user-assigned-identity` (#5)
 - `aks.log_analytics_workspace_id` / `aks.diagnostic_settings.log_analytics_workspace_id` → `log-analytics-workspace` (#7), for Container Insights

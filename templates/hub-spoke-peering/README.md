@@ -4,7 +4,6 @@ Generic reusable pattern for the first step beyond a single VNet: a hub
 and a spoke, peered both ways, with a route table and NSG ready for the
 spoke workload subnet.
 
-
 ## Usage
 
 This directory is a complete Terraform root: `main.tf` wires the modules
@@ -47,12 +46,11 @@ derives them from the VNet ids with `split("/", ...)`, so pointing
 `remote_virtual_network_id` at an existing VNet in another resource group
 needs no other change.
 
-## Deliberately unwired
+## Recommended optional bindings
 
-- `virtual-network.subnet_route_table_associations` /
-  `subnet_nsg_associations` (RT/NSG → spoke subnet) are not wired — same
-  as the hub baseline and the jump boxes. Associate them in
-  `terraform.tfvars` or after deployment.
+- `virtual-network.subnet_route_table_associations` (`map_key: workload`) →
+  `route-table` (#4) and `subnet_nsg_associations` (`map_key: workload`) →
+  `network-security-group` (#5) on the `spoke` VNet — wired.
 
 ## Not included (optional, future variant)
 
