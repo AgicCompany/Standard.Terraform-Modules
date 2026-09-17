@@ -4,7 +4,7 @@ metadata:
   module_name: virtual-network
   module_version: "1.0.0"
   schema_authored_by: AGIC Infrastructure Team
-  schema_last_updated: "2026-07-09"
+  schema_last_updated: "2026-09-17"
 
 catalogue:
   display_name: "Virtual Network"
@@ -138,6 +138,7 @@ composition_contract:
     resource_type: network_security_group
     cardinality: many
     collection_kind: keyed_map
+    keys_from: subnets
     compatible_providers:
     - network-security-group
     recommended_provider: network-security-group
@@ -153,6 +154,7 @@ composition_contract:
     resource_type: route_table
     cardinality: many
     collection_kind: keyed_map
+    keys_from: subnets
     compatible_providers:
     - route-table
     recommended_provider: route-table
@@ -168,11 +170,13 @@ dependencies:
       resource_type: network_security_group
       cardinality: many
       collection_kind: keyed_map
+      keys_from: subnets
       notes: "Optional NSG associations. Keys must match subnet names."
     - variable: subnet_route_table_associations
       resource_type: route_table
       cardinality: many
       collection_kind: keyed_map
+      keys_from: subnets
       notes: "Optional route table associations. Keys must match subnet names."
 
   produces_outputs_consumable_by:
