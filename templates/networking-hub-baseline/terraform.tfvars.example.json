@@ -1,0 +1,76 @@
+{
+  "bastion_bastion": {
+    "location": "westeurope",
+    "name": "bas-myapp-dev-weu-001",
+    "resource_group_name": "rg-myapp-dev-weu-001",
+    "tags": {
+      "environment": "dev",
+      "managed-by": "terraform",
+      "owner": "platform-team"
+    }
+  },
+  "nat_gateway_nat": {
+    "location": "westeurope",
+    "name": "ng-myapp-dev-weu-001",
+    "resource_group_name": "rg-myapp-dev-weu-001",
+    "tags": {
+      "environment": "dev",
+      "managed-by": "terraform",
+      "owner": "platform-team"
+    }
+  },
+  "network_security_group_nsg": {
+    "location": "westeurope",
+    "name": "nsg-myapp-dev-weu-001",
+    "resource_group_name": "rg-myapp-dev-weu-001",
+    "tags": {
+      "environment": "dev",
+      "managed-by": "terraform",
+      "owner": "platform-team"
+    }
+  },
+  "private_dns_zone_pdns": {
+    "name": "privatelink.blob.core.windows.net",
+    "resource_group_name": "rg-myapp-dev-weu-001",
+    "tags": {
+      "environment": "dev",
+      "managed-by": "terraform",
+      "owner": "platform-team"
+    }
+  },
+  "route_table_rt": {
+    "location": "westeurope",
+    "name": "rt-myapp-dev-weu-001",
+    "resource_group_name": "rg-myapp-dev-weu-001",
+    "tags": {
+      "environment": "dev",
+      "managed-by": "terraform",
+      "owner": "platform-team"
+    }
+  },
+  "virtual_network_vnet": {
+    "address_space": [
+      "10.0.0.0/16"
+    ],
+    "location": "westeurope",
+    "name": "vnet-myapp-dev-weu-001",
+    "resource_group_name": "rg-myapp-dev-weu-001",
+    "subnets": {
+      "AzureBastionSubnet": {
+        "address_prefixes": [
+          "10.0.2.0/26"
+        ]
+      },
+      "workload": {
+        "address_prefixes": [
+          "10.0.1.0/24"
+        ]
+      }
+    },
+    "tags": {
+      "environment": "dev",
+      "managed-by": "terraform",
+      "owner": "platform-team"
+    }
+  }
+}

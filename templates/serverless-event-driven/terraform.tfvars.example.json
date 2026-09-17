@@ -1,0 +1,136 @@
+{
+  "app_service_plan_plan": {
+    "enable_per_site_scaling": false,
+    "enable_zone_redundancy": false,
+    "location": "westeurope",
+    "name": "asp-myapp-dev-weu-001",
+    "os_type": "Linux",
+    "resource_group_name": "rg-myapp-dev-weu-001",
+    "sku_name": "EP1",
+    "tags": {
+      "environment": "dev",
+      "managed-by": "terraform",
+      "owner": "platform-team"
+    },
+    "worker_count": 1
+  },
+  "application_insights_insights": {
+    "application_type": "web",
+    "daily_data_cap_notifications_disabled": false,
+    "disable_ip_masking": false,
+    "force_customer_storage_for_profiler": false,
+    "internet_ingestion_enabled": false,
+    "internet_query_enabled": false,
+    "local_authentication_disabled": true,
+    "location": "westeurope",
+    "name": "appi-myapp-dev-weu-001",
+    "resource_group_name": "rg-myapp-dev-weu-001",
+    "retention_in_days": 90,
+    "sampling_percentage": 100,
+    "tags": {
+      "environment": "dev",
+      "managed-by": "terraform",
+      "owner": "platform-team"
+    }
+  },
+  "cosmosdb_cosmos": {
+    "automatic_failover_enabled": false,
+    "consistency_policy": {
+      "consistency_level": "Session"
+    },
+    "enable_local_auth": false,
+    "enable_multiple_write_locations": false,
+    "enable_private_endpoint": false,
+    "enable_public_access": false,
+    "enable_virtual_network_filter": false,
+    "free_tier_enabled": false,
+    "kind": "GlobalDocumentDB",
+    "location": "westeurope",
+    "name": "cosmos-myapp-dev-weu-001",
+    "resource_group_name": "rg-myapp-dev-weu-001",
+    "tags": {
+      "environment": "dev",
+      "managed-by": "terraform",
+      "owner": "platform-team"
+    }
+  },
+  "function_app_flex_func": {
+    "client_certificate_mode": "Required",
+    "enable_private_endpoint": false,
+    "enable_public_access": false,
+    "https_only": true,
+    "identity_type": "None",
+    "instance_memory_in_mb": 2048,
+    "location": "westeurope",
+    "maximum_instance_count": 10,
+    "name": "funcflex-myapp-dev-weu-001",
+    "resource_group_name": "rg-myapp-dev-weu-001",
+    "runtime_name": "python",
+    "runtime_version": "3.12",
+    "storage_authentication_type": "StorageAccountConnectionString",
+    "storage_container_type": "blobContainer",
+    "tags": {
+      "environment": "dev",
+      "managed-by": "terraform",
+      "owner": "platform-team"
+    },
+    "webdeploy_publish_basic_authentication_enabled": false
+  },
+  "log_analytics_workspace_logs": {
+    "daily_quota_gb": -1,
+    "enable_internet_ingestion": false,
+    "enable_internet_query": false,
+    "location": "westeurope",
+    "name": "log-myapp-dev-weu-001",
+    "resource_group_name": "rg-myapp-dev-weu-001",
+    "retention_in_days": 30,
+    "sku": "PerGB2018",
+    "tags": {
+      "environment": "dev",
+      "managed-by": "terraform",
+      "owner": "platform-team"
+    }
+  },
+  "service_bus_bus": {
+    "capacity": 0,
+    "enable_local_auth": false,
+    "enable_private_endpoint": false,
+    "enable_public_access": false,
+    "location": "westeurope",
+    "name": "sb-myapp-dev-weu-001",
+    "resource_group_name": "rg-myapp-dev-weu-001",
+    "sku": "Standard",
+    "tags": {
+      "environment": "dev",
+      "managed-by": "terraform",
+      "owner": "platform-team"
+    }
+  },
+  "storage_account_storage": {
+    "access_tier": "Hot",
+    "account_kind": "StorageV2",
+    "account_replication_type": "LRS",
+    "account_tier": "Standard",
+    "allow_nested_items_to_be_public": false,
+    "blob_soft_delete_retention_days": 7,
+    "container_soft_delete_retention_days": 7,
+    "enable_blob_private_endpoint": true,
+    "enable_blob_soft_delete": true,
+    "enable_container_soft_delete": true,
+    "enable_file_private_endpoint": false,
+    "enable_private_endpoint": false,
+    "enable_public_access": false,
+    "enable_queue_private_endpoint": false,
+    "enable_table_private_endpoint": false,
+    "enable_versioning": false,
+    "location": "westeurope",
+    "name": "stmyappdevweu001",
+    "resource_group_name": "rg-myapp-dev-weu-001",
+    "shared_access_key_enabled": false,
+    "tags": {
+      "environment": "dev",
+      "managed-by": "terraform",
+      "owner": "platform-team"
+    }
+  }
+}
