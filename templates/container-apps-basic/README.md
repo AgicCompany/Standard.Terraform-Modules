@@ -47,11 +47,9 @@ Per each module's `composition_contract`:
 
 - `container-app.user_assigned_identity_ids` → `user-assigned-identity` (#5)
 - `container-app-environment.infrastructure_subnet_id` → `aca` subnet on
-  `virtual-network` (#6). Optional per the contract but effectively
-  mandatory today: the module always emits
-  `internal_load_balancer_enabled` / `zone_redundancy_enabled`, which
-  azurerm rejects without `infrastructure_subnet_id`. Upstream module bug,
-  tracked separately.
+  `virtual-network` (#6). Optional per the contract; wired here because a
+  VNet-integrated environment is the realistic starting point. (Before
+  `container-app-environment/v2.0.1` the module could not plan without it.)
 
 ## Operational step outside Terraform
 

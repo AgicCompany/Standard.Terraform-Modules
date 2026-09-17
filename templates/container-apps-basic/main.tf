@@ -14,7 +14,7 @@ module "log_analytics_workspace_logs" {
   tags                = var.log_analytics_workspace_logs.tags
 }
 module "container_app_environment_env" {
-  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/container-app-environment?ref=container-app-environment/v2.0.0"
+  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/container-app-environment?ref=container-app-environment/v2.0.1"
 
   resource_group_name        = var.container_app_environment_env.resource_group_name
   location                   = var.container_app_environment_env.location
