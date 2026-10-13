@@ -377,6 +377,20 @@ composition_contract:
       discovery_kind: azure-resource-id
     external_changes:
       allowed: false
+  - requirement_id: storage-account.customer_managed_key.user_assigned_identity_id
+    variable: customer_managed_key.user_assigned_identity_id
+    role: resource_binding
+    necessity: optional
+    resource_type: user_assigned_identity
+    cardinality: one
+    compatible_providers:
+    - user-assigned-identity
+    recommended_provider: user-assigned-identity
+    existing_resource:
+      supported: true
+      discovery_kind: azure-resource-id
+    external_changes:
+      allowed: false
   - requirement_id: storage-account.diagnostic_settings.log_analytics_workspace_id
     variable: diagnostic_settings.log_analytics_workspace_id
     role: resource_binding
@@ -424,6 +438,10 @@ dependencies:
       resource_type: user_assigned_identity
       cardinality: many
       notes: "Required when identity.type includes UserAssigned, and for customer-managed key encryption."
+    - variable: customer_managed_key.user_assigned_identity_id
+      resource_type: user_assigned_identity
+      cardinality: one
+      notes: "Required when customer_managed_key is configured. Must be one of the identities bound to identity.identity_ids; the module fails at plan time otherwise."
     - variable: diagnostic_settings.log_analytics_workspace_id
       resource_type: log_analytics_workspace
       cardinality: one
