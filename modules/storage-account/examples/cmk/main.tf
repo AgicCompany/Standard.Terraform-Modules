@@ -80,6 +80,12 @@ module "storage_cmk" {
     user_assigned_identity_id = azurerm_user_assigned_identity.storage.id
   }
 
+  # Without these two, the key covers blob and file data only; queue and table data
+  # stay on Microsoft-managed service keys. Both are ForceNew, so they belong in the
+  # first apply -- changing them later recreates the account.
+  queue_encryption_key_type = "Account"
+  table_encryption_key_type = "Account"
+
   tags = {
     project     = "example"
     environment = "dev"
