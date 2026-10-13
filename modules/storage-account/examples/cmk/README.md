@@ -27,7 +27,7 @@ This example is validated, not applied, by the repository checks. Applying it cr
 - RSA-HSM 3072 key, referenced by its versionless ID for automatic key rotation
 - `Key Vault Crypto Officer` role assignment for the deploying principal
 - `Key Vault Crypto Service Encryption User` role assignment for the storage identity, created by the consumer rather than the module
-- Storage account with customer-managed key encryption, secure defaults and no private endpoint
+- Storage account with customer-managed key encryption, secure defaults and no private endpoint. `queue_encryption_key_type` and `table_encryption_key_type` are set to `Account` so queue and table data are covered by the key too; without them the key covers blob and file data only. Both are ForceNew, so they have to be right in the first apply.
 
 The Managed HSM variant uses `managed_hsm_key_id` instead of `key_vault_key_id` and requires `Managed HSM Crypto Service Encryption User` on the HSM key scope.
 

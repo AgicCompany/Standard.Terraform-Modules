@@ -6,7 +6,14 @@ resource "azurerm_storage_account" "this" {
   account_tier             = var.account_tier
   account_replication_type = var.account_replication_type
   account_kind             = var.account_kind
-  access_tier              = var.access_tier
+  access_tier              = local.access_tier
+
+  # Encryption scope for the queue and table services. "Account" is what puts them
+  # under the account key (and therefore under a customer-managed key); "Service"
+  # keeps them on Microsoft-managed service keys. Blob and file are always account
+  # scoped when customer_managed_key is set. Both are ForceNew in AzureRM.
+  queue_encryption_key_type = var.queue_encryption_key_type
+  table_encryption_key_type = var.table_encryption_key_type
 
   # Security settings
   min_tls_version                 = var.min_tls_version == "1.2" ? "TLS1_2" : var.min_tls_version
@@ -104,6 +111,18 @@ resource "azurerm_storage_account" "this" {
         )
       )
       error_message = "customer_managed_key.user_assigned_identity_id must be listed in identity.identity_ids, and identity.type must include \"UserAssigned\"."
+    }
+
+    # GPv1 accounts have no account-scoped key for queue and table data.
+    precondition {
+      condition = (
+        var.account_kind != "Storage" ? true
+        : (
+          var.queue_encryption_key_type == "Account" ? false
+          : var.table_encryption_key_type != "Account"
+        )
+      )
+      error_message = "queue_encryption_key_type and table_encryption_key_type cannot be \"Account\" when account_kind = \"Storage\"."
     }
 
     # Azure only supports customer-managed keys on StorageV2 or Premium accounts.

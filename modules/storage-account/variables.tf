@@ -56,7 +56,7 @@ variable "account_kind" {
 variable "access_tier" {
   type        = string
   default     = "Hot"
-  description = "Access tier for BlobStorage/StorageV2 (Hot, Cool, or Cold)"
+  description = "Access tier (Hot, Cool, or Cold). Applies to BlobStorage, FileStorage and StorageV2 accounts only; ignored for BlockBlobStorage and Storage, which do not support the attribute."
 
   validation {
     condition     = contains(["Hot", "Cool", "Cold"], var.access_tier)
@@ -254,6 +254,28 @@ variable "customer_managed_key" {
       )
     )
     error_message = "customer_managed_key requires exactly one of key_vault_key_id or managed_hsm_key_id."
+  }
+}
+
+variable "queue_encryption_key_type" {
+  type        = string
+  default     = "Service"
+  description = "Encryption scope for queue data: \"Service\" (Microsoft-managed service key) or \"Account\" (the account key, which is the customer-managed key when customer_managed_key is set). customer_managed_key covers blob and file data only; queue data needs \"Account\". Cannot be changed after creation -- AzureRM recreates the storage account. Not supported with account_kind = \"Storage\"."
+
+  validation {
+    condition     = contains(["Service", "Account"], var.queue_encryption_key_type)
+    error_message = "queue_encryption_key_type must be \"Service\" or \"Account\"."
+  }
+}
+
+variable "table_encryption_key_type" {
+  type        = string
+  default     = "Service"
+  description = "Encryption scope for table data: \"Service\" (Microsoft-managed service key) or \"Account\" (the account key, which is the customer-managed key when customer_managed_key is set). customer_managed_key covers blob and file data only; table data needs \"Account\". Cannot be changed after creation -- AzureRM recreates the storage account. Not supported with account_kind = \"Storage\"."
+
+  validation {
+    condition     = contains(["Service", "Account"], var.table_encryption_key_type)
+    error_message = "table_encryption_key_type must be \"Service\" or \"Account\"."
   }
 }
 

@@ -76,9 +76,11 @@ variables:
     widget_options: { derive_from_validation: true }
     group: core
     order: 40
-    help: "Hot for frequent access, Cool for infrequent, Cold for rarely-accessed archival-style data. Applies to BlobStorage and StorageV2 only."
-    # NOTE: could be hidden when account_kind is in {FileStorage, BlockBlobStorage}
+    help: "Hot for frequent access, Cool for infrequent, Cold for rarely-accessed archival-style data. Applies to BlobStorage, FileStorage and StorageV2 only; ignored for BlockBlobStorage and Storage."
+    # NOTE: could be hidden when account_kind is in {BlockBlobStorage, Storage}
     # via show_when set-inclusion (the shown-set complement); not yet wired.
+    # The module sends no access_tier for those two kinds (v3.4.0), so the value
+    # shown here has no effect on them.
 
   # --- Security ---
   min_tls_version:

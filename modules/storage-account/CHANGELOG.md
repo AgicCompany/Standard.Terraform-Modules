@@ -4,6 +4,50 @@ All notable changes to this module will be documented in this file.
 
 ## [Unreleased]
 
+## [3.4.0] - 2026-10-13
+
+### Added
+
+- `queue_encryption_key_type` and `table_encryption_key_type` inputs, both
+  defaulting to `"Service"`. Set them to `"Account"` to put queue and table data
+  under the account key, which is the customer-managed key when
+  `customer_managed_key` is set. Both are ForceNew in AzureRM: changing either
+  one after creation destroys and recreates the storage account.
+- Plan-time precondition rejecting `"Account"` for either input when
+  `account_kind = "Storage"`, which has no account-scoped key for those
+  services. The provider raises this at apply time.
+
+### Fixed
+
+- `account_kind = "BlockBlobStorage"` and `account_kind = "Storage"` could never
+  plan. Both are accepted by the `account_kind` validation, but the module always
+  sent `access_tier`, which AzureRM only allows on `BlobStorage`, `FileStorage`
+  and `StorageV2` accounts and rejects at plan time for anything else. The
+  attribute is now sent only for the kinds that support it.
+
+### Changed
+
+- README and `examples/cmk` state what `customer_managed_key` actually covers.
+  AzureRM puts blob and file data under the account key, but passes queue and
+  table data the two inputs above, so before this release queue and table data
+  stayed on Microsoft-managed keys with no way to change that from the module.
+  The CMK example now sets both to `"Account"`.
+- `access_tier` description states which account kinds it applies to. No
+  behaviour change for `BlobStorage`, `FileStorage` or `StorageV2` accounts,
+  which keep sending the configured value (default `Hot`).
+- Manifest help for `access_tier` corrected: it applies to `FileStorage` too,
+  and the hide-when note now names `BlockBlobStorage` and `Storage`.
+
+### Notes
+
+- Defaults match the current AzureRM and Azure behaviour, so existing
+  configurations plan no change. Accounts already created with
+  `customer_managed_key` keep service-scoped queue and table keys; moving them
+  to `"Account"` means recreating the account.
+- Supersedes the `3.3.1` section this release originally carried. The
+  `access_tier` fix and the encryption key type inputs landed in one merge, so
+  they ship as a single minor release and `3.3.1` was never tagged.
+
 ## [3.3.0] - 2026-10-13
 
 ### Added

@@ -85,7 +85,7 @@ private_dns_zone_ids = {
 
 ## Customer-Managed Keys
 
-Configure `identity` and `customer_managed_key` to encrypt the storage account with an existing key. Both inputs default to `null`, so existing configurations are unchanged.
+Configure `identity` and `customer_managed_key` to encrypt blob and file data with an existing key. Both inputs default to `null`, so existing configurations are unchanged. Queue and table data need one more input each, see [What the key covers](#what-the-key-covers).
 
 ```hcl
 identity = {
@@ -106,6 +106,19 @@ The identity type must include `UserAssigned`, and the selected `user_assigned_i
 Versionless key IDs enable automatic key rotation. Pass `azurerm_key_vault_key.<k>.versionless_id`; a versioned ID pins the account to that key version. To switch from Key Vault to Managed HSM, set `managed_hsm_key_id` instead of `key_vault_key_id`, changing no other module input. Update the consumer-managed role assignment to the HSM role and scope.
 
 The Key Vault must have both soft delete and purge protection enabled. RSA-HSM keys require a Premium vault. CMK requires `account_kind = "StorageV2"` (the default) or `account_tier = "Premium"`.
+
+### What the key covers
+
+`customer_managed_key` puts **blob and file data only** under your key. Queue and table data stay on Microsoft-managed service keys unless you also set:
+
+```hcl
+queue_encryption_key_type = "Account"
+table_encryption_key_type = "Account"
+```
+
+Both default to `"Service"`, which is what Azure and AzureRM default to. Set them to `"Account"` for any account that stores queue or table data you need under your own key.
+
+**Set them at creation time.** Both are ForceNew in AzureRM: changing either one later destroys and recreates the storage account, taking its data with it. There is no in-place migration. Neither value is supported with `account_kind = "Storage"` (GPv1), which the module rejects at plan time.
 
 The module uses the inline `customer_managed_key` block on the storage account. Do not also manage `azurerm_storage_account_customer_managed_key` for the same account: the two conflict.
 
@@ -159,7 +172,7 @@ No modules.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_access_tier"></a> [access\_tier](#input\_access\_tier) | Access tier for BlobStorage/StorageV2 (Hot, Cool, or Cold) | `string` | `"Hot"` | no |
+| <a name="input_access_tier"></a> [access\_tier](#input\_access\_tier) | Access tier (Hot, Cool, or Cold). Applies to BlobStorage, FileStorage and StorageV2 accounts only; ignored for BlockBlobStorage and Storage, which do not support the attribute. | `string` | `"Hot"` | no |
 | <a name="input_account_kind"></a> [account\_kind](#input\_account\_kind) | Account kind (StorageV2, BlobStorage, BlockBlobStorage, FileStorage) | `string` | `"StorageV2"` | no |
 | <a name="input_account_replication_type"></a> [account\_replication\_type](#input\_account\_replication\_type) | Replication type (LRS, ZRS, GRS, RAGRS, GZRS, RAGZRS) | `string` | `"LRS"` | no |
 | <a name="input_account_tier"></a> [account\_tier](#input\_account\_tier) | Account tier (Standard or Premium) | `string` | `"Standard"` | no |
@@ -185,9 +198,11 @@ No modules.
 | <a name="input_private_dns_zone_ids"></a> [private\_dns\_zone\_ids](#input\_private\_dns\_zone\_ids) | Map of subresource name (blob, file, table, queue) to private DNS zone ID. | `map(string)` | `{}` | no |
 | <a name="input_private_endpoint_name_prefix"></a> [private\_endpoint\_name\_prefix](#input\_private\_endpoint\_name\_prefix) | Prefix for private endpoint and NIC resource names. Suffixed with subresource (e.g., "pep-storage" -> "pep-storage-blob", "pep-storage-blob-nic"). null defaults to "pep-<var.name>". | `string` | `null` | no |
 | <a name="input_private_service_connection_name_prefix"></a> [private\_service\_connection\_name\_prefix](#input\_private\_service\_connection\_name\_prefix) | Override prefix for private service connection names. Defaults to "psc-{name}". Final name: "{prefix}-{subresource}". | `string` | `null` | no |
+| <a name="input_queue_encryption_key_type"></a> [queue\_encryption\_key\_type](#input\_queue\_encryption\_key\_type) | Encryption scope for queue data: "Service" (Microsoft-managed service key) or "Account" (the account key, which is the customer-managed key when customer\_managed\_key is set). customer\_managed\_key covers blob and file data only; queue data needs "Account". Cannot be changed after creation -- AzureRM recreates the storage account. Not supported with account\_kind = "Storage". | `string` | `"Service"` | no |
 | <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name) | Name of the resource group | `string` | n/a | yes |
 | <a name="input_shared_access_key_enabled"></a> [shared\_access\_key\_enabled](#input\_shared\_access\_key\_enabled) | Enable shared key authorization. Disabled by default; use managed identity where possible. | `bool` | `false` | no |
 | <a name="input_subnet_id"></a> [subnet\_id](#input\_subnet\_id) | Subnet ID for private endpoints. Required when any private endpoint is enabled. | `string` | `null` | no |
+| <a name="input_table_encryption_key_type"></a> [table\_encryption\_key\_type](#input\_table\_encryption\_key\_type) | Encryption scope for table data: "Service" (Microsoft-managed service key) or "Account" (the account key, which is the customer-managed key when customer\_managed\_key is set). customer\_managed\_key covers blob and file data only; table data needs "Account". Cannot be changed after creation -- AzureRM recreates the storage account. Not supported with account\_kind = "Storage". | `string` | `"Service"` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | Tags to apply to the resource | `map(string)` | `{}` | no |
 
 ## Outputs
