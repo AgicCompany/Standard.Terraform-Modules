@@ -260,7 +260,7 @@ variable "customer_managed_key" {
 variable "queue_encryption_key_type" {
   type        = string
   default     = null
-  description = "Encryption scope for queue data: \"Service\" (Microsoft-managed service key) or \"Account\" (the account key, which is the customer-managed key when customer_managed_key is set). null follows customer_managed_key: \"Account\" when a key is configured on a StorageV2 account, \"Service\" otherwise. Cannot be changed after creation -- AzureRM recreates the storage account. Not supported with account_kind = \"Storage\"."
+  description = "Encryption scope for queue data: \"Service\" (Microsoft-managed service key) or \"Account\" (the account key, which is the customer-managed key when customer_managed_key is set). null follows customer_managed_key: \"Account\" when a key is configured on a StorageV2 account, \"Service\" otherwise. Cannot be changed after creation -- AzureRM recreates the storage account. \"Account\" is not supported with account_kind = \"Storage\"."
 
   validation {
     condition = (
@@ -274,7 +274,7 @@ variable "queue_encryption_key_type" {
 variable "table_encryption_key_type" {
   type        = string
   default     = null
-  description = "Encryption scope for table data: \"Service\" (Microsoft-managed service key) or \"Account\" (the account key, which is the customer-managed key when customer_managed_key is set). null follows customer_managed_key: \"Account\" when a key is configured on a StorageV2 account, \"Service\" otherwise. Cannot be changed after creation -- AzureRM recreates the storage account. Not supported with account_kind = \"Storage\"."
+  description = "Encryption scope for table data: \"Service\" (Microsoft-managed service key) or \"Account\" (the account key, which is the customer-managed key when customer_managed_key is set). null follows customer_managed_key: \"Account\" when a key is configured on a StorageV2 account, \"Service\" otherwise. Cannot be changed after creation -- AzureRM recreates the storage account. \"Account\" is not supported with account_kind = \"Storage\"."
 
   validation {
     condition = (
