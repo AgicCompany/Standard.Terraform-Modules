@@ -17,23 +17,6 @@ All notable changes to this module will be documented in this file.
   `account_kind = "Storage"`, which has no account-scoped key for those
   services. The provider raises this at apply time.
 
-### Changed
-
-- README and `examples/cmk` state what `customer_managed_key` actually covers.
-  AzureRM puts blob and file data under the account key, but passes queue and
-  table data the two inputs above, so before this release queue and table data
-  stayed on Microsoft-managed keys with no way to change that from the module.
-  The CMK example now sets both to `"Account"`.
-
-### Notes
-
-- Defaults match the current AzureRM and Azure behaviour, so existing
-  configurations plan no change. Accounts already created with
-  `customer_managed_key` keep service-scoped queue and table keys; moving them
-  to `"Account"` means recreating the account.
-
-## [3.3.1] - 2026-10-13
-
 ### Fixed
 
 - `account_kind = "BlockBlobStorage"` and `account_kind = "Storage"` could never
@@ -44,9 +27,26 @@ All notable changes to this module will be documented in this file.
 
 ### Changed
 
+- README and `examples/cmk` state what `customer_managed_key` actually covers.
+  AzureRM puts blob and file data under the account key, but passes queue and
+  table data the two inputs above, so before this release queue and table data
+  stayed on Microsoft-managed keys with no way to change that from the module.
+  The CMK example now sets both to `"Account"`.
 - `access_tier` description states which account kinds it applies to. No
   behaviour change for `BlobStorage`, `FileStorage` or `StorageV2` accounts,
   which keep sending the configured value (default `Hot`).
+- Manifest help for `access_tier` corrected: it applies to `FileStorage` too,
+  and the hide-when note now names `BlockBlobStorage` and `Storage`.
+
+### Notes
+
+- Defaults match the current AzureRM and Azure behaviour, so existing
+  configurations plan no change. Accounts already created with
+  `customer_managed_key` keep service-scoped queue and table keys; moving them
+  to `"Account"` means recreating the account.
+- Supersedes the `3.3.1` section this release originally carried. The
+  `access_tier` fix and the encryption key type inputs landed in one merge, so
+  they ship as a single minor release and `3.3.1` was never tagged.
 
 ## [3.3.0] - 2026-10-13
 
