@@ -259,22 +259,28 @@ variable "customer_managed_key" {
 
 variable "queue_encryption_key_type" {
   type        = string
-  default     = "Service"
-  description = "Encryption scope for queue data: \"Service\" (Microsoft-managed service key) or \"Account\" (the account key, which is the customer-managed key when customer_managed_key is set). customer_managed_key covers blob and file data only; queue data needs \"Account\". Cannot be changed after creation -- AzureRM recreates the storage account. Not supported with account_kind = \"Storage\"."
+  default     = null
+  description = "Encryption scope for queue data: \"Service\" (Microsoft-managed service key) or \"Account\" (the account key, which is the customer-managed key when customer_managed_key is set). null follows customer_managed_key: \"Account\" when a key is configured on a StorageV2 account, \"Service\" otherwise. Cannot be changed after creation -- AzureRM recreates the storage account. Not supported with account_kind = \"Storage\"."
 
   validation {
-    condition     = contains(["Service", "Account"], var.queue_encryption_key_type)
+    condition = (
+      var.queue_encryption_key_type == null ? true
+      : contains(["Service", "Account"], var.queue_encryption_key_type)
+    )
     error_message = "queue_encryption_key_type must be \"Service\" or \"Account\"."
   }
 }
 
 variable "table_encryption_key_type" {
   type        = string
-  default     = "Service"
-  description = "Encryption scope for table data: \"Service\" (Microsoft-managed service key) or \"Account\" (the account key, which is the customer-managed key when customer_managed_key is set). customer_managed_key covers blob and file data only; table data needs \"Account\". Cannot be changed after creation -- AzureRM recreates the storage account. Not supported with account_kind = \"Storage\"."
+  default     = null
+  description = "Encryption scope for table data: \"Service\" (Microsoft-managed service key) or \"Account\" (the account key, which is the customer-managed key when customer_managed_key is set). null follows customer_managed_key: \"Account\" when a key is configured on a StorageV2 account, \"Service\" otherwise. Cannot be changed after creation -- AzureRM recreates the storage account. Not supported with account_kind = \"Storage\"."
 
   validation {
-    condition     = contains(["Service", "Account"], var.table_encryption_key_type)
+    condition = (
+      var.table_encryption_key_type == null ? true
+      : contains(["Service", "Account"], var.table_encryption_key_type)
+    )
     error_message = "table_encryption_key_type must be \"Service\" or \"Account\"."
   }
 }

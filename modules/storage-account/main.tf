@@ -8,12 +8,13 @@ resource "azurerm_storage_account" "this" {
   account_kind             = var.account_kind
   access_tier              = local.access_tier
 
-  # Encryption scope for the queue and table services. "Account" is what puts them
-  # under the account key (and therefore under a customer-managed key); "Service"
-  # keeps them on Microsoft-managed service keys. Blob and file are always account
-  # scoped when customer_managed_key is set. Both are ForceNew in AzureRM.
-  queue_encryption_key_type = var.queue_encryption_key_type
-  table_encryption_key_type = var.table_encryption_key_type
+  # Encryption scope for the queue and table services. "Account" puts them under the
+  # account key (and therefore under a customer-managed key); "Service" keeps them on
+  # Microsoft-managed service keys. Blob and file are always account scoped when
+  # customer_managed_key is set. Both are ForceNew in AzureRM. See locals.tf for how
+  # the effective value follows customer_managed_key.
+  queue_encryption_key_type = local.queue_encryption_key_type
+  table_encryption_key_type = local.table_encryption_key_type
 
   # Security settings
   min_tls_version                 = var.min_tls_version == "1.2" ? "TLS1_2" : var.min_tls_version
@@ -118,8 +119,8 @@ resource "azurerm_storage_account" "this" {
       condition = (
         var.account_kind != "Storage" ? true
         : (
-          var.queue_encryption_key_type == "Account" ? false
-          : var.table_encryption_key_type != "Account"
+          local.queue_encryption_key_type == "Account" ? false
+          : local.table_encryption_key_type != "Account"
         )
       )
       error_message = "queue_encryption_key_type and table_encryption_key_type cannot be \"Account\" when account_kind = \"Storage\"."
