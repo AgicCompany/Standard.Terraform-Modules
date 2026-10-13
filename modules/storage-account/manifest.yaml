@@ -2,7 +2,7 @@ schema_version: "0.1"
 
 metadata:
   module_name: storage-account
-  module_version: "3.3.0"
+  module_version: "3.4.0"
   schema_authored_by: AGIC Infrastructure Team
   schema_last_updated: "2026-10-13"
 
@@ -15,7 +15,8 @@ catalogue:
     auth disabled, TLS 1.2 enforced, soft delete enabled. Supports optional
     diagnostic settings with multi-sink output (Log Analytics, storage, Event Hub).
     Optionally attaches a managed identity and encrypts with a customer-managed
-    key held in Key Vault or a Managed HSM.
+    key held in Key Vault or a Managed HSM, covering blob and file data, plus
+    queue and table data when the encryption key types are set to Account.
   category: data
   subcategory: storage
   icon: storage-account
@@ -119,6 +120,22 @@ variables:
     order: 40
     advanced: true
     help: "Optional customer-managed key for encryption at rest. Leave blank for Microsoft-managed keys. Requires an identity whose type includes UserAssigned, and account_kind StorageV2 or account_tier Premium. The module does not create the key, the vault or the role assignment: grant the identity Key Vault Crypto Service Encryption User (or the Managed HSM equivalent) first."
+
+  queue_encryption_key_type:
+    widget: select
+    widget_options: { derive_from_validation: true }
+    group: security
+    order: 50
+    advanced: true
+    help: "Account puts queue data under the account key, which is the customer-managed key when one is configured. Service keeps it on Microsoft-managed service keys. customer_managed_key covers blob and file data only, so queue data needs Account. Cannot be changed after creation: Azure recreates the storage account. Not supported with account kind Storage."
+
+  table_encryption_key_type:
+    widget: select
+    widget_options: { derive_from_validation: true }
+    group: security
+    order: 60
+    advanced: true
+    help: "Account puts table data under the account key, which is the customer-managed key when one is configured. Service keeps it on Microsoft-managed service keys. customer_managed_key covers blob and file data only, so table data needs Account. Cannot be changed after creation: Azure recreates the storage account. Not supported with account kind Storage."
 
   # --- Identity ---
   identity:
