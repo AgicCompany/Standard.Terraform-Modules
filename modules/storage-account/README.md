@@ -32,6 +32,8 @@ module "storage_account" {
 - Container soft delete with configurable retention
 - Blob versioning (optional)
 - Network rules for public access scenarios
+- Managed identity (system-assigned, user-assigned, or both)
+- Customer-managed key encryption (Key Vault or Managed HSM)
 
 ## Security Defaults
 
@@ -81,6 +83,36 @@ private_dns_zone_ids = {
 }
 ```
 
+## Customer-Managed Keys
+
+Configure `identity` and `customer_managed_key` to encrypt the storage account with an existing key. Both inputs default to `null`, so existing configurations are unchanged.
+
+```hcl
+identity = {
+  type         = "UserAssigned"
+  identity_ids = [azurerm_user_assigned_identity.storage.id]
+}
+
+customer_managed_key = {
+  key_vault_key_id          = azurerm_key_vault_key.cmk.versionless_id
+  user_assigned_identity_id = azurerm_user_assigned_identity.storage.id
+}
+```
+
+The identity type must include `UserAssigned`, and the selected `user_assigned_identity_id` must be listed in `identity.identity_ids`.
+
+**The consumer grants the role:** the module creates no key, vault or role assignment. Before applying the storage account, grant its user-assigned identity `Key Vault Crypto Service Encryption User` on the vault, or `Managed HSM Crypto Service Encryption User` on the Managed HSM key scope. Use a module `depends_on` for the role assignment when creating them together, and allow for Azure RBAC propagation.
+
+Versionless key IDs enable automatic key rotation. Pass `azurerm_key_vault_key.<k>.versionless_id`; a versioned ID pins the account to that key version. To switch from Key Vault to Managed HSM, set `managed_hsm_key_id` instead of `key_vault_key_id`, changing no other module input. Update the consumer-managed role assignment to the HSM role and scope.
+
+The Key Vault must have both soft delete and purge protection enabled. RSA-HSM keys require a Premium vault. CMK requires `account_kind = "StorageV2"` (the default) or `account_tier = "Premium"`.
+
+The module uses the inline `customer_managed_key` block on the storage account. Do not also manage `azurerm_storage_account_customer_managed_key` for the same account: the two conflict.
+
+The `identity` output exposes the identity type, principal ID, tenant ID and assigned user-assigned identity IDs, or `null` when no identity is configured. Principal and tenant IDs are populated only for types that include `SystemAssigned`. User-assigned client IDs come from the `azurerm_user_assigned_identity` resource, not from the storage account.
+
+See [the CMK example](./examples/cmk) for the key, identity and role assignments.
+
 ## Public Outputs
 
 These outputs are designed for cross-project state consumption:
@@ -95,6 +127,7 @@ These outputs are designed for cross-project state consumption:
 
 - [basic](./examples/basic)
 - [complete](./examples/complete)
+- [cmk](./examples/cmk)
 
 <!-- BEGIN_TF_DOCS -->
 ## Requirements
@@ -133,6 +166,7 @@ No modules.
 | <a name="input_allow_nested_items_to_be_public"></a> [allow\_nested\_items\_to\_be\_public](#input\_allow\_nested\_items\_to\_be\_public) | Allow blob public access at the container level | `bool` | `false` | no |
 | <a name="input_blob_soft_delete_retention_days"></a> [blob\_soft\_delete\_retention\_days](#input\_blob\_soft\_delete\_retention\_days) | Blob soft delete retention period in days (1-365) | `number` | `7` | no |
 | <a name="input_container_soft_delete_retention_days"></a> [container\_soft\_delete\_retention\_days](#input\_container\_soft\_delete\_retention\_days) | Container soft delete retention period in days (1-365) | `number` | `7` | no |
+| <a name="input_customer_managed_key"></a> [customer\_managed\_key](#input\_customer\_managed\_key) | Customer-managed key for encryption at rest. Set exactly one of key\_vault\_key\_id (Key Vault key; Premium vault for RSA-HSM keys) or managed\_hsm\_key\_id (Managed HSM key). Supply a versionless key ID to let Azure pick up key rotation automatically. user\_assigned\_identity\_id must be one of identity.identity\_ids. The module does not create the key, the vault or the role assignment -- see the README. | <pre>object({<br/>    key_vault_key_id          = optional(string)<br/>    managed_hsm_key_id        = optional(string)<br/>    user_assigned_identity_id = string<br/>  })</pre> | `null` | no |
 | <a name="input_diagnostic_settings"></a> [diagnostic\_settings](#input\_diagnostic\_settings) | Optional diagnostic settings. null disables. Supports multi-sink (Log Analytics, storage account, Event Hub). enabled\_log\_categories = null -> all categories the resource supports. enabled\_metrics = null -> all metrics the resource supports. At least one of log\_analytics\_workspace\_id, storage\_account\_id, or eventhub\_authorization\_rule\_id is required when the object is non-null. | <pre>object({<br/>    name                           = optional(string)<br/>    log_analytics_workspace_id     = optional(string)<br/>    storage_account_id             = optional(string)<br/>    eventhub_authorization_rule_id = optional(string)<br/>    eventhub_name                  = optional(string)<br/>    log_analytics_destination_type = optional(string)<br/>    enabled_log_categories         = optional(list(string))<br/>    enabled_metrics                = optional(list(string))<br/>  })</pre> | `null` | no |
 | <a name="input_enable_blob_private_endpoint"></a> [enable\_blob\_private\_endpoint](#input\_enable\_blob\_private\_endpoint) | Create private endpoint for blob subresource | `bool` | `true` | no |
 | <a name="input_enable_blob_soft_delete"></a> [enable\_blob\_soft\_delete](#input\_enable\_blob\_soft\_delete) | Enable blob soft delete | `bool` | `true` | no |
@@ -143,6 +177,7 @@ No modules.
 | <a name="input_enable_queue_private_endpoint"></a> [enable\_queue\_private\_endpoint](#input\_enable\_queue\_private\_endpoint) | Create private endpoint for queue subresource | `bool` | `false` | no |
 | <a name="input_enable_table_private_endpoint"></a> [enable\_table\_private\_endpoint](#input\_enable\_table\_private\_endpoint) | Create private endpoint for table subresource | `bool` | `false` | no |
 | <a name="input_enable_versioning"></a> [enable\_versioning](#input\_enable\_versioning) | Enable blob versioning | `bool` | `false` | no |
+| <a name="input_identity"></a> [identity](#input\_identity) | Managed identity configuration. type must be "SystemAssigned", "UserAssigned", or "SystemAssigned, UserAssigned". Customer-managed keys require a type that includes UserAssigned. | <pre>object({<br/>    type         = string<br/>    identity_ids = optional(list(string))<br/>  })</pre> | `null` | no |
 | <a name="input_location"></a> [location](#input\_location) | Azure region | `string` | n/a | yes |
 | <a name="input_min_tls_version"></a> [min\_tls\_version](#input\_min\_tls\_version) | Minimum TLS version. Only "1.2" is supported; TLS 1.0/1.1 retired by Azure. | `string` | `"1.2"` | no |
 | <a name="input_name"></a> [name](#input\_name) | Storage account name (full CAF-compliant name, provided by consumer) | `string` | n/a | yes |
@@ -160,6 +195,7 @@ No modules.
 | Name | Description |
 |------|-------------|
 | <a name="output_id"></a> [id](#output\_id) | Storage account resource ID |
+| <a name="output_identity"></a> [identity](#output\_identity) | Managed identity of the storage account, or null when no identity is configured. principal\_id and tenant\_id are populated only for types that include SystemAssigned. The storage account exposes no client\_id for user-assigned identities -- read that from the azurerm\_user\_assigned\_identity resource. |
 | <a name="output_name"></a> [name](#output\_name) | Storage account name |
 | <a name="output_primary_blob_endpoint"></a> [primary\_blob\_endpoint](#output\_primary\_blob\_endpoint) | Primary blob endpoint URL |
 | <a name="output_primary_file_endpoint"></a> [primary\_file\_endpoint](#output\_primary\_file\_endpoint) | Primary file endpoint URL |

@@ -52,12 +52,71 @@ resource "azurerm_storage_account" "this" {
     }
   }
 
+  dynamic "identity" {
+    for_each = var.identity != null ? [var.identity] : []
+
+    content {
+      type         = identity.value.type
+      identity_ids = identity.value.identity_ids
+    }
+  }
+
+  # Inline block rather than azurerm_storage_account_customer_managed_key: the two
+  # conflict, and the inline one sets the key in the same call that creates the
+  # account. Both module inputs render into key_vault_key_id -- the provider parses
+  # Key Vault and Managed HSM key IDs with the same function, and its own
+  # managed_hsm_key_id attribute is deprecated and gone in azurerm 5.0.
+  dynamic "customer_managed_key" {
+    for_each = var.customer_managed_key != null ? [var.customer_managed_key] : []
+
+    content {
+      key_vault_key_id = coalesce(
+        customer_managed_key.value.key_vault_key_id,
+        customer_managed_key.value.managed_hsm_key_id,
+      )
+      user_assigned_identity_id = customer_managed_key.value.user_assigned_identity_id
+    }
+  }
+
   tags = var.tags
 
   lifecycle {
     precondition {
       condition     = var.network_rules == null || var.enable_public_access
       error_message = "network_rules are only applied when enable_public_access = true. Remove network_rules or set enable_public_access = true."
+    }
+
+    # CMK needs a user-assigned identity, and Azure uses exactly the identity named
+    # here to reach the key -- so it has to be one the account actually carries.
+    # Resource IDs vary in case across sources, hence the lower() comparison.
+    precondition {
+      condition = (
+        var.customer_managed_key == null ? true
+        : (
+          var.identity == null ? false
+          : (
+            !strcontains(var.identity.type, "UserAssigned") ? false
+            : contains(
+              [for id in coalesce(var.identity.identity_ids, []) : lower(id)],
+              lower(var.customer_managed_key.user_assigned_identity_id)
+            )
+          )
+        )
+      )
+      error_message = "customer_managed_key.user_assigned_identity_id must be listed in identity.identity_ids, and identity.type must include \"UserAssigned\"."
+    }
+
+    # Azure only supports customer-managed keys on StorageV2 or Premium accounts.
+    # The provider raises this at apply time; catch it at plan time instead.
+    precondition {
+      condition = (
+        var.customer_managed_key == null ? true
+        : (
+          var.account_kind == "StorageV2" ? true
+          : var.account_tier == "Premium"
+        )
+      )
+      error_message = "customer_managed_key requires account_kind = \"StorageV2\" (the module default) or account_tier = \"Premium\"."
     }
   }
 }

@@ -4,6 +4,37 @@ All notable changes to this module will be documented in this file.
 
 ## [Unreleased]
 
+## [3.3.0] - 2026-10-13
+
+### Added
+
+- Optional `identity` input (`SystemAssigned`, `UserAssigned`, or
+  `SystemAssigned, UserAssigned`) rendering the storage account's managed
+  identity block.
+- Optional `customer_managed_key` input for encryption at rest, taking either a
+  Key Vault key (`key_vault_key_id`) or a Managed HSM key
+  (`managed_hsm_key_id`) plus the `user_assigned_identity_id` Azure uses to
+  reach it. Versionless key IDs are supported and enable automatic key
+  rotation. Implemented with the inline `customer_managed_key` block of
+  `azurerm_storage_account`; the module creates no key, vault or role
+  assignment.
+- `identity` output exposing the identity type, principal ID, tenant ID and
+  assigned user-assigned identity IDs.
+- Plan-time preconditions: `customer_managed_key` requires an `identity` whose
+  type includes `UserAssigned` and whose `identity_ids` contain the chosen
+  `user_assigned_identity_id`; and it requires `account_kind = "StorageV2"` or
+  `account_tier = "Premium"`.
+- `examples/cmk` showing a user-assigned identity, a Key Vault Premium RSA-HSM
+  3072 key, the required role assignment, and the Managed HSM variant.
+
+### Notes
+
+- Both inputs default to `null`; existing configurations plan no change.
+- `managed_hsm_key_id` is mapped onto the provider's `key_vault_key_id`
+  attribute, which accepts Key Vault and Managed HSM key IDs alike. The
+  provider's own `managed_hsm_key_id` is deprecated and removed in azurerm 5.0,
+  so this keeps the module's interface stable across that migration.
+
 ## [3.2.1] - 2026-09-16
 
 ### Fixed
