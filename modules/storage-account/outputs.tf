@@ -35,6 +35,17 @@ output "primary_location" {
   description = "Primary location of the storage account"
 }
 
+# === Identity Outputs ===
+output "identity" {
+  value = var.identity == null ? null : {
+    type         = azurerm_storage_account.this.identity[0].type
+    principal_id = azurerm_storage_account.this.identity[0].principal_id
+    tenant_id    = azurerm_storage_account.this.identity[0].tenant_id
+    identity_ids = azurerm_storage_account.this.identity[0].identity_ids
+  }
+  description = "Managed identity of the storage account, or null when no identity is configured. principal_id and tenant_id are populated only for types that include SystemAssigned. The storage account exposes no client_id for user-assigned identities -- read that from the azurerm_user_assigned_identity resource."
+}
+
 # === Private Endpoint Outputs ===
 output "private_endpoint_ids" {
   value = {

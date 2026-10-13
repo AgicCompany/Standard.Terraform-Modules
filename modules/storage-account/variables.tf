@@ -206,6 +206,57 @@ variable "private_service_connection_name_prefix" {
   description = "Override prefix for private service connection names. Defaults to \"psc-{name}\". Final name: \"{prefix}-{subresource}\"."
 }
 
+# === Optional: Identity and Encryption ===
+variable "identity" {
+  type = object({
+    type         = string
+    identity_ids = optional(list(string))
+  })
+  default     = null
+  description = "Managed identity configuration. type must be \"SystemAssigned\", \"UserAssigned\", or \"SystemAssigned, UserAssigned\". Customer-managed keys require a type that includes UserAssigned."
+
+  validation {
+    condition = (
+      var.identity == null ? true
+      : contains(["SystemAssigned", "UserAssigned", "SystemAssigned, UserAssigned"], var.identity.type)
+    )
+    error_message = "identity.type must be \"SystemAssigned\", \"UserAssigned\", or \"SystemAssigned, UserAssigned\" (note the space after the comma)."
+  }
+
+  validation {
+    condition = (
+      var.identity == null ? true
+      : (
+        !strcontains(var.identity.type, "UserAssigned") ? true
+        : length(coalesce(var.identity.identity_ids, [])) > 0
+      )
+    )
+    error_message = "identity.identity_ids must list at least one user-assigned identity ID when identity.type includes UserAssigned."
+  }
+}
+
+variable "customer_managed_key" {
+  type = object({
+    key_vault_key_id          = optional(string)
+    managed_hsm_key_id        = optional(string)
+    user_assigned_identity_id = string
+  })
+  default     = null
+  description = "Customer-managed key for encryption at rest. Set exactly one of key_vault_key_id (Key Vault key; Premium vault for RSA-HSM keys) or managed_hsm_key_id (Managed HSM key). Supply a versionless key ID to let Azure pick up key rotation automatically. user_assigned_identity_id must be one of identity.identity_ids. The module does not create the key, the vault or the role assignment -- see the README."
+
+  validation {
+    condition = (
+      var.customer_managed_key == null ? true
+      : (
+        var.customer_managed_key.key_vault_key_id == null
+        ? var.customer_managed_key.managed_hsm_key_id != null
+        : var.customer_managed_key.managed_hsm_key_id == null
+      )
+    )
+    error_message = "customer_managed_key requires exactly one of key_vault_key_id or managed_hsm_key_id."
+  }
+}
+
 # === Optional: Diagnostics ===
 variable "diagnostic_settings" {
   type = object({
