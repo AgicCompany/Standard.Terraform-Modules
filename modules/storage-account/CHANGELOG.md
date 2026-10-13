@@ -4,6 +4,22 @@ All notable changes to this module will be documented in this file.
 
 ## [Unreleased]
 
+## [3.3.1] - 2026-10-13
+
+### Fixed
+
+- `account_kind = "BlockBlobStorage"` and `account_kind = "Storage"` could never
+  plan. Both are accepted by the `account_kind` validation, but the module always
+  sent `access_tier`, which AzureRM only allows on `BlobStorage`, `FileStorage`
+  and `StorageV2` accounts and rejects at plan time for anything else. The
+  attribute is now sent only for the kinds that support it.
+
+### Changed
+
+- `access_tier` description states which account kinds it applies to. No
+  behaviour change for `BlobStorage`, `FileStorage` or `StorageV2` accounts,
+  which keep sending the configured value (default `Hot`).
+
 ## [3.3.0] - 2026-10-13
 
 ### Added

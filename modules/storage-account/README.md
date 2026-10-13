@@ -159,7 +159,7 @@ No modules.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_access_tier"></a> [access\_tier](#input\_access\_tier) | Access tier for BlobStorage/StorageV2 (Hot, Cool, or Cold) | `string` | `"Hot"` | no |
+| <a name="input_access_tier"></a> [access\_tier](#input\_access\_tier) | Access tier (Hot, Cool, or Cold). Applies to BlobStorage, FileStorage and StorageV2 accounts only; ignored for BlockBlobStorage and Storage, which do not support the attribute. | `string` | `"Hot"` | no |
 | <a name="input_account_kind"></a> [account\_kind](#input\_account\_kind) | Account kind (StorageV2, BlobStorage, BlockBlobStorage, FileStorage) | `string` | `"StorageV2"` | no |
 | <a name="input_account_replication_type"></a> [account\_replication\_type](#input\_account\_replication\_type) | Replication type (LRS, ZRS, GRS, RAGRS, GZRS, RAGZRS) | `string` | `"LRS"` | no |
 | <a name="input_account_tier"></a> [account\_tier](#input\_account\_tier) | Account tier (Standard or Premium) | `string` | `"Standard"` | no |

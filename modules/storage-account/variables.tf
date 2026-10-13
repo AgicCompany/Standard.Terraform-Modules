@@ -56,7 +56,7 @@ variable "account_kind" {
 variable "access_tier" {
   type        = string
   default     = "Hot"
-  description = "Access tier for BlobStorage/StorageV2 (Hot, Cool, or Cold)"
+  description = "Access tier (Hot, Cool, or Cold). Applies to BlobStorage, FileStorage and StorageV2 accounts only; ignored for BlockBlobStorage and Storage, which do not support the attribute."
 
   validation {
     condition     = contains(["Hot", "Cool", "Cold"], var.access_tier)
