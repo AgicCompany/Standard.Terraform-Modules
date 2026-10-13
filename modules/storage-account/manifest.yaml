@@ -2,9 +2,9 @@ schema_version: "0.1"
 
 metadata:
   module_name: storage-account
-  module_version: "3.2.1"
+  module_version: "3.3.0"
   schema_authored_by: AGIC Infrastructure Team
-  schema_last_updated: "2026-09-16"
+  schema_last_updated: "2026-10-13"
 
 catalogue:
   display_name: "Storage Account"
@@ -14,6 +14,8 @@ catalogue:
     blob/file/table/queue subresources, public access disabled, shared key
     auth disabled, TLS 1.2 enforced, soft delete enabled. Supports optional
     diagnostic settings with multi-sink output (Log Analytics, storage, Event Hub).
+    Optionally attaches a managed identity and encrypts with a customer-managed
+    key held in Key Vault or a Managed HSM.
   category: data
   subcategory: storage
   icon: storage-account
@@ -27,6 +29,7 @@ catalogue:
     - queue
     - table
     - private-endpoint
+    - encryption
 
 variables:
   # --- Deployment-context derived ---
@@ -95,6 +98,45 @@ variables:
     group: security
     order: 30
     help: "Enable shared key auth. Disabled by default; prefer managed identity."
+
+  customer_managed_key:
+    widget: object
+    widget_options:
+      fields:
+        key_vault_key_id:
+          widget: text
+          help: "Key Vault key resource ID. A versionless ID lets Azure follow key rotation. Leave blank when using a Managed HSM key."
+        managed_hsm_key_id:
+          widget: text
+          help: "Managed HSM key resource ID. Leave blank when using a Key Vault key. Set exactly one of the two key IDs."
+        user_assigned_identity_id:
+          widget: resource_picker
+          widget_options: { resource_type: user_assigned_identity }
+          help: "User-assigned identity Azure uses to reach the key. Must be one of identity.identity_ids."
+    group: security
+    order: 40
+    advanced: true
+    help: "Optional customer-managed key for encryption at rest. Leave blank for Microsoft-managed keys. Requires an identity whose type includes UserAssigned, and account_kind StorageV2 or account_tier Premium. The module does not create the key, the vault or the role assignment: grant the identity Key Vault Crypto Service Encryption User (or the Managed HSM equivalent) first."
+
+  # --- Identity ---
+  identity:
+    widget: object
+    widget_options:
+      fields:
+        type:
+          widget: select
+          widget_options:
+            options:
+              - { value: "SystemAssigned", label: "System Assigned" }
+              - { value: "UserAssigned", label: "User Assigned" }
+              - { value: "SystemAssigned, UserAssigned", label: "System + User Assigned" }
+        identity_ids:
+          widget: resource_picker
+          widget_options: { resource_type: user_assigned_identity, multiple: true }
+          help: "One or more user-assigned identity resource IDs. Required when type includes UserAssigned."
+    group: identity
+    order: 10
+    help: "Managed identity configuration. Required for customer-managed key encryption, which needs a type that includes UserAssigned."
 
   # --- Networking: public access ---
   enable_public_access:
@@ -321,6 +363,34 @@ composition_contract:
       discovery_kind: azure-resource-id
     external_changes:
       allowed: false
+  - requirement_id: storage-account.identity.identity_ids
+    variable: identity.identity_ids
+    role: resource_binding
+    necessity: optional
+    resource_type: user_assigned_identity
+    cardinality: many
+    compatible_providers:
+    - user-assigned-identity
+    recommended_provider: user-assigned-identity
+    existing_resource:
+      supported: true
+      discovery_kind: azure-resource-id
+    external_changes:
+      allowed: false
+  - requirement_id: storage-account.customer_managed_key.user_assigned_identity_id
+    variable: customer_managed_key.user_assigned_identity_id
+    role: resource_binding
+    necessity: optional
+    resource_type: user_assigned_identity
+    cardinality: one
+    compatible_providers:
+    - user-assigned-identity
+    recommended_provider: user-assigned-identity
+    existing_resource:
+      supported: true
+      discovery_kind: azure-resource-id
+    external_changes:
+      allowed: false
   - requirement_id: storage-account.diagnostic_settings.log_analytics_workspace_id
     variable: diagnostic_settings.log_analytics_workspace_id
     role: resource_binding
@@ -364,6 +434,14 @@ dependencies:
       resource_type: subnet
       cardinality: many
       notes: "Only when public access is enabled and network ACLs are configured."
+    - variable: identity.identity_ids
+      resource_type: user_assigned_identity
+      cardinality: many
+      notes: "Required when identity.type includes UserAssigned, and for customer-managed key encryption."
+    - variable: customer_managed_key.user_assigned_identity_id
+      resource_type: user_assigned_identity
+      cardinality: one
+      notes: "Required when customer_managed_key is configured. Must be one of the identities bound to identity.identity_ids; the module fails at plan time otherwise."
     - variable: diagnostic_settings.log_analytics_workspace_id
       resource_type: log_analytics_workspace
       cardinality: one
@@ -423,6 +501,11 @@ outputs_display:
 
   primary_location:
     display_name: "Primary location"
+    show_in_summary: false
+    copyable: true
+
+  identity:
+    display_name: "Managed identity"
     show_in_summary: false
     copyable: true
 
