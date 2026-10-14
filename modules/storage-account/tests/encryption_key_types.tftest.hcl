@@ -11,17 +11,98 @@ variables {
   enable_private_endpoint = false
 }
 
-run "defaults_keep_service_scoped_keys" {
+run "defaults_keep_service_scoped_keys_without_a_customer_key" {
   command = plan
 
   assert {
     condition     = azurerm_storage_account.this.queue_encryption_key_type == "Service"
-    error_message = "queue_encryption_key_type must default to Service, matching the provider default."
+    error_message = "Without a customer-managed key, queue_encryption_key_type must stay Service."
   }
 
   assert {
     condition     = azurerm_storage_account.this.table_encryption_key_type == "Service"
-    error_message = "table_encryption_key_type must default to Service, matching the provider default."
+    error_message = "Without a customer-managed key, table_encryption_key_type must stay Service."
+  }
+}
+
+run "a_customer_key_covers_queue_and_table_by_default" {
+  command = plan
+
+  variables {
+    identity = {
+      type         = "UserAssigned"
+      identity_ids = ["/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-test-weu-001/providers/Microsoft.ManagedIdentity/userAssignedIdentities/id-st-cmk"]
+    }
+    customer_managed_key = {
+      key_vault_key_id          = "https://kv-test-weu-001.vault.azure.net/keys/key-st-cmk"
+      user_assigned_identity_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-test-weu-001/providers/Microsoft.ManagedIdentity/userAssignedIdentities/id-st-cmk"
+    }
+  }
+
+  assert {
+    condition     = azurerm_storage_account.this.queue_encryption_key_type == "Account"
+    error_message = "A customer-managed key on StorageV2 must put queue data under the account key without being asked."
+  }
+
+  assert {
+    condition     = azurerm_storage_account.this.table_encryption_key_type == "Account"
+    error_message = "A customer-managed key on StorageV2 must put table data under the account key without being asked."
+  }
+}
+
+run "explicit_service_wins_over_the_customer_key_default" {
+  command = plan
+
+  variables {
+    identity = {
+      type         = "UserAssigned"
+      identity_ids = ["/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-test-weu-001/providers/Microsoft.ManagedIdentity/userAssignedIdentities/id-st-cmk"]
+    }
+    customer_managed_key = {
+      key_vault_key_id          = "https://kv-test-weu-001.vault.azure.net/keys/key-st-cmk"
+      user_assigned_identity_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-test-weu-001/providers/Microsoft.ManagedIdentity/userAssignedIdentities/id-st-cmk"
+    }
+    queue_encryption_key_type = "Service"
+    table_encryption_key_type = "Service"
+  }
+
+  assert {
+    condition     = azurerm_storage_account.this.queue_encryption_key_type == "Service"
+    error_message = "An explicit Service must survive a customer-managed key; this is the opt-out for an existing account."
+  }
+
+  assert {
+    condition     = azurerm_storage_account.this.table_encryption_key_type == "Service"
+    error_message = "An explicit Service must survive a customer-managed key; this is the opt-out for an existing account."
+  }
+}
+
+run "premium_block_blob_with_a_customer_key_stays_service_scoped" {
+  command = plan
+
+  variables {
+    account_kind = "BlockBlobStorage"
+    account_tier = "Premium"
+    identity = {
+      type         = "UserAssigned"
+      identity_ids = ["/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-test-weu-001/providers/Microsoft.ManagedIdentity/userAssignedIdentities/id-st-cmk"]
+    }
+    customer_managed_key = {
+      key_vault_key_id          = "https://kv-test-weu-001.vault.azure.net/keys/key-st-cmk"
+      user_assigned_identity_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-test-weu-001/providers/Microsoft.ManagedIdentity/userAssignedIdentities/id-st-cmk"
+    }
+  }
+
+  # BlockBlobStorage has no queue or table data, so there is nothing to bring under
+  # the key and no reason to risk an account-scoped key type the kind may reject.
+  assert {
+    condition     = azurerm_storage_account.this.queue_encryption_key_type == "Service"
+    error_message = "Only StorageV2 should get the automatic flip to Account."
+  }
+
+  assert {
+    condition     = azurerm_storage_account.this.table_encryption_key_type == "Service"
+    error_message = "Only StorageV2 should get the automatic flip to Account."
   }
 }
 

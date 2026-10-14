@@ -4,6 +4,39 @@ All notable changes to this module will be documented in this file.
 
 ## [Unreleased]
 
+## [4.0.0] - 2026-10-13
+
+### Changed
+
+- **BREAKING:** `queue_encryption_key_type` and `table_encryption_key_type` now
+  default to `null`, which follows `customer_managed_key` instead of always
+  meaning `"Service"`. On a `StorageV2` account with a customer-managed key both
+  resolve to `"Account"`, so the key covers queue and table data as well as blob
+  and file data. Without a customer-managed key, and on every other account kind,
+  both still resolve to `"Service"`. An explicit value always wins.
+
+  Only `StorageV2` gets the flip: `BlockBlobStorage` and `FileStorage` have no
+  queue or table data, and `Storage` (GPv1) rejects account-scoped keys for those
+  services.
+
+### Migration from 3.4.0
+
+An existing storage account that uses `customer_managed_key` and relied on the
+old defaults will plan a **destroy and recreate**, because both attributes are
+ForceNew in AzureRM. There is no in-place migration.
+
+To keep such an account exactly as it is, set the old defaults explicitly:
+
+```hcl
+queue_encryption_key_type = "Service"
+table_encryption_key_type = "Service"
+```
+
+To adopt the new behaviour on an existing account, the data has to be moved to a
+new account; plan it as a migration, not a version bump.
+
+Accounts without `customer_managed_key` are unaffected and plan no change.
+
 ## [3.4.0] - 2026-10-13
 
 ### Added
