@@ -127,8 +127,8 @@ variables:
     widget: select
     widget_options:
       options:
-        - { value: "Account", label: "Account key (covered by a customer-managed key)" }
-        - { value: "Service", label: "Service key (Microsoft-managed)" }
+        - { value: "Account", label: "Account-scoped key (your customer-managed key, when one is configured)" }
+        - { value: "Service", label: "Service-scoped key (always Microsoft-managed)" }
     group: security
     order: 50
     advanced: true
@@ -138,8 +138,8 @@ variables:
     widget: select
     widget_options:
       options:
-        - { value: "Account", label: "Account key (covered by a customer-managed key)" }
-        - { value: "Service", label: "Service key (Microsoft-managed)" }
+        - { value: "Account", label: "Account-scoped key (your customer-managed key, when one is configured)" }
+        - { value: "Service", label: "Service-scoped key (always Microsoft-managed)" }
     group: security
     order: 60
     advanced: true
