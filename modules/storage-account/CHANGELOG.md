@@ -4,7 +4,7 @@ All notable changes to this module will be documented in this file.
 
 ## [Unreleased]
 
-## [4.0.0] - 2026-10-13
+## [4.0.0] - 2026-10-15
 
 ### Changed
 
