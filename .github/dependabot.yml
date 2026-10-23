@@ -1,0 +1,1943 @@
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    exclude-paths:
+      - ".github/workflows/managed-*"
+      - ".github/workflows/agentics-maintenance.yml"
+      - ".github/workflows/conventional-pr-title.yml"
+      - ".github/workflows/case-rename-policy.yml"
+    groups:
+      github-actions:
+        patterns:
+          - "*"
+      github-actions-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "pip"
+    directory: "/tools"
+    schedule:
+      interval: "weekly"
+    groups:
+      pip:
+        patterns:
+          - "*"
+      pip-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/action-group"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/action-group/examples/basic"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/action-group/examples/complete"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/ai-foundry"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/ai-foundry/examples/basic"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/ai-foundry/examples/complete"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/aks"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/aks-node-pool"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/aks-node-pool/examples/basic"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/aks-node-pool/examples/complete"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/aks/examples/basic"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/aks/examples/complete"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/api-management"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/api-management/examples/basic"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/api-management/examples/complete"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/app-service-plan"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/app-service-plan/examples/basic"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/app-service-plan/examples/complete"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/application-gateway"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/application-gateway/examples/basic"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/application-gateway/examples/complete"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/application-insights"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/application-insights/examples/basic"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/application-insights/examples/complete"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/bastion"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/bastion/examples/basic"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/bastion/examples/complete"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/communication-service-email"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/communication-service-email/examples/basic"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/communication-service-email/examples/complete"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/container-app"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/container-app-environment"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/container-app-environment/examples/basic"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/container-app-environment/examples/complete"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/container-app-job"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/container-app-job/examples/basic"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/container-app-job/examples/complete"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/container-app/examples/basic"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/container-app/examples/complete"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/container-registry"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/container-registry/examples/basic"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/container-registry/examples/complete"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/cosmosdb"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/cosmosdb/examples/basic"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/cosmosdb/examples/complete"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/diagnostic-settings"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/diagnostic-settings/examples/basic"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/diagnostic-settings/examples/complete"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/event-hub"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/event-hub/examples/basic"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/event-hub/examples/complete"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/front-door"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/front-door/examples/basic"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/front-door/examples/complete"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/function-app"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/function-app-flex"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/function-app-flex/examples/basic"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/function-app-flex/examples/complete"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/function-app/examples/basic"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/function-app/examples/complete"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/key-vault"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/key-vault/examples/basic"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/key-vault/examples/complete"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/linux-virtual-machine"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/linux-virtual-machine/examples/basic"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/linux-virtual-machine/examples/complete"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/linux-web-app"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/linux-web-app/examples/basic"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/linux-web-app/examples/complete"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/log-analytics-workspace"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/log-analytics-workspace/examples/basic"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/log-analytics-workspace/examples/complete"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/managed-redis"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/managed-redis/examples/basic"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/managed-redis/examples/complete"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/mssql-database"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/mssql-database/examples/basic"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/mssql-database/examples/complete"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/mssql-managed-instance"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/mssql-managed-instance/examples/basic"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/mssql-managed-instance/examples/complete"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/mssql-server"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/mssql-server/examples/basic"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/mssql-server/examples/complete"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/mysql-flexible-server"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/mysql-flexible-server/examples/basic"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/mysql-flexible-server/examples/complete"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/nat-gateway"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/nat-gateway/examples/basic"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/nat-gateway/examples/complete"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/network-security-group"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/network-security-group/examples/basic"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/network-security-group/examples/complete"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/postgresql-flexible-server"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/postgresql-flexible-server/examples/basic"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/postgresql-flexible-server/examples/complete"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/private-dns-zone"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/private-dns-zone/examples/basic"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/private-dns-zone/examples/complete"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/redis-cache"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/redis-cache/examples/basic"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/redis-cache/examples/complete"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/route-table"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/route-table/examples/basic"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/route-table/examples/complete"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/service-bus"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/service-bus/examples/basic"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/service-bus/examples/complete"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/static-web-app"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/static-web-app/examples/basic"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/static-web-app/examples/complete"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/storage-account"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/storage-account/examples/basic"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/storage-account/examples/cmk"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/storage-account/examples/complete"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/user-assigned-identity"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/user-assigned-identity/examples/basic"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/user-assigned-identity/examples/complete"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/virtual-network"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/virtual-network/examples/basic"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/virtual-network/examples/complete"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/vnet-peering"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/vnet-peering/examples/basic"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/vnet-peering/examples/complete"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/windows-virtual-machine"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/windows-virtual-machine/examples/basic"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/modules/windows-virtual-machine/examples/complete"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/templates/aks-microservices"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/templates/container-apps-basic"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/templates/container-apps-jobs"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/templates/hub-spoke-peering"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/templates/linux-vm-jumpbox"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/templates/networking-hub-baseline"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/templates/serverless-event-driven"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/templates/sql-web-app"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/templates/static-web-api"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/templates/web-app-db"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/templates/windows-vm-jumpbox"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/tests/integration/aks-stack"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/tests/integration/container-stack"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/tests/integration/database-stack"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/tests/integration/messaging-stack"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/tests/integration/networking-stack"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/tests/integration/oss-database-stack"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/tests/integration/serverless-stack"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/tests/integration/vm-stack"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+
+  - package-ecosystem: "terraform"
+    directory: "/tests/integration/web-app-stack"
+    schedule:
+      interval: "weekly"
+    groups:
+      terraform:
+        patterns:
+          - "*"
+      terraform-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
