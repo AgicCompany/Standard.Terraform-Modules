@@ -31,7 +31,7 @@ module "app_service_plan_plan" {
   enable_per_site_scaling = var.app_service_plan_plan.enable_per_site_scaling
 }
 module "storage_account_storage" {
-  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/storage-account?ref=storage-account/v3.2.1"
+  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/storage-account?ref=storage-account/v4.0.0"
 
   resource_group_name                  = var.storage_account_storage.resource_group_name
   location                             = var.storage_account_storage.location
