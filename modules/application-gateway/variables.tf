@@ -66,6 +66,46 @@ variable "firewall_policy_id" {
   description = "WAF policy resource ID (for WAF_v2 SKU)"
 }
 
+variable "waf_policy" {
+  type = object({
+    name                        = optional(string, null)
+    mode                        = optional(string, "Prevention")
+    rule_set_type               = optional(string, "OWASP")
+    rule_set_version            = optional(string, "3.2")
+    file_upload_limit_in_mb     = optional(number, 100)
+    max_request_body_size_in_kb = optional(number, 128)
+    request_body_check          = optional(bool, true)
+  })
+  default     = null
+  description = "Optional managed WAF policy created by the module when firewall_policy_id is null."
+
+  validation {
+    condition = (
+      var.waf_policy == null ? true
+      : contains(["Detection", "Prevention"], var.waf_policy.mode)
+    )
+    error_message = "waf_policy.mode must be \"Detection\" or \"Prevention\"."
+  }
+}
+
+variable "private_frontend_ip_configuration" {
+  type = object({
+    private_ip_address            = string
+    private_ip_address_allocation = optional(string, "Static")
+    subnet_id                     = optional(string, null)
+  })
+  default     = null
+  description = "Optional private frontend IP configuration. subnet_id defaults to var.subnet_id when null."
+
+  validation {
+    condition = (
+      var.private_frontend_ip_configuration == null ? true
+      : contains(["Static"], var.private_frontend_ip_configuration.private_ip_address_allocation)
+    )
+    error_message = "private_frontend_ip_configuration.private_ip_address_allocation must be \"Static\" for Application Gateway v2 SKUs."
+  }
+}
+
 variable "ssl_policy_name" {
   type        = string
   default     = "AppGwSslPolicy20220101"
@@ -139,9 +179,11 @@ variable "http_listeners" {
     host_name            = optional(string, null)
     host_names           = optional(list(string), null)
     ssl_certificate_name = optional(string, null)
+    use_private_frontend = optional(bool, false)
+    firewall_policy_id   = optional(string, null)
   }))
   default     = {}
-  description = "Map of HTTP listeners. Key is used as the listener name."
+  description = "Map of HTTP listeners. Key is used as the listener name. Set use_private_frontend = true to bind to the private frontend IP."
 
   validation {
     condition = alltrue([
@@ -249,6 +291,13 @@ variable "enable_http2" {
   type        = bool
   default     = false
   description = "Enable HTTP/2"
+}
+
+# === Optional: Identity ===
+variable "user_assigned_identity_ids" {
+  type        = list(string)
+  default     = []
+  description = "List of User-Assigned Managed Identity IDs (required when referencing Key Vault SSL certificates)."
 }
 
 # === Optional: Diagnostics ===

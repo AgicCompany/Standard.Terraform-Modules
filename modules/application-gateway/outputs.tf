@@ -25,6 +25,20 @@ output "backend_address_pool_ids" {
   description = "Map of backend address pool names to IDs"
 }
 
+output "private_ip_address" {
+  value = (
+    var.private_frontend_ip_configuration != null
+    ? var.private_frontend_ip_configuration.private_ip_address
+    : null
+  )
+  description = "Private frontend IP address of the Application Gateway (null when not configured)"
+}
+
+output "waf_policy_id" {
+  value       = var.firewall_policy_id != null ? var.firewall_policy_id : try(azurerm_web_application_firewall_policy.this[0].id, null)
+  description = "Effective WAF policy resource ID attached to the Application Gateway"
+}
+
 # === Public Outputs (Cross-Project Consumption) ===
 output "public_appgw_id" {
   value       = azurerm_application_gateway.this.id
