@@ -149,3 +149,70 @@ run "accepts_waf_v2_with_managed_waf_policy_and_private_frontend" {
     }
   }
 }
+
+run "rejects_trusted_root_cert_with_both_data_and_key_vault_secret_id" {
+  command = plan
+  variables {
+    trusted_root_certificates = {
+      rootca = {
+        data                = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA..."
+        key_vault_secret_id = "https://kv-test.vault.azure.net/secrets/rootca"
+      }
+    }
+  }
+  expect_failures = [var.trusted_root_certificates]
+}
+
+run "rejects_trusted_root_cert_with_neither_data_nor_key_vault_secret_id" {
+  command = plan
+  variables {
+    trusted_root_certificates = {
+      rootca = {}
+    }
+  }
+  expect_failures = [var.trusted_root_certificates]
+}
+
+run "rejects_trusted_root_cert_key_vault_secret_id_without_identity" {
+  command = plan
+  variables {
+    trusted_root_certificates = {
+      rootca = {
+        key_vault_secret_id = "https://kv-test.vault.azure.net/secrets/rootca"
+      }
+    }
+  }
+  expect_failures = [azurerm_application_gateway.this]
+}
+
+run "rejects_backend_http_settings_referencing_unknown_trusted_root_cert" {
+  command = plan
+  variables {
+    backend_http_settings = {
+      setting1 = {
+        port                           = 443
+        protocol                       = "Https"
+        trusted_root_certificate_names = ["nonexistent-ca"]
+      }
+    }
+  }
+  expect_failures = [azurerm_application_gateway.this]
+}
+
+run "accepts_valid_trusted_root_certificate_on_backend_http_settings" {
+  command = plan
+  variables {
+    trusted_root_certificates = {
+      internal-ca = {
+        data = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA..."
+      }
+    }
+    backend_http_settings = {
+      setting1 = {
+        port                           = 443
+        protocol                       = "Https"
+        trusted_root_certificate_names = ["internal-ca"]
+      }
+    }
+  }
+}
