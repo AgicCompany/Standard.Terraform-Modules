@@ -64,3 +64,30 @@ run "rejects_bad_node_os_start_time" {
   }
   expect_failures = [var.maintenance_window_node_os]
 }
+
+run "rejects_cilium_policy_without_cilium_data_plane" {
+  command = plan
+  variables {
+    network_profile = {
+      network_policy     = "cilium"
+      network_data_plane = "azure"
+    }
+  }
+  expect_failures = [var.network_profile]
+}
+
+run "accepts_cilium_policy_with_cilium_data_plane_and_critical_addons" {
+  command = plan
+  variables {
+    default_node_pool = {
+      only_critical_addons_enabled = true
+    }
+    network_profile = {
+      network_policy     = "cilium"
+      network_data_plane = "cilium"
+    }
+    key_vault_secrets_provider = {
+      secret_rotation_enabled = true
+    }
+  }
+}

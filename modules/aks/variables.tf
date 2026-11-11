@@ -40,18 +40,19 @@ variable "sku_tier" {
 
 variable "default_node_pool" {
   type = object({
-    name                        = optional(string, "system")
-    vm_size                     = optional(string, "Standard_D2s_v3")
-    vnet_subnet_id              = optional(string)
-    node_count                  = optional(number, 3)
-    min_count                   = optional(number, 1)
-    max_count                   = optional(number, 5)
-    os_disk_size_gb             = optional(number, 128)
-    os_disk_type                = optional(string, "Managed")
-    os_sku                      = optional(string, "AzureLinux")
-    zones                       = optional(list(string), [])
-    max_pods                    = optional(number, 30)
-    temporary_name_for_rotation = optional(string, "tmpnodepool")
+    name                         = optional(string, "system")
+    vm_size                      = optional(string, "Standard_D2s_v3")
+    vnet_subnet_id               = optional(string)
+    node_count                   = optional(number, 3)
+    min_count                    = optional(number, 1)
+    max_count                    = optional(number, 5)
+    os_disk_size_gb              = optional(number, 128)
+    os_disk_type                 = optional(string, "Managed")
+    os_sku                       = optional(string, "AzureLinux")
+    zones                        = optional(list(string), [])
+    max_pods                     = optional(number, 30)
+    only_critical_addons_enabled = optional(bool, false)
+    temporary_name_for_rotation  = optional(string, "tmpnodepool")
     upgrade_settings = optional(object({
       max_surge                     = optional(string, "33%")
       drain_timeout_in_minutes      = optional(number, 30)
@@ -77,6 +78,7 @@ variable "network_profile" {
     network_plugin      = optional(string, "azure")
     network_plugin_mode = optional(string, "overlay")
     network_policy      = optional(string, "azure")
+    network_data_plane  = optional(string, "azure")
     pod_cidr            = optional(string, "10.244.0.0/16")
     service_cidr        = optional(string, "10.0.0.0/16")
     dns_service_ip      = optional(string, "10.0.0.10")
@@ -100,6 +102,19 @@ variable "network_profile" {
   validation {
     condition     = contains(["azure", "calico", "cilium"], var.network_profile.network_policy)
     error_message = "network_profile.network_policy must be azure, calico, or cilium."
+  }
+
+  validation {
+    condition     = contains(["azure", "cilium"], var.network_profile.network_data_plane)
+    error_message = "network_profile.network_data_plane must be azure or cilium."
+  }
+
+  validation {
+    condition = (
+      var.network_profile.network_policy != "cilium" ? true
+      : var.network_profile.network_data_plane == "cilium"
+    )
+    error_message = "network_profile.network_data_plane must be \"cilium\" when network_profile.network_policy is \"cilium\"."
   }
 
   validation {

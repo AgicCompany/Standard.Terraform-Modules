@@ -4,6 +4,12 @@ All notable changes to this module will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- `default_node_pool.only_critical_addons_enabled` field (default: `false`) to taint system nodes with `CriticalAddonsOnly=true:NoSchedule` so application pods schedule only onto user node pools.
+- `network_profile.network_data_plane` field (default: `"azure"`, allowed: `"azure"`, `"cilium"`) and plan-time validation requiring `network_data_plane = "cilium"` when `network_policy = "cilium"`.
+- `key_vault_secrets_provider_identity` output exposing the Key Vault CSI driver managed identity (`client_id`, `object_id`, `user_assigned_identity_id`), or `null` when the add-on is disabled.
+
 ## [4.1.2] - 2026-09-16
 
 ### Fixed
