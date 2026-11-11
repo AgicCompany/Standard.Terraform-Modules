@@ -4,6 +4,8 @@ All notable changes to this module will be documented in this file.
 
 ## [Unreleased]
 
+## [2.3.0] - 2026-11-11
+
 ### Added
 
 - `trusted_root_certificates` variable (`data` or `key_vault_secret_id`) and `backend_http_settings[*].trusted_root_certificate_names` list to support backend HTTPS verification with custom/internal root CAs, with plan-time validations and preconditions.

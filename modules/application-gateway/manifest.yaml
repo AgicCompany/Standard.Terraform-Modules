@@ -2,7 +2,7 @@ schema_version: "0.1"
 
 metadata:
   module_name: application-gateway
-  module_version: "2.2.0"
+  module_version: "2.3.0"
   schema_authored_by: AGIC Infrastructure Team
   schema_last_updated: "2026-11-11"
 
@@ -116,6 +116,10 @@ variables:
         path:
           widget: text
           help: "Override the path prefix. Optional."
+        trusted_root_certificate_names:
+          widget: text
+          widget_options: { multiline: true }
+          help: "Names of trusted root certificates (keys in trusted_root_certificates) for backend HTTPS verification, one per line."
       add_label: "Add backend HTTP settings"
     group: core
     order: 40
@@ -420,6 +424,25 @@ variables:
     group: security
     order: 30
     help: "SSL certificates. Key is the certificate name. Provide either data+password or key_vault_secret_id."
+
+  trusted_root_certificates:
+    widget: repeater
+    widget_options:
+      mode: keyed_map
+      key_field:
+        label: "Root certificate name"
+        placeholder: "internal-root-ca"
+      row_fields:
+        data:
+          widget: text
+          help: "Base64-encoded .cer root certificate data. Mutually exclusive with key_vault_secret_id."
+        key_vault_secret_id:
+          widget: text
+          help: "Key Vault secret URI for the root certificate. Mutually exclusive with data."
+      add_label: "Add trusted root certificate"
+    group: security
+    order: 32
+    help: "Trusted root certificates (.cer) for backend HTTPS verification. Provide either data or key_vault_secret_id."
 
   # --- Scaling ---
   autoscale:
