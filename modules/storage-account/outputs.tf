@@ -35,6 +35,11 @@ output "primary_location" {
   description = "Primary location of the storage account"
 }
 
+output "file_share_ids" {
+  value       = { for k, v in azurerm_storage_share.this : k => v.id }
+  description = "Map of file share name to resource ID"
+}
+
 # === Identity Outputs ===
 output "identity" {
   value = var.identity == null ? null : {

@@ -4,6 +4,12 @@ All notable changes to this module will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- `enable_https_traffic_only` variable (default: `true`) allowing consumers to disable HTTPS-only enforcement when required for Azure Files NFSv4.1 shares.
+- `file_shares` variable (default: `{}`) to provision `azurerm_storage_share` resources (`SMB` or `NFS`) with plan-time validations (`quota >= 100` for NFS) and a precondition requiring `account_kind = "FileStorage"`, `account_tier = "Premium"`, and `enable_https_traffic_only = false` when any share uses `NFS`.
+- `file_share_ids` output mapping each provisioned file share name to its resource ID.
+
 ## [4.0.0] - 2026-10-15
 
 ### Changed

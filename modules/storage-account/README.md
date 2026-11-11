@@ -174,6 +174,7 @@ No modules.
 | [azurerm_monitor_diagnostic_setting.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_diagnostic_setting) | resource |
 | [azurerm_private_endpoint.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/private_endpoint) | resource |
 | [azurerm_storage_account.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account) | resource |
+| [azurerm_storage_share.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_share) | resource |
 
 ## Inputs
 
@@ -192,11 +193,13 @@ No modules.
 | <a name="input_enable_blob_soft_delete"></a> [enable\_blob\_soft\_delete](#input\_enable\_blob\_soft\_delete) | Enable blob soft delete | `bool` | `true` | no |
 | <a name="input_enable_container_soft_delete"></a> [enable\_container\_soft\_delete](#input\_enable\_container\_soft\_delete) | Enable container soft delete | `bool` | `true` | no |
 | <a name="input_enable_file_private_endpoint"></a> [enable\_file\_private\_endpoint](#input\_enable\_file\_private\_endpoint) | Create private endpoint for file subresource | `bool` | `false` | no |
+| <a name="input_enable_https_traffic_only"></a> [enable\_https\_traffic\_only](#input\_enable\_https\_traffic\_only) | Enforce HTTPS-only traffic. Must be set to false when using Azure Files NFSv4.1 shares. | `bool` | `true` | no |
 | <a name="input_enable_private_endpoint"></a> [enable\_private\_endpoint](#input\_enable\_private\_endpoint) | Create private endpoints for enabled subresources (blob, file, queue, table). | `bool` | `true` | no |
 | <a name="input_enable_public_access"></a> [enable\_public\_access](#input\_enable\_public\_access) | Allow public network access to the storage account | `bool` | `false` | no |
 | <a name="input_enable_queue_private_endpoint"></a> [enable\_queue\_private\_endpoint](#input\_enable\_queue\_private\_endpoint) | Create private endpoint for queue subresource | `bool` | `false` | no |
 | <a name="input_enable_table_private_endpoint"></a> [enable\_table\_private\_endpoint](#input\_enable\_table\_private\_endpoint) | Create private endpoint for table subresource | `bool` | `false` | no |
 | <a name="input_enable_versioning"></a> [enable\_versioning](#input\_enable\_versioning) | Enable blob versioning | `bool` | `false` | no |
+| <a name="input_file_shares"></a> [file\_shares](#input\_file\_shares) | Map of Azure Files shares to create. Key is the share name. Note: NFS protocol requires account\_kind = "FileStorage", account\_tier = "Premium", enable\_https\_traffic\_only = false, and quota >= 100. | <pre>map(object({<br/>    quota            = number<br/>    enabled_protocol = optional(string, "SMB")<br/>    access_tier      = optional(string, null)<br/>    metadata         = optional(map(string), {})<br/>  }))</pre> | `{}` | no |
 | <a name="input_identity"></a> [identity](#input\_identity) | Managed identity configuration. type must be "SystemAssigned", "UserAssigned", or "SystemAssigned, UserAssigned". Customer-managed keys require a type that includes UserAssigned. | <pre>object({<br/>    type         = string<br/>    identity_ids = optional(list(string))<br/>  })</pre> | `null` | no |
 | <a name="input_location"></a> [location](#input\_location) | Azure region | `string` | n/a | yes |
 | <a name="input_min_tls_version"></a> [min\_tls\_version](#input\_min\_tls\_version) | Minimum TLS version. Only "1.2" is supported; TLS 1.0/1.1 retired by Azure. | `string` | `"1.2"` | no |
@@ -216,6 +219,7 @@ No modules.
 
 | Name | Description |
 |------|-------------|
+| <a name="output_file_share_ids"></a> [file\_share\_ids](#output\_file\_share\_ids) | Map of file share name to resource ID |
 | <a name="output_id"></a> [id](#output\_id) | Storage account resource ID |
 | <a name="output_identity"></a> [identity](#output\_identity) | Managed identity of the storage account, or null when no identity is configured. principal\_id and tenant\_id are populated only for types that include SystemAssigned. The storage account exposes no client\_id for user-assigned identities -- read that from the azurerm\_user\_assigned\_identity resource. |
 | <a name="output_name"></a> [name](#output\_name) | Storage account name |

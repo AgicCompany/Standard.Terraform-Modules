@@ -128,6 +128,7 @@ No modules.
 | [azurerm_application_gateway.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/application_gateway) | resource |
 | [azurerm_monitor_diagnostic_setting.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_diagnostic_setting) | resource |
 | [azurerm_public_ip.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/public_ip) | resource |
+| [azurerm_web_application_firewall_policy.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/web_application_firewall_policy) | resource |
 
 ## Inputs
 
@@ -140,9 +141,10 @@ No modules.
 | <a name="input_enable_http2"></a> [enable\_http2](#input\_enable\_http2) | Enable HTTP/2 | `bool` | `false` | no |
 | <a name="input_firewall_policy_id"></a> [firewall\_policy\_id](#input\_firewall\_policy\_id) | WAF policy resource ID (for WAF\_v2 SKU) | `string` | `null` | no |
 | <a name="input_frontend_ports"></a> [frontend\_ports](#input\_frontend\_ports) | Map of frontend ports. Key is used as the port name. | <pre>map(object({<br/>    port = number<br/>  }))</pre> | <pre>{<br/>  "http": {<br/>    "port": 80<br/>  },<br/>  "https": {<br/>    "port": 443<br/>  }<br/>}</pre> | no |
-| <a name="input_http_listeners"></a> [http\_listeners](#input\_http\_listeners) | Map of HTTP listeners. Key is used as the listener name. | <pre>map(object({<br/>    frontend_port_name   = string<br/>    protocol             = string<br/>    host_name            = optional(string, null)<br/>    host_names           = optional(list(string), null)<br/>    ssl_certificate_name = optional(string, null)<br/>  }))</pre> | `{}` | no |
+| <a name="input_http_listeners"></a> [http\_listeners](#input\_http\_listeners) | Map of HTTP listeners. Key is used as the listener name. Set use\_private\_frontend = true to bind to the private frontend IP. | <pre>map(object({<br/>    frontend_port_name   = string<br/>    protocol             = string<br/>    host_name            = optional(string, null)<br/>    host_names           = optional(list(string), null)<br/>    ssl_certificate_name = optional(string, null)<br/>    use_private_frontend = optional(bool, false)<br/>    firewall_policy_id   = optional(string, null)<br/>  }))</pre> | `{}` | no |
 | <a name="input_location"></a> [location](#input\_location) | Azure region | `string` | n/a | yes |
 | <a name="input_name"></a> [name](#input\_name) | Application Gateway name (full CAF-compliant name, provided by consumer) | `string` | n/a | yes |
+| <a name="input_private_frontend_ip_configuration"></a> [private\_frontend\_ip\_configuration](#input\_private\_frontend\_ip\_configuration) | Optional private frontend IP configuration. subnet\_id defaults to var.subnet\_id when null. | <pre>object({<br/>    private_ip_address            = string<br/>    private_ip_address_allocation = optional(string, "Static")<br/>    subnet_id                     = optional(string, null)<br/>  })</pre> | `null` | no |
 | <a name="input_probes"></a> [probes](#input\_probes) | Map of health probes. Key is used as the probe name. | <pre>map(object({<br/>    protocol                                  = string<br/>    path                                      = string<br/>    host                                      = optional(string, null)<br/>    interval                                  = optional(number, 30)<br/>    timeout                                   = optional(number, 30)<br/>    unhealthy_threshold                       = optional(number, 3)<br/>    pick_host_name_from_backend_http_settings = optional(bool, false)<br/>    minimum_servers                           = optional(number, 0)<br/>    match_status_codes                        = optional(list(string), ["200-399"])<br/>  }))</pre> | `{}` | no |
 | <a name="input_redirect_configurations"></a> [redirect\_configurations](#input\_redirect\_configurations) | Map of redirect configurations. Key is used as the configuration name. | <pre>map(object({<br/>    redirect_type        = string<br/>    target_listener_name = optional(string, null)<br/>    target_url           = optional(string, null)<br/>    include_path         = optional(bool, true)<br/>    include_query_string = optional(bool, true)<br/>  }))</pre> | `{}` | no |
 | <a name="input_request_routing_rules"></a> [request\_routing\_rules](#input\_request\_routing\_rules) | Map of request routing rules. Key is used as the rule name. | <pre>map(object({<br/>    rule_type                   = optional(string, "Basic")<br/>    priority                    = number<br/>    http_listener_name          = string<br/>    backend_address_pool_name   = optional(string, null)<br/>    backend_http_settings_name  = optional(string, null)<br/>    url_path_map_name           = optional(string, null)<br/>    redirect_configuration_name = optional(string, null)<br/>  }))</pre> | `{}` | no |
@@ -154,6 +156,8 @@ No modules.
 | <a name="input_subnet_id"></a> [subnet\_id](#input\_subnet\_id) | Subnet ID for the Application Gateway (dedicated subnet, minimum /24 recommended) | `string` | n/a | yes |
 | <a name="input_tags"></a> [tags](#input\_tags) | Tags to apply to the resource | `map(string)` | `{}` | no |
 | <a name="input_url_path_maps"></a> [url\_path\_maps](#input\_url\_path\_maps) | Map of URL path maps. Key is used as the path map name. | <pre>map(object({<br/>    default_backend_address_pool_name   = optional(string, null)<br/>    default_backend_http_settings_name  = optional(string, null)<br/>    default_redirect_configuration_name = optional(string, null)<br/>    path_rules = map(object({<br/>      paths                       = list(string)<br/>      backend_address_pool_name   = optional(string, null)<br/>      backend_http_settings_name  = optional(string, null)<br/>      redirect_configuration_name = optional(string, null)<br/>    }))<br/>  }))</pre> | `{}` | no |
+| <a name="input_user_assigned_identity_ids"></a> [user\_assigned\_identity\_ids](#input\_user\_assigned\_identity\_ids) | List of User-Assigned Managed Identity IDs (required when referencing Key Vault SSL certificates). | `list(string)` | `[]` | no |
+| <a name="input_waf_policy"></a> [waf\_policy](#input\_waf\_policy) | Optional managed WAF policy created by the module when firewall\_policy\_id is null. | <pre>object({<br/>    name                        = optional(string, null)<br/>    mode                        = optional(string, "Prevention")<br/>    rule_set_type               = optional(string, "OWASP")<br/>    rule_set_version            = optional(string, "3.2")<br/>    file_upload_limit_in_mb     = optional(number, 100)<br/>    max_request_body_size_in_kb = optional(number, 128)<br/>    request_body_check          = optional(bool, true)<br/>  })</pre> | `null` | no |
 | <a name="input_zones"></a> [zones](#input\_zones) | Availability zones | `list(string)` | `[]` | no |
 
 ## Outputs
@@ -163,10 +167,12 @@ No modules.
 | <a name="output_backend_address_pool_ids"></a> [backend\_address\_pool\_ids](#output\_backend\_address\_pool\_ids) | Map of backend address pool names to IDs |
 | <a name="output_id"></a> [id](#output\_id) | Application Gateway resource ID |
 | <a name="output_name"></a> [name](#output\_name) | Application Gateway name |
+| <a name="output_private_ip_address"></a> [private\_ip\_address](#output\_private\_ip\_address) | Private frontend IP address of the Application Gateway (null when not configured) |
 | <a name="output_public_appgw_id"></a> [public\_appgw\_id](#output\_public\_appgw\_id) | Application Gateway resource ID (for cross-project consumption) |
 | <a name="output_public_appgw_public_ip"></a> [public\_appgw\_public\_ip](#output\_public\_appgw\_public\_ip) | Application Gateway public IP (for cross-project consumption) |
 | <a name="output_public_ip_address"></a> [public\_ip\_address](#output\_public\_ip\_address) | Public IP address of the Application Gateway |
 | <a name="output_public_ip_id"></a> [public\_ip\_id](#output\_public\_ip\_id) | Public IP resource ID |
+| <a name="output_waf_policy_id"></a> [waf\_policy\_id](#output\_waf\_policy\_id) | Effective WAF policy resource ID attached to the Application Gateway |
 <!-- END_TF_DOCS -->
 
 ## Notes

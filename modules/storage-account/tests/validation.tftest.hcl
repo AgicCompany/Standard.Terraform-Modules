@@ -31,3 +31,50 @@ run "rejects_bad_log_analytics_destination_type" {
   }
   expect_failures = [var.diagnostic_settings]
 }
+
+run "rejects_nfs_file_share_with_https_traffic_only" {
+  command = plan
+  variables {
+    account_kind              = "FileStorage"
+    account_tier              = "Premium"
+    enable_https_traffic_only = true
+    file_shares = {
+      nfsshare = {
+        quota            = 100
+        enabled_protocol = "NFS"
+      }
+    }
+  }
+  expect_failures = [azurerm_storage_account.this]
+}
+
+run "rejects_nfs_file_share_quota_below_100" {
+  command = plan
+  variables {
+    account_kind              = "FileStorage"
+    account_tier              = "Premium"
+    enable_https_traffic_only = false
+    file_shares = {
+      nfsshare = {
+        quota            = 50
+        enabled_protocol = "NFS"
+      }
+    }
+  }
+  expect_failures = [var.file_shares]
+}
+
+run "accepts_nfs_file_share_on_premium_filestorage" {
+  command = plan
+  variables {
+    account_kind              = "FileStorage"
+    account_tier              = "Premium"
+    enable_https_traffic_only = false
+    file_shares = {
+      nfsshare = {
+        quota            = 100
+        enabled_protocol = "NFS"
+      }
+    }
+  }
+}

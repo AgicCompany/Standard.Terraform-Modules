@@ -25,12 +25,20 @@ variable "remote_virtual_network_id" {
 
 variable "remote_virtual_network_resource_group_name" {
   type        = string
-  description = "Resource group name of the remote virtual network"
+  default     = null
+  description = "Resource group name of the remote virtual network (required when enable_remote_to_local = true)"
 }
 
 variable "remote_virtual_network_name" {
   type        = string
-  description = "Name of the remote virtual network"
+  default     = null
+  description = "Name of the remote virtual network (required when enable_remote_to_local = true)"
+}
+
+variable "enable_remote_to_local" {
+  type        = bool
+  default     = true
+  description = "Create the reverse peering (remote-to-local). Set to false when the remote VNet is managed separately."
 }
 
 variable "allow_virtual_network_access" {
@@ -54,7 +62,19 @@ variable "allow_gateway_transit" {
 variable "use_remote_gateways" {
   type        = bool
   default     = false
-  description = "Use remote VNet's gateway"
+  description = "Use remote VNet's gateway on the remote-to-local peering"
+}
+
+variable "local_use_remote_gateways" {
+  type        = bool
+  default     = false
+  description = "Use remote VNet's gateway on the local-to-remote peering (used when local is the spoke)."
+}
+
+variable "remote_allow_gateway_transit" {
+  type        = bool
+  default     = false
+  description = "Allow gateway transit on the remote-to-local peering (used when remote is the hub)."
 }
 
 # tflint-ignore: terraform_unused_declarations

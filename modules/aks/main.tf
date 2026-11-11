@@ -15,19 +15,20 @@ resource "azurerm_kubernetes_cluster" "this" {
   private_dns_zone_id       = var.private_dns_zone_id
 
   default_node_pool {
-    name                        = var.default_node_pool.name
-    vm_size                     = var.default_node_pool.vm_size
-    vnet_subnet_id              = var.default_node_pool.vnet_subnet_id
-    auto_scaling_enabled        = var.enable_auto_scaling
-    node_count                  = var.enable_auto_scaling ? null : var.default_node_pool.node_count
-    min_count                   = var.enable_auto_scaling ? var.default_node_pool.min_count : null
-    max_count                   = var.enable_auto_scaling ? var.default_node_pool.max_count : null
-    os_disk_size_gb             = var.default_node_pool.os_disk_size_gb
-    os_disk_type                = var.default_node_pool.os_disk_type
-    os_sku                      = var.default_node_pool.os_sku
-    zones                       = var.default_node_pool.zones
-    max_pods                    = var.default_node_pool.max_pods
-    temporary_name_for_rotation = var.default_node_pool.temporary_name_for_rotation
+    name                         = var.default_node_pool.name
+    vm_size                      = var.default_node_pool.vm_size
+    vnet_subnet_id               = var.default_node_pool.vnet_subnet_id
+    auto_scaling_enabled         = var.enable_auto_scaling
+    node_count                   = var.enable_auto_scaling ? null : var.default_node_pool.node_count
+    min_count                    = var.enable_auto_scaling ? var.default_node_pool.min_count : null
+    max_count                    = var.enable_auto_scaling ? var.default_node_pool.max_count : null
+    os_disk_size_gb              = var.default_node_pool.os_disk_size_gb
+    os_disk_type                 = var.default_node_pool.os_disk_type
+    os_sku                       = var.default_node_pool.os_sku
+    zones                        = var.default_node_pool.zones
+    max_pods                     = var.default_node_pool.max_pods
+    only_critical_addons_enabled = var.default_node_pool.only_critical_addons_enabled
+    temporary_name_for_rotation  = var.default_node_pool.temporary_name_for_rotation
 
     upgrade_settings {
       max_surge                     = var.default_node_pool.upgrade_settings.max_surge
@@ -72,6 +73,7 @@ resource "azurerm_kubernetes_cluster" "this" {
     network_plugin      = var.network_profile.network_plugin
     network_plugin_mode = var.network_profile.network_plugin_mode
     network_policy      = var.network_profile.network_policy
+    network_data_plane  = var.network_profile.network_data_plane
     pod_cidr            = var.network_profile.network_plugin_mode == "overlay" ? var.network_profile.pod_cidr : null
     service_cidr        = var.network_profile.service_cidr
     dns_service_ip      = var.network_profile.dns_service_ip

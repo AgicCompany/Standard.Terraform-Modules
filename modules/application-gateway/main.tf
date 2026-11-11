@@ -10,6 +10,31 @@ resource "azurerm_public_ip" "this" {
   tags = var.tags
 }
 
+resource "azurerm_web_application_firewall_policy" "this" {
+  count = var.waf_policy != null && var.firewall_policy_id == null ? 1 : 0
+
+  name                = coalesce(var.waf_policy.name, "wafpol-${var.name}")
+  resource_group_name = var.resource_group_name
+  location            = var.location
+
+  policy_settings {
+    enabled                     = true
+    mode                        = var.waf_policy.mode
+    request_body_check          = var.waf_policy.request_body_check
+    file_upload_limit_in_mb     = var.waf_policy.file_upload_limit_in_mb
+    max_request_body_size_in_kb = var.waf_policy.max_request_body_size_in_kb
+  }
+
+  managed_rules {
+    managed_rule_set {
+      type    = var.waf_policy.rule_set_type
+      version = var.waf_policy.rule_set_version
+    }
+  }
+
+  tags = var.tags
+}
+
 resource "azurerm_application_gateway" "this" {
   name                = var.name
   location            = var.location
@@ -17,7 +42,16 @@ resource "azurerm_application_gateway" "this" {
 
   enable_http2       = var.enable_http2
   zones              = var.zones
-  firewall_policy_id = var.firewall_policy_id
+  firewall_policy_id = var.firewall_policy_id != null ? var.firewall_policy_id : try(azurerm_web_application_firewall_policy.this[0].id, null)
+
+  dynamic "identity" {
+    for_each = length(var.user_assigned_identity_ids) > 0 ? [1] : []
+
+    content {
+      type         = "UserAssigned"
+      identity_ids = var.user_assigned_identity_ids
+    }
+  }
 
   ssl_policy {
     policy_type = "Predefined"
@@ -42,6 +76,17 @@ resource "azurerm_application_gateway" "this" {
   frontend_ip_configuration {
     name                 = local.frontend_ip_configuration_name
     public_ip_address_id = azurerm_public_ip.this.id
+  }
+
+  dynamic "frontend_ip_configuration" {
+    for_each = var.private_frontend_ip_configuration != null ? [var.private_frontend_ip_configuration] : []
+
+    content {
+      name                          = local.private_frontend_ip_configuration_name
+      subnet_id                     = coalesce(frontend_ip_configuration.value.subnet_id, var.subnet_id)
+      private_ip_address            = frontend_ip_configuration.value.private_ip_address
+      private_ip_address_allocation = frontend_ip_configuration.value.private_ip_address_allocation
+    }
   }
 
   dynamic "frontend_port" {
@@ -83,13 +128,18 @@ resource "azurerm_application_gateway" "this" {
     for_each = var.http_listeners
 
     content {
-      name                           = http_listener.key
-      frontend_ip_configuration_name = local.frontend_ip_configuration_name
-      frontend_port_name             = http_listener.value.frontend_port_name
-      protocol                       = http_listener.value.protocol
-      host_name                      = http_listener.value.host_name
-      host_names                     = http_listener.value.host_names
-      ssl_certificate_name           = http_listener.value.ssl_certificate_name
+      name = http_listener.key
+      frontend_ip_configuration_name = (
+        http_listener.value.use_private_frontend
+        ? local.private_frontend_ip_configuration_name
+        : local.frontend_ip_configuration_name
+      )
+      frontend_port_name   = http_listener.value.frontend_port_name
+      protocol             = http_listener.value.protocol
+      host_name            = http_listener.value.host_name
+      host_names           = http_listener.value.host_names
+      ssl_certificate_name = http_listener.value.ssl_certificate_name
+      firewall_policy_id   = http_listener.value.firewall_policy_id
     }
   }
 
@@ -205,6 +255,30 @@ resource "azurerm_application_gateway" "this" {
         rule.backend_http_settings_name == null ? true : contains(keys(var.backend_http_settings), rule.backend_http_settings_name)
       ])
       error_message = "All request_routing_rules must reference a backend_http_settings_name that exists in backend_http_settings (or be null)."
+    }
+
+    precondition {
+      condition = (
+        !anytrue([for l in values(var.http_listeners) : l.use_private_frontend]) ? true
+        : var.private_frontend_ip_configuration != null
+      )
+      error_message = "private_frontend_ip_configuration is required when any http_listener sets use_private_frontend = true."
+    }
+
+    precondition {
+      condition = (
+        !anytrue([for c in values(nonsensitive(var.ssl_certificates)) : c.key_vault_secret_id != null]) ? true
+        : length(var.user_assigned_identity_ids) > 0
+      )
+      error_message = "user_assigned_identity_ids must contain at least one User-Assigned Managed Identity ID when any ssl_certificate uses key_vault_secret_id."
+    }
+
+    precondition {
+      condition = (
+        var.sku_tier != "WAF_v2" ? true
+        : (var.firewall_policy_id != null ? true : var.waf_policy != null)
+      )
+      error_message = "WAF_v2 SKU requires either firewall_policy_id or waf_policy to be configured."
     }
   }
 }

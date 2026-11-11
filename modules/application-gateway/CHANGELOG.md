@@ -4,6 +4,13 @@ All notable changes to this module will be documented in this file.
 
 ## [Unreleased]
 
+### Added
+
+- `private_frontend_ip_configuration` variable and `http_listeners[*].use_private_frontend` flag for dual public + private frontend IP configurations, plus `private_ip_address` output.
+- `http_listeners[*].firewall_policy_id` field for per-listener WAF policy overrides.
+- `user_assigned_identity_ids` variable attaching User-Assigned Managed Identities to the Application Gateway, with a plan-time precondition when `ssl_certificates` reference `key_vault_secret_id`.
+- `waf_policy` variable to optionally create a managed `azurerm_web_application_firewall_policy` when `firewall_policy_id` is `null`, plus `waf_policy_id` output and a `WAF_v2` precondition requiring either `firewall_policy_id` or `waf_policy`.
+
 ## [2.1.1] - 2026-09-16
 
 ### Fixed

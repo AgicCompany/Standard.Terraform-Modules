@@ -45,6 +45,11 @@ output "kubelet_identity" {
   description = "Kubelet managed identity (client_id, object_id, user_assigned_identity_id)"
 }
 
+output "key_vault_secrets_provider_identity" {
+  value       = try(azurerm_kubernetes_cluster.this.key_vault_secrets_provider[0].secret_identity[0], null)
+  description = "Key Vault Secrets Provider add-on managed identity (client_id, object_id, user_assigned_identity_id), or null when disabled"
+}
+
 # === Public Outputs (Cross-Project Consumption) ===
 output "public_aks_id" {
   value       = azurerm_kubernetes_cluster.this.id

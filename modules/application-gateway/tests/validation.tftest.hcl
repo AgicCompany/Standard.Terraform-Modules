@@ -82,3 +82,70 @@ run "redirect_rule_without_backend_does_not_crash" {
   # backend_http_settings_name preconditions evaluated without crashing for
   # a redirect rule that sets neither. (Formerly crashed on Terraform 1.10.)
 }
+
+run "rejects_private_listener_without_private_frontend_ip" {
+  command = plan
+  variables {
+    http_listeners = {
+      listener1 = {
+        frontend_port_name   = "http"
+        protocol             = "Http"
+        use_private_frontend = true
+      }
+    }
+  }
+  expect_failures = [azurerm_application_gateway.this]
+}
+
+run "rejects_key_vault_ssl_cert_without_user_assigned_identity" {
+  command = plan
+  variables {
+    ssl_certificates = {
+      cert1 = {
+        key_vault_secret_id = "https://kv-test.vault.azure.net/secrets/cert1"
+      }
+    }
+  }
+  expect_failures = [azurerm_application_gateway.this]
+}
+
+run "rejects_waf_v2_without_policy" {
+  command = plan
+  variables {
+    sku_name = "WAF_v2"
+    sku_tier = "WAF_v2"
+  }
+  expect_failures = [azurerm_application_gateway.this]
+}
+
+run "rejects_dynamic_private_frontend_ip_allocation" {
+  command = plan
+  variables {
+    private_frontend_ip_configuration = {
+      private_ip_address            = "10.0.1.10"
+      private_ip_address_allocation = "Dynamic"
+    }
+  }
+  expect_failures = [var.private_frontend_ip_configuration]
+}
+
+run "accepts_waf_v2_with_managed_waf_policy_and_private_frontend" {
+  command = plan
+  variables {
+    sku_name = "WAF_v2"
+    sku_tier = "WAF_v2"
+    waf_policy = {
+      mode = "Prevention"
+    }
+    private_frontend_ip_configuration = {
+      private_ip_address = "10.0.1.10"
+    }
+    http_listeners = {
+      listener1 = {
+        frontend_port_name   = "http"
+        protocol             = "Http"
+        use_private_frontend = true
+      }
+    }
+  }
+}
