@@ -161,8 +161,8 @@ Creates an Azure NAT Gateway with Standard SKU public IP for outbound connectivi
 
 ---
 
-### vnet-peering `v1.0.0`
-Creates bidirectional Azure Virtual Network peering between two VNets.
+### vnet-peering `v1.1.0`
+Creates bidirectional or one-sided Azure Virtual Network peering between two VNets.
 
 | Variable | Type | Required | Default | Description |
 |----------|------|----------|---------|-------------|
@@ -171,20 +171,23 @@ Creates bidirectional Azure Virtual Network peering between two VNets.
 | `virtual_network_resource_group_name` | string | yes | — | Local VNet RG |
 | `virtual_network_name` | string | yes | — | Local VNet name |
 | `remote_virtual_network_id` | string | yes | — | Remote VNet resource ID |
-| `remote_virtual_network_resource_group_name` | string | yes | — | Remote VNet RG |
-| `remote_virtual_network_name` | string | yes | — | Remote VNet name |
+| `remote_virtual_network_resource_group_name` | string | no | `null` | Remote VNet RG (required when `enable_remote_to_local = true`) |
+| `remote_virtual_network_name` | string | no | `null` | Remote VNet name (required when `enable_remote_to_local = true`) |
+| `enable_remote_to_local` | bool | no | `true` | Create reverse peering (remote-to-local) |
 | `allow_virtual_network_access` | bool | no | `true` | Allow VNet access |
 | `allow_forwarded_traffic` | bool | no | `false` | Allow forwarded traffic |
-| `allow_gateway_transit` | bool | no | `false` | Allow gateway transit |
-| `use_remote_gateways` | bool | no | `false` | Use remote gateways |
+| `allow_gateway_transit` | bool | no | `false` | Allow gateway transit on local-to-remote |
+| `use_remote_gateways` | bool | no | `false` | Use remote gateways on remote-to-local |
+| `local_use_remote_gateways` | bool | no | `false` | Use remote gateways on local-to-remote |
+| `remote_allow_gateway_transit` | bool | no | `false` | Allow gateway transit on remote-to-local |
 | `tags` | map(string) | no | `{}` | Tags |
 
-**Outputs:** `id`, `name`
+**Outputs:** `id`, `name`, `local_to_remote_id`, `remote_to_local_id`
 
 ---
 
-### storage-account `v3.2.1`
-Creates an Azure Storage Account with secure defaults and optional private endpoints per subresource.
+### storage-account `v4.1.0`
+Creates an Azure Storage Account with secure defaults, optional Azure Files shares, and optional private endpoints per subresource.
 
 | Variable | Type | Required | Default | Description |
 |----------|------|----------|---------|-------------|
@@ -193,13 +196,16 @@ Creates an Azure Storage Account with secure defaults and optional private endpo
 | `name` | string | yes | — | Storage account name (3-24 chars, lowercase alphanumeric) |
 | `account_tier` | string | no | `"Standard"` | Standard or Premium |
 | `account_replication_type` | string | no | `"LRS"` | LRS, ZRS, GRS, RAGRS, GZRS, RAGZRS |
-| `access_tier` | string | no | `null` | Hot or Cool |
+| `account_kind` | string | no | `"StorageV2"` | StorageV2, BlobStorage, BlockBlobStorage, FileStorage, Storage |
+| `access_tier` | string | no | `"Hot"` | Hot, Cool, or Cold |
 | `min_tls_version` | string | no | `"1.2"` | Must be 1.2 |
+| `enable_https_traffic_only` | bool | no | `true` | Enforce HTTPS-only traffic (set `false` for NFSv4.1 shares) |
+| `file_shares` | map(object) | no | `{}` | Azure Files shares: quota, enabled_protocol (SMB/NFS), access_tier, metadata |
 | `enable_blob_soft_delete` | bool | no | `true` | Enable blob soft delete |
 | `blob_soft_delete_retention_days` | number | no | `7` | Blob soft delete retention |
 | `enable_container_soft_delete` | bool | no | `true` | Enable container soft delete |
 | `container_soft_delete_retention_days` | number | no | `7` | Container soft delete retention |
-| `enable_blob_versioning` | bool | no | `false` | Enable blob versioning |
+| `enable_versioning` | bool | no | `false` | Enable blob versioning |
 | `enable_private_endpoint` | bool | no | `true` | Enable private endpoints |
 | `enable_public_access` | bool | no | `false` | Enable public access |
 | `allow_nested_items_to_be_public` | bool | no | `false` | Allow public blob containers |
@@ -209,7 +215,7 @@ Creates an Azure Storage Account with secure defaults and optional private endpo
 | `private_service_connection_name_prefix` | string | no | `null` | Override PSC name prefix |
 | `tags` | map(string) | no | `{}` | Tags |
 
-**Outputs:** `id`, `name`, `primary_blob_endpoint`, `primary_queue_endpoint`, `primary_table_endpoint`, `primary_file_endpoint`, `private_endpoint_ids`
+**Outputs:** `id`, `name`, `primary_blob_endpoint`, `primary_queue_endpoint`, `primary_table_endpoint`, `primary_file_endpoint`, `file_share_ids`, `private_endpoint_ids`
 
 ---
 
@@ -290,7 +296,7 @@ Creates an Azure Monitor diagnostic setting to route logs and metrics to Log Ana
 
 ## Compute
 
-### aks `v4.1.2`
+### aks `v4.2.0`
 Creates an Azure Kubernetes Service cluster with private-by-default config, Azure AD auth, RBAC, and Container Insights.
 
 | Variable | Type | Required | Default | Description |
@@ -298,11 +304,11 @@ Creates an Azure Kubernetes Service cluster with private-by-default config, Azur
 | `resource_group_name` | string | yes | — | Resource group name |
 | `location` | string | yes | — | Azure region |
 | `name` | string | yes | — | AKS cluster name |
-| `default_node_pool` | object | no | Standard_D2s_v3 | name (default "system"), vm_size, subnet_id, node_count, min/max_count, zones, os_disk_size_gb, etc. |
+| `default_node_pool` | object | no | Standard_D2s_v3 | name (default "system"), vm_size, subnet_id, node_count, min/max_count, zones, os_disk_size_gb, only_critical_addons_enabled, etc. |
 | `dns_prefix` | string | no | name | DNS prefix |
 | `kubernetes_version` | string | no | `null` (latest) | Kubernetes version |
 | `sku_tier` | string | no | `"Free"` | Free, Standard, or Premium |
-| `network_profile` | object | no | azure CNI | network_plugin, network_policy, service_cidr, dns_service_ip, load_balancer_sku |
+| `network_profile` | object | no | azure CNI | network_plugin, network_policy, network_data_plane (azure/cilium), service_cidr, dns_service_ip, load_balancer_sku |
 | `authorized_ip_ranges` | list(string) | no | `[]` | Public IPs allowed to reach API server |
 | `admin_group_object_ids` | list(string) | no | `[]` | Azure AD group IDs for cluster admin |
 | `rbac_mode` | string | no | `"azure"` | azure or kubernetes |
@@ -322,7 +328,7 @@ Creates an Azure Kubernetes Service cluster with private-by-default config, Azur
 | `user_assigned_identity_ids` | list(string) | no | `[]` | User-assigned identity IDs |
 | `tags` | map(string) | no | `{}` | Tags |
 
-**Outputs:** `id`, `name`, `fqdn`, `private_fqdn`, `kubelet_identity`, `principal_id`, `tenant_id`, `oidc_issuer_url`, `node_resource_group`
+**Outputs:** `id`, `name`, `fqdn`, `private_fqdn`, `kubelet_identity`, `key_vault_secrets_provider_identity`, `principal_id`, `tenant_id`, `oidc_issuer_url`, `node_resource_group`
 
 ---
 
@@ -508,6 +514,7 @@ Creates an Azure Container App in an existing Container Apps Environment.
 | `ingress` | object | no | `null` | Ingress: target_port, transport (auto/http/http2/tcp), traffic_weight |
 | `secrets` | map(string) | no | `{}` | Secrets (sensitive) |
 | `scale` | object | no | `null` | Scale: min_replicas, max_replicas, rules |
+| `registries` | list(object) | no | `[]` | Private registry auth: server, identity (UAI resource ID) or username + password_secret_name |
 | `user_assigned_identity_ids` | list(string) | no | `[]` | User-assigned identity IDs |
 | `workload_profile_name` | string | no | `null` | Workload profile (null = Consumption) |
 | `init_containers` | list(object) | no | `[]` | Init containers |
@@ -878,8 +885,8 @@ Creates an Azure Managed Redis (Enterprise) instance with modules, geo-replicati
 
 ## Networking
 
-### application-gateway `v2.1.1`
-Creates an Azure Application Gateway (v2) with public IP, L7 load balancing, SSL termination, and optional WAF.
+### application-gateway `v2.2.0`
+Creates an Azure Application Gateway (v2) with public and optional private frontend IPs, L7 load balancing, SSL termination, and optional WAF.
 
 | Variable | Type | Required | Default | Description |
 |----------|------|----------|---------|-------------|
@@ -891,12 +898,15 @@ Creates an Azure Application Gateway (v2) with public IP, L7 load balancing, SSL
 | `sku_tier` | string | no | `"Standard_v2"` | Standard_v2 or WAF_v2 |
 | `autoscale` | object | no | `{min=1, max=2}` | Min/max capacity |
 | `zones` | list(string) | no | `[]` | Availability zones |
-| `firewall_policy_id` | string | no | `null` | WAF policy ID |
+| `firewall_policy_id` | string | no | `null` | External WAF policy ID |
+| `waf_policy` | object | no | `null` | Managed WAF policy created when `firewall_policy_id` is `null` |
+| `private_frontend_ip_configuration` | object | no | `null` | Private frontend IP: `private_ip_address`, `subnet_id` |
+| `user_assigned_identity_ids` | list(string) | no | `[]` | User-assigned managed identity IDs (for Key Vault SSL certs) |
 | `ssl_policy_name` | string | no | `"AppGwSslPolicy20220101"` | Predefined SSL policy (TLS 1.2+) |
 | `frontend_ports` | map(object) | no | ports 80, 443 | Port definitions |
 | `backend_address_pools` | map(object) | no | `{}` | Pools: fqdns, ip_addresses |
 | `backend_http_settings` | map(object) | no | `{}` | HTTP settings: port, protocol, probe, affinity, timeout |
-| `http_listeners` | map(object) | no | `{}` | Listeners: protocol, port, hostname, ssl_certificate |
+| `http_listeners` | map(object) | no | `{}` | Listeners: protocol, port, hostname, ssl_certificate, use_private_frontend, firewall_policy_id |
 | `request_routing_rules` | map(object) | no | `{}` | Rules: priority, listener, pool, settings |
 | `probes` | map(object) | no | `{}` | Health probes: protocol, path, interval |
 | `ssl_certificates` | map(object) | no | `{}` | PFX data+password or Key Vault secret ID (sensitive) |
@@ -905,7 +915,7 @@ Creates an Azure Application Gateway (v2) with public IP, L7 load balancing, SSL
 | `enable_http2` | bool | no | `false` | Enable HTTP/2 |
 | `tags` | map(string) | no | `{}` | Tags |
 
-**Outputs:** `id`, `name`, `public_ip_address`, `public_ip_id`, `backend_address_pool_ids`
+**Outputs:** `id`, `name`, `public_ip_address`, `public_ip_id`, `private_ip_address`, `waf_policy_id`, `backend_address_pool_ids`
 
 ---
 
