@@ -5,7 +5,7 @@ variable "route_table_rt" {}
 variable "network_security_group_nsg" {}
 
 module "virtual_network_hub" {
-  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/virtual-network?ref=virtual-network/v1.0.0"
+  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/virtual-network?ref=virtual-network/v1.0.1"
 
   resource_group_name = var.virtual_network_hub.resource_group_name
   location            = var.virtual_network_hub.location
@@ -15,7 +15,7 @@ module "virtual_network_hub" {
   subnets             = var.virtual_network_hub.subnets
 }
 module "virtual_network_spoke" {
-  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/virtual-network?ref=virtual-network/v1.0.0"
+  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/virtual-network?ref=virtual-network/v1.0.1"
 
   resource_group_name             = var.virtual_network_spoke.resource_group_name
   location                        = var.virtual_network_spoke.location
@@ -27,7 +27,7 @@ module "virtual_network_spoke" {
   subnet_nsg_associations         = { "workload" = module.network_security_group_nsg.id }
 }
 module "vnet_peering_peering" {
-  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/vnet-peering?ref=vnet-peering/v1.0.0"
+  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/vnet-peering?ref=vnet-peering/v1.1.0"
 
   name                                       = var.vnet_peering_peering.name
   tags                                       = var.vnet_peering_peering.tags
@@ -39,7 +39,7 @@ module "vnet_peering_peering" {
   remote_virtual_network_id                  = module.virtual_network_spoke.id
 }
 module "route_table_rt" {
-  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/route-table?ref=route-table/v1.2.0"
+  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/route-table?ref=route-table/v1.2.1"
 
   resource_group_name = var.route_table_rt.resource_group_name
   location            = var.route_table_rt.location
@@ -47,7 +47,7 @@ module "route_table_rt" {
   tags                = var.route_table_rt.tags
 }
 module "network_security_group_nsg" {
-  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/network-security-group?ref=network-security-group/v1.3.0"
+  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/network-security-group?ref=network-security-group/v1.3.1"
 
   resource_group_name = var.network_security_group_nsg.resource_group_name
   location            = var.network_security_group_nsg.location
