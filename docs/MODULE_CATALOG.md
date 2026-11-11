@@ -82,7 +82,7 @@ See `docs/MIGRATION.md` for upgrade instructions.
 
 ## Foundation
 
-### virtual-network `v1.0.0`
+### virtual-network `v1.0.1`
 Creates an Azure Virtual Network with configurable subnets.
 
 | Variable | Type | Required | Default | Description |
@@ -100,7 +100,7 @@ Creates an Azure Virtual Network with configurable subnets.
 
 ---
 
-### network-security-group `v1.2.0`
+### network-security-group `v1.3.1`
 Creates an Azure NSG with configurable security rules managed as separate resources.
 
 | Variable | Type | Required | Default | Description |
@@ -115,7 +115,7 @@ Creates an Azure NSG with configurable security rules managed as separate resour
 
 ---
 
-### private-dns-zone `v1.0.0`
+### private-dns-zone `v1.0.1`
 Creates an Azure Private DNS Zone with virtual network linking.
 
 | Variable | Type | Required | Default | Description |
@@ -129,7 +129,7 @@ Creates an Azure Private DNS Zone with virtual network linking.
 
 ---
 
-### route-table `v1.2.0`
+### route-table `v1.2.1`
 Creates an Azure Route Table with configurable routes managed as separate resources.
 
 | Variable | Type | Required | Default | Description |
@@ -145,7 +145,7 @@ Creates an Azure Route Table with configurable routes managed as separate resour
 
 ---
 
-### nat-gateway `v1.0.0`
+### nat-gateway `v1.0.1`
 Creates an Azure NAT Gateway with Standard SKU public IP for outbound connectivity.
 
 | Variable | Type | Required | Default | Description |
@@ -245,7 +245,7 @@ Creates an Azure Key Vault with RBAC authorization and optional private endpoint
 
 ---
 
-### user-assigned-identity `v1.0.0`
+### user-assigned-identity `v1.0.1`
 Creates an Azure User-Assigned Managed Identity.
 
 | Variable | Type | Required | Default | Description |
@@ -259,7 +259,7 @@ Creates an Azure User-Assigned Managed Identity.
 
 ---
 
-### log-analytics-workspace `v1.0.0`
+### log-analytics-workspace `v1.0.1`
 Creates an Azure Log Analytics workspace for centralized logging.
 
 | Variable | Type | Required | Default | Description |
@@ -278,7 +278,7 @@ Creates an Azure Log Analytics workspace for centralized logging.
 
 ---
 
-### diagnostic-settings `v1.0.1`
+### diagnostic-settings `v1.0.2`
 Creates an Azure Monitor diagnostic setting to route logs and metrics to Log Analytics.
 
 | Variable | Type | Required | Default | Description |
@@ -332,7 +332,7 @@ Creates an Azure Kubernetes Service cluster with private-by-default config, Azur
 
 ---
 
-### aks-node-pool `v2.0.0`
+### aks-node-pool `v2.0.1`
 Creates additional user node pools for an existing AKS cluster.
 
 | Variable | Type | Required | Default | Description |
@@ -344,7 +344,7 @@ Creates additional user node pools for an existing AKS cluster.
 
 ---
 
-### app-service-plan `v1.0.1`
+### app-service-plan `v1.0.2`
 Creates an Azure App Service Plan with configurable OS, SKU, and optional zone redundancy.
 
 | Variable | Type | Required | Default | Description |
@@ -550,7 +550,7 @@ Creates an Azure Container Registry with secure defaults and optional private en
 
 ---
 
-### linux-virtual-machine `v1.3.0`
+### linux-virtual-machine `v1.3.1`
 Creates an Azure Linux VM with NIC, optional public IP, and data disk management.
 
 | Variable | Type | Required | Default | Description |
@@ -580,7 +580,7 @@ Creates an Azure Linux VM with NIC, optional public IP, and data disk management
 
 ---
 
-### windows-virtual-machine `v2.0.0`
+### windows-virtual-machine `v2.0.1`
 Creates an Azure Windows VM with NIC, optional public IP, and data disk management.
 
 | Variable | Type | Required | Default | Description |
@@ -611,7 +611,7 @@ Creates an Azure Windows VM with NIC, optional public IP, and data disk manageme
 
 ---
 
-### bastion `v1.0.0`
+### bastion `v1.0.1`
 Creates an Azure Bastion host with automatic public IP for secure RDP/SSH access.
 
 | Variable | Type | Required | Default | Description |
@@ -633,7 +633,7 @@ Creates an Azure Bastion host with automatic public IP for secure RDP/SSH access
 
 ---
 
-### static-web-app `v3.0.0`
+### static-web-app `v3.0.1`
 Creates an Azure Static Web App with Standard SKU and private endpoint by default.
 
 | Variable | Type | Required | Default | Description |
@@ -1019,7 +1019,7 @@ Creates an Azure Event Hub namespace with event hubs, consumer groups, and optio
 
 ---
 
-### communication-service-email `v1.0.1`
+### communication-service-email `v1.0.2`
 Composes an Azure Communication Service, Email Communication Service, an email domain (Azure-managed or customer-managed), per-entry sender usernames, and the communication-service ↔ domain association. ACS resources are global — the module's `location` variable is required by convention but not passed to the underlying resources.
 
 | Variable | Type | Required | Default | Description |
@@ -1042,7 +1042,7 @@ Composes an Azure Communication Service, Email Communication Service, an email d
 
 ## AI / ML
 
-### ai-foundry `v1.0.1`
+### ai-foundry `v1.0.2`
 Wraps `azurerm_ai_foundry` (hub, AML-workspace flavour with kind = Hub) and a single default `azurerm_ai_foundry_project`. Optional private endpoint to the `amlworkspace` subresource and Phase 2 diagnostic settings. Connections are out of scope — AzureRM has no `azurerm_ai_foundry_connection` resource yet.
 
 | Variable | Type | Required | Default | Description |
@@ -1102,7 +1102,7 @@ Creates an Azure Application Insights resource backed by Log Analytics for APM.
 
 ---
 
-### action-group `v1.0.0`
+### action-group `v1.0.1`
 Creates an Azure Monitor Action Group for alert notifications.
 
 | Variable | Type | Required | Default | Description |

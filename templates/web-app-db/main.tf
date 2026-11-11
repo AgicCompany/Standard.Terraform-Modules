@@ -7,7 +7,7 @@ variable "log_analytics_workspace_logs" {}
 variable "application_insights_insights" {}
 
 module "app_service_plan_plan" {
-  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/app-service-plan?ref=app-service-plan/v1.0.1"
+  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/app-service-plan?ref=app-service-plan/v1.0.2"
 
   resource_group_name = var.app_service_plan_plan.resource_group_name
   location            = var.app_service_plan_plan.location
@@ -57,7 +57,7 @@ module "key_vault_kv" {
   enable_private_endpoint = var.key_vault_kv.enable_private_endpoint
 }
 module "log_analytics_workspace_logs" {
-  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/log-analytics-workspace?ref=log-analytics-workspace/v1.0.0"
+  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/log-analytics-workspace?ref=log-analytics-workspace/v1.0.1"
 
   resource_group_name = var.log_analytics_workspace_logs.resource_group_name
   location            = var.log_analytics_workspace_logs.location

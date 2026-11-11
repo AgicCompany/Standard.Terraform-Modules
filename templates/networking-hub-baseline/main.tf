@@ -6,7 +6,7 @@ variable "bastion_bastion" {}
 variable "private_dns_zone_pdns" {}
 
 module "virtual_network_vnet" {
-  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/virtual-network?ref=virtual-network/v1.0.0"
+  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/virtual-network?ref=virtual-network/v1.0.1"
 
   resource_group_name             = var.virtual_network_vnet.resource_group_name
   location                        = var.virtual_network_vnet.location
@@ -18,7 +18,7 @@ module "virtual_network_vnet" {
   subnet_route_table_associations = { "workload" = module.route_table_rt.id }
 }
 module "network_security_group_nsg" {
-  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/network-security-group?ref=network-security-group/v1.3.0"
+  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/network-security-group?ref=network-security-group/v1.3.1"
 
   resource_group_name = var.network_security_group_nsg.resource_group_name
   location            = var.network_security_group_nsg.location
@@ -26,7 +26,7 @@ module "network_security_group_nsg" {
   tags                = var.network_security_group_nsg.tags
 }
 module "route_table_rt" {
-  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/route-table?ref=route-table/v1.2.0"
+  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/route-table?ref=route-table/v1.2.1"
 
   resource_group_name = var.route_table_rt.resource_group_name
   location            = var.route_table_rt.location
@@ -34,7 +34,7 @@ module "route_table_rt" {
   tags                = var.route_table_rt.tags
 }
 module "nat_gateway_nat" {
-  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/nat-gateway?ref=nat-gateway/v1.0.0"
+  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/nat-gateway?ref=nat-gateway/v1.0.1"
 
   resource_group_name = var.nat_gateway_nat.resource_group_name
   location            = var.nat_gateway_nat.location
@@ -42,7 +42,7 @@ module "nat_gateway_nat" {
   tags                = var.nat_gateway_nat.tags
 }
 module "bastion_bastion" {
-  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/bastion?ref=bastion/v1.0.0"
+  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/bastion?ref=bastion/v1.0.1"
 
   resource_group_name = var.bastion_bastion.resource_group_name
   location            = var.bastion_bastion.location
@@ -51,7 +51,7 @@ module "bastion_bastion" {
   subnet_id           = module.virtual_network_vnet.subnet_ids["AzureBastionSubnet"]
 }
 module "private_dns_zone_pdns" {
-  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/private-dns-zone?ref=private-dns-zone/v1.0.0"
+  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/private-dns-zone?ref=private-dns-zone/v1.0.1"
 
   resource_group_name   = var.private_dns_zone_pdns.resource_group_name
   name                  = var.private_dns_zone_pdns.name

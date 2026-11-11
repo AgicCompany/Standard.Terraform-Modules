@@ -6,7 +6,7 @@ variable "log_analytics_workspace_logs" {}
 variable "application_insights_insights" {}
 
 module "static_web_app_swa" {
-  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/static-web-app?ref=static-web-app/v3.0.0"
+  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/static-web-app?ref=static-web-app/v3.0.1"
 
   resource_group_name             = var.static_web_app_swa.resource_group_name
   location                        = var.static_web_app_swa.location
@@ -18,7 +18,7 @@ module "static_web_app_swa" {
   enable_private_endpoint         = var.static_web_app_swa.enable_private_endpoint
 }
 module "app_service_plan_plan" {
-  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/app-service-plan?ref=app-service-plan/v1.0.1"
+  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/app-service-plan?ref=app-service-plan/v1.0.2"
 
   resource_group_name     = var.app_service_plan_plan.resource_group_name
   location                = var.app_service_plan_plan.location
@@ -31,7 +31,7 @@ module "app_service_plan_plan" {
   enable_per_site_scaling = var.app_service_plan_plan.enable_per_site_scaling
 }
 module "storage_account_storage" {
-  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/storage-account?ref=storage-account/v3.2.1"
+  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/storage-account?ref=storage-account/v4.1.0"
 
   resource_group_name                  = var.storage_account_storage.resource_group_name
   location                             = var.storage_account_storage.location
@@ -78,7 +78,7 @@ module "function_app_flex_api" {
   storage_container_endpoint                     = module.storage_account_storage.id
 }
 module "log_analytics_workspace_logs" {
-  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/log-analytics-workspace?ref=log-analytics-workspace/v1.0.0"
+  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/log-analytics-workspace?ref=log-analytics-workspace/v1.0.1"
 
   resource_group_name       = var.log_analytics_workspace_logs.resource_group_name
   location                  = var.log_analytics_workspace_logs.location

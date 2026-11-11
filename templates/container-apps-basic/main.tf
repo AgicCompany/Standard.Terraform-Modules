@@ -6,7 +6,7 @@ variable "user_assigned_identity_uami" {}
 variable "virtual_network_vnet" {}
 
 module "log_analytics_workspace_logs" {
-  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/log-analytics-workspace?ref=log-analytics-workspace/v1.0.0"
+  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/log-analytics-workspace?ref=log-analytics-workspace/v1.0.1"
 
   resource_group_name = var.log_analytics_workspace_logs.resource_group_name
   location            = var.log_analytics_workspace_logs.location
@@ -43,7 +43,7 @@ module "container_registry_acr" {
   enable_private_endpoint = var.container_registry_acr.enable_private_endpoint
 }
 module "user_assigned_identity_uami" {
-  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/user-assigned-identity?ref=user-assigned-identity/v1.0.0"
+  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/user-assigned-identity?ref=user-assigned-identity/v1.0.1"
 
   resource_group_name = var.user_assigned_identity_uami.resource_group_name
   location            = var.user_assigned_identity_uami.location
@@ -51,7 +51,7 @@ module "user_assigned_identity_uami" {
   tags                = var.user_assigned_identity_uami.tags
 }
 module "virtual_network_vnet" {
-  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/virtual-network?ref=virtual-network/v1.0.0"
+  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/virtual-network?ref=virtual-network/v1.0.1"
 
   resource_group_name = var.virtual_network_vnet.resource_group_name
   location            = var.virtual_network_vnet.location

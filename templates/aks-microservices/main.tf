@@ -7,7 +7,7 @@ variable "key_vault_kv" {}
 variable "log_analytics_workspace_logs" {}
 
 module "virtual_network_vnet" {
-  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/virtual-network?ref=virtual-network/v1.0.0"
+  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/virtual-network?ref=virtual-network/v1.0.1"
 
   resource_group_name = var.virtual_network_vnet.resource_group_name
   location            = var.virtual_network_vnet.location
@@ -17,7 +17,7 @@ module "virtual_network_vnet" {
   subnets             = var.virtual_network_vnet.subnets
 }
 module "aks_aks" {
-  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/aks?ref=aks/v4.1.2"
+  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/aks?ref=aks/v4.2.0"
 
   resource_group_name             = var.aks_aks.resource_group_name
   location                        = var.aks_aks.location
@@ -31,7 +31,7 @@ module "aks_aks" {
   default_node_pool               = merge(var.aks_aks.default_node_pool, { vnet_subnet_id = module.virtual_network_vnet.subnet_ids["aks"] })
 }
 module "aks_node_pool_userpool" {
-  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/aks-node-pool?ref=aks-node-pool/v2.0.0"
+  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/aks-node-pool?ref=aks-node-pool/v2.0.1"
 
   node_pools            = merge(var.aks_node_pool_userpool.node_pools, { "user" = merge(try(var.aks_node_pool_userpool.node_pools["user"], {}), { vnet_subnet_id = module.virtual_network_vnet.subnet_ids["aks"] }) })
   kubernetes_cluster_id = module.aks_aks.id
@@ -46,7 +46,7 @@ module "container_registry_acr" {
   enable_private_endpoint = var.container_registry_acr.enable_private_endpoint
 }
 module "user_assigned_identity_uami" {
-  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/user-assigned-identity?ref=user-assigned-identity/v1.0.0"
+  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/user-assigned-identity?ref=user-assigned-identity/v1.0.1"
 
   resource_group_name = var.user_assigned_identity_uami.resource_group_name
   location            = var.user_assigned_identity_uami.location
@@ -63,7 +63,7 @@ module "key_vault_kv" {
   enable_private_endpoint = var.key_vault_kv.enable_private_endpoint
 }
 module "log_analytics_workspace_logs" {
-  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/log-analytics-workspace?ref=log-analytics-workspace/v1.0.0"
+  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/log-analytics-workspace?ref=log-analytics-workspace/v1.0.1"
 
   resource_group_name = var.log_analytics_workspace_logs.resource_group_name
   location            = var.log_analytics_workspace_logs.location

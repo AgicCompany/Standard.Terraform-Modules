@@ -4,7 +4,7 @@ variable "windows_virtual_machine_vm" {}
 variable "bastion_bastion" {}
 
 module "virtual_network_vnet" {
-  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/virtual-network?ref=virtual-network/v1.0.0"
+  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/virtual-network?ref=virtual-network/v1.0.1"
 
   resource_group_name     = var.virtual_network_vnet.resource_group_name
   location                = var.virtual_network_vnet.location
@@ -15,7 +15,7 @@ module "virtual_network_vnet" {
   subnet_nsg_associations = { "vm" = module.network_security_group_nsg.id }
 }
 module "network_security_group_nsg" {
-  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/network-security-group?ref=network-security-group/v1.3.0"
+  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/network-security-group?ref=network-security-group/v1.3.1"
 
   resource_group_name = var.network_security_group_nsg.resource_group_name
   location            = var.network_security_group_nsg.location
@@ -23,7 +23,7 @@ module "network_security_group_nsg" {
   tags                = var.network_security_group_nsg.tags
 }
 module "windows_virtual_machine_vm" {
-  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/windows-virtual-machine?ref=windows-virtual-machine/v2.0.0"
+  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/windows-virtual-machine?ref=windows-virtual-machine/v2.0.1"
 
   resource_group_name = var.windows_virtual_machine_vm.resource_group_name
   location            = var.windows_virtual_machine_vm.location
@@ -35,7 +35,7 @@ module "windows_virtual_machine_vm" {
   subnet_id           = module.virtual_network_vnet.subnet_ids["vm"]
 }
 module "bastion_bastion" {
-  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/bastion?ref=bastion/v1.0.0"
+  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/bastion?ref=bastion/v1.0.1"
 
   resource_group_name = var.bastion_bastion.resource_group_name
   location            = var.bastion_bastion.location
