@@ -17,7 +17,7 @@ module "virtual_network_vnet" {
   subnets             = var.virtual_network_vnet.subnets
 }
 module "aks_aks" {
-  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/aks?ref=aks/v4.2.0"
+  source = "git::https://github.com/AgicCompany/Standard.Terraform-Modules.git//modules/aks?ref=aks/v4.2.1"
 
   resource_group_name             = var.aks_aks.resource_group_name
   location                        = var.aks_aks.location

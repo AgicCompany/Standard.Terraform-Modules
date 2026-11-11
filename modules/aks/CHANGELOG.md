@@ -4,6 +4,8 @@ All notable changes to this module will be documented in this file.
 
 ## [Unreleased]
 
+## [4.2.1] - 2026-11-11
+
 ### Fixed
 
 - Rewrote `auto_scaler_profile.expander` validation as a null-safe nested ternary instead of relying on `try(..., true)` around `||`. No interface or behavior change.

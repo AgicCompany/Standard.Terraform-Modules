@@ -17,6 +17,7 @@ updates:
       applies-to: security-updates
       patterns:
       - '*'
+  open-pull-requests-limit: 0
 - package-ecosystem: pip
   directory: /tools
   schedule:
@@ -47,6 +48,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/action-group/examples/basic
   schedule:
@@ -64,6 +66,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/action-group/examples/complete
   schedule:
@@ -81,6 +84,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/ai-foundry
   schedule:
@@ -98,6 +102,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/ai-foundry/examples/basic
   schedule:
@@ -115,6 +120,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/ai-foundry/examples/complete
   schedule:
@@ -132,6 +138,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/aks
   schedule:
@@ -149,6 +156,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/aks-node-pool
   schedule:
@@ -166,6 +174,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/aks-node-pool/examples/basic
   schedule:
@@ -183,6 +192,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/aks-node-pool/examples/complete
   schedule:
@@ -200,6 +210,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/aks/examples/basic
   schedule:
@@ -217,6 +228,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/aks/examples/complete
   schedule:
@@ -234,6 +246,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/api-management
   schedule:
@@ -251,6 +264,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/api-management/examples/basic
   schedule:
@@ -268,6 +282,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/api-management/examples/complete
   schedule:
@@ -285,6 +300,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/app-service-plan
   schedule:
@@ -302,6 +318,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/app-service-plan/examples/basic
   schedule:
@@ -319,6 +336,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/app-service-plan/examples/complete
   schedule:
@@ -336,6 +354,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/application-gateway
   schedule:
@@ -353,6 +372,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/application-gateway/examples/basic
   schedule:
@@ -370,6 +390,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/application-gateway/examples/complete
   schedule:
@@ -387,6 +408,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/application-insights
   schedule:
@@ -404,6 +426,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/application-insights/examples/basic
   schedule:
@@ -421,6 +444,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/application-insights/examples/complete
   schedule:
@@ -438,6 +462,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/bastion
   schedule:
@@ -455,6 +480,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/bastion/examples/basic
   schedule:
@@ -472,6 +498,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/bastion/examples/complete
   schedule:
@@ -489,6 +516,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/communication-service-email
   schedule:
@@ -506,6 +534,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/communication-service-email/examples/basic
   schedule:
@@ -523,6 +552,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/communication-service-email/examples/complete
   schedule:
@@ -540,6 +570,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/container-app
   schedule:
@@ -557,6 +588,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/container-app-environment
   schedule:
@@ -574,6 +606,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/container-app-environment/examples/basic
   schedule:
@@ -591,6 +624,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/container-app-environment/examples/complete
   schedule:
@@ -608,6 +642,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/container-app-job
   schedule:
@@ -625,6 +660,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/container-app-job/examples/basic
   schedule:
@@ -642,6 +678,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/container-app-job/examples/complete
   schedule:
@@ -659,6 +696,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/container-app/examples/basic
   schedule:
@@ -676,6 +714,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/container-app/examples/complete
   schedule:
@@ -693,6 +732,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/container-registry
   schedule:
@@ -710,6 +750,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/container-registry/examples/basic
   schedule:
@@ -727,6 +768,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/container-registry/examples/complete
   schedule:
@@ -744,6 +786,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/cosmosdb
   schedule:
@@ -761,6 +804,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/cosmosdb/examples/basic
   schedule:
@@ -778,6 +822,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/cosmosdb/examples/complete
   schedule:
@@ -795,6 +840,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/diagnostic-settings
   schedule:
@@ -812,6 +858,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/diagnostic-settings/examples/basic
   schedule:
@@ -829,6 +876,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/diagnostic-settings/examples/complete
   schedule:
@@ -846,6 +894,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/event-hub
   schedule:
@@ -863,6 +912,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/event-hub/examples/basic
   schedule:
@@ -880,6 +930,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/event-hub/examples/complete
   schedule:
@@ -897,6 +948,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/front-door
   schedule:
@@ -914,6 +966,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/front-door/examples/basic
   schedule:
@@ -931,6 +984,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/front-door/examples/complete
   schedule:
@@ -948,6 +1002,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/function-app
   schedule:
@@ -965,6 +1020,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/function-app-flex
   schedule:
@@ -982,6 +1038,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/function-app-flex/examples/basic
   schedule:
@@ -999,6 +1056,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/function-app-flex/examples/complete
   schedule:
@@ -1016,6 +1074,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/function-app/examples/basic
   schedule:
@@ -1033,6 +1092,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/function-app/examples/complete
   schedule:
@@ -1050,6 +1110,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/key-vault
   schedule:
@@ -1067,6 +1128,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/key-vault/examples/basic
   schedule:
@@ -1084,6 +1146,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/key-vault/examples/complete
   schedule:
@@ -1101,6 +1164,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/linux-virtual-machine
   schedule:
@@ -1118,6 +1182,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/linux-virtual-machine/examples/basic
   schedule:
@@ -1135,6 +1200,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/linux-virtual-machine/examples/complete
   schedule:
@@ -1152,6 +1218,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/linux-web-app
   schedule:
@@ -1169,6 +1236,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/linux-web-app/examples/basic
   schedule:
@@ -1186,6 +1254,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/linux-web-app/examples/complete
   schedule:
@@ -1203,6 +1272,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/log-analytics-workspace
   schedule:
@@ -1220,6 +1290,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/log-analytics-workspace/examples/basic
   schedule:
@@ -1237,6 +1308,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/log-analytics-workspace/examples/complete
   schedule:
@@ -1254,6 +1326,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/managed-redis
   schedule:
@@ -1271,6 +1344,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/managed-redis/examples/basic
   schedule:
@@ -1288,6 +1362,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/managed-redis/examples/complete
   schedule:
@@ -1305,6 +1380,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/mssql-database
   schedule:
@@ -1322,6 +1398,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/mssql-database/examples/basic
   schedule:
@@ -1339,6 +1416,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/mssql-database/examples/complete
   schedule:
@@ -1356,6 +1434,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/mssql-managed-instance
   schedule:
@@ -1373,6 +1452,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/mssql-managed-instance/examples/basic
   schedule:
@@ -1390,6 +1470,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/mssql-managed-instance/examples/complete
   schedule:
@@ -1407,6 +1488,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/mssql-server
   schedule:
@@ -1424,6 +1506,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/mssql-server/examples/basic
   schedule:
@@ -1441,6 +1524,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/mssql-server/examples/complete
   schedule:
@@ -1458,6 +1542,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/mysql-flexible-server
   schedule:
@@ -1475,6 +1560,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/mysql-flexible-server/examples/basic
   schedule:
@@ -1492,6 +1578,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/mysql-flexible-server/examples/complete
   schedule:
@@ -1509,6 +1596,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/nat-gateway
   schedule:
@@ -1526,6 +1614,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/nat-gateway/examples/basic
   schedule:
@@ -1543,6 +1632,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/nat-gateway/examples/complete
   schedule:
@@ -1560,6 +1650,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/network-security-group
   schedule:
@@ -1577,6 +1668,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/network-security-group/examples/basic
   schedule:
@@ -1594,6 +1686,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/network-security-group/examples/complete
   schedule:
@@ -1611,6 +1704,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/postgresql-flexible-server
   schedule:
@@ -1628,6 +1722,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/postgresql-flexible-server/examples/basic
   schedule:
@@ -1645,6 +1740,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/postgresql-flexible-server/examples/complete
   schedule:
@@ -1662,6 +1758,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/private-dns-zone
   schedule:
@@ -1679,6 +1776,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/private-dns-zone/examples/basic
   schedule:
@@ -1696,6 +1794,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/private-dns-zone/examples/complete
   schedule:
@@ -1713,6 +1812,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/redis-cache
   schedule:
@@ -1730,6 +1830,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/redis-cache/examples/basic
   schedule:
@@ -1747,6 +1848,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/redis-cache/examples/complete
   schedule:
@@ -1764,6 +1866,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/route-table
   schedule:
@@ -1781,6 +1884,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/route-table/examples/basic
   schedule:
@@ -1798,6 +1902,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/route-table/examples/complete
   schedule:
@@ -1815,6 +1920,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/service-bus
   schedule:
@@ -1832,6 +1938,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/service-bus/examples/basic
   schedule:
@@ -1849,6 +1956,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/service-bus/examples/complete
   schedule:
@@ -1866,6 +1974,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/static-web-app
   schedule:
@@ -1883,6 +1992,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/static-web-app/examples/basic
   schedule:
@@ -1900,6 +2010,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/static-web-app/examples/complete
   schedule:
@@ -1917,6 +2028,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/storage-account
   schedule:
@@ -1934,6 +2046,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/storage-account/examples/basic
   schedule:
@@ -1951,6 +2064,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/storage-account/examples/cmk
   schedule:
@@ -1968,6 +2082,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/storage-account/examples/complete
   schedule:
@@ -1985,6 +2100,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/user-assigned-identity
   schedule:
@@ -2002,6 +2118,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/user-assigned-identity/examples/basic
   schedule:
@@ -2019,6 +2136,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/user-assigned-identity/examples/complete
   schedule:
@@ -2036,6 +2154,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/virtual-network
   schedule:
@@ -2053,6 +2172,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/virtual-network/examples/basic
   schedule:
@@ -2070,6 +2190,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/virtual-network/examples/complete
   schedule:
@@ -2087,6 +2208,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/vnet-peering
   schedule:
@@ -2104,6 +2226,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/vnet-peering/examples/basic
   schedule:
@@ -2121,6 +2244,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/vnet-peering/examples/complete
   schedule:
@@ -2138,6 +2262,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/windows-virtual-machine
   schedule:
@@ -2155,6 +2280,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/windows-virtual-machine/examples/basic
   schedule:
@@ -2172,6 +2298,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /modules/windows-virtual-machine/examples/complete
   schedule:
@@ -2189,6 +2316,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /templates/aks-microservices
   schedule:
@@ -2206,6 +2334,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /templates/container-apps-basic
   schedule:
@@ -2223,6 +2352,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /templates/container-apps-jobs
   schedule:
@@ -2240,6 +2370,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /templates/hub-spoke-peering
   schedule:
@@ -2257,6 +2388,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /templates/linux-vm-jumpbox
   schedule:
@@ -2274,6 +2406,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /templates/networking-hub-baseline
   schedule:
@@ -2291,6 +2424,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /templates/serverless-event-driven
   schedule:
@@ -2308,6 +2442,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /templates/sql-web-app
   schedule:
@@ -2325,6 +2460,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /templates/static-web-api
   schedule:
@@ -2342,6 +2478,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /templates/web-app-db
   schedule:
@@ -2359,6 +2496,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /templates/windows-vm-jumpbox
   schedule:
@@ -2376,6 +2514,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /tests/integration/aks-stack
   schedule:
@@ -2393,6 +2532,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /tests/integration/container-stack
   schedule:
@@ -2410,6 +2550,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /tests/integration/database-stack
   schedule:
@@ -2427,6 +2568,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /tests/integration/messaging-stack
   schedule:
@@ -2444,6 +2586,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /tests/integration/networking-stack
   schedule:
@@ -2461,6 +2604,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /tests/integration/oss-database-stack
   schedule:
@@ -2478,6 +2622,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /tests/integration/serverless-stack
   schedule:
@@ -2495,6 +2640,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /tests/integration/vm-stack
   schedule:
@@ -2512,6 +2658,7 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0
 - package-ecosystem: terraform
   directory: /tests/integration/web-app-stack
   schedule:
@@ -2529,3 +2676,4 @@ updates:
     versions:
     - '>= 5.0.0'
   - dependency-name: '*Standard.Terraform-Modules*'
+  open-pull-requests-limit: 0

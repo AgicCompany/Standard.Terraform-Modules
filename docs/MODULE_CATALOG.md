@@ -296,7 +296,7 @@ Creates an Azure Monitor diagnostic setting to route logs and metrics to Log Ana
 
 ## Compute
 
-### aks `v4.2.0`
+### aks `v4.2.1`
 Creates an Azure Kubernetes Service cluster with private-by-default config, Azure AD auth, RBAC, and Container Insights.
 
 | Variable | Type | Required | Default | Description |
@@ -826,7 +826,7 @@ Creates an Azure Cosmos DB account with SQL API databases and optional private e
 
 ---
 
-### redis-cache `v4.0.2`
+### redis-cache `v4.0.3`
 Creates an Azure Cache for Redis with secure defaults and optional private endpoint.
 
 | Variable | Type | Required | Default | Description |
