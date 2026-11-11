@@ -207,7 +207,13 @@ variable "auto_scaler_profile" {
   description = "Cluster autoscaler profile. When null, Azure defaults apply."
 
   validation {
-    condition     = var.auto_scaler_profile == null || try(var.auto_scaler_profile.expander == null || contains(["least-waste", "priority", "most-pods", "random"], var.auto_scaler_profile.expander), true)
+    condition = (
+      var.auto_scaler_profile == null ? true
+      : (
+        var.auto_scaler_profile.expander == null ? true
+        : contains(["least-waste", "priority", "most-pods", "random"], var.auto_scaler_profile.expander)
+      )
+    )
     error_message = "auto_scaler_profile.expander must be least-waste, priority, most-pods, or random."
   }
 }

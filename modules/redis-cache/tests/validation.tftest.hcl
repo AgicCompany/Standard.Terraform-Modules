@@ -31,3 +31,13 @@ run "rejects_bad_log_analytics_destination_type" {
   }
   expect_failures = [var.diagnostic_settings]
 }
+
+run "rejects_bad_maxmemory_policy" {
+  command = plan
+  variables {
+    redis_configuration = {
+      maxmemory_policy = "invalid"
+    }
+  }
+  expect_failures = [var.redis_configuration]
+}

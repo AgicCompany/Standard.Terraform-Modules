@@ -91,3 +91,13 @@ run "accepts_cilium_policy_with_cilium_data_plane_and_critical_addons" {
     }
   }
 }
+
+run "rejects_bad_auto_scaler_profile_expander" {
+  command = plan
+  variables {
+    auto_scaler_profile = {
+      expander = "invalid"
+    }
+  }
+  expect_failures = [var.auto_scaler_profile]
+}

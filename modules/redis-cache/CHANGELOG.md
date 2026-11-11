@@ -4,6 +4,10 @@ All notable changes to this module will be documented in this file.
 
 ## [Unreleased]
 
+### Fixed
+
+- Rewrote `redis_configuration.maxmemory_policy` validation as a null-safe nested ternary. No interface or behavior change.
+
 ## [4.0.2] - 2026-09-16
 
 ### Fixed
