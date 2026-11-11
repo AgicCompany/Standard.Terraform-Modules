@@ -885,7 +885,7 @@ Creates an Azure Managed Redis (Enterprise) instance with modules, geo-replicati
 
 ## Networking
 
-### application-gateway `v2.2.0`
+### application-gateway `v2.3.0`
 Creates an Azure Application Gateway (v2) with public and optional private frontend IPs, L7 load balancing, SSL termination, and optional WAF.
 
 | Variable | Type | Required | Default | Description |
@@ -905,11 +905,12 @@ Creates an Azure Application Gateway (v2) with public and optional private front
 | `ssl_policy_name` | string | no | `"AppGwSslPolicy20220101"` | Predefined SSL policy (TLS 1.2+) |
 | `frontend_ports` | map(object) | no | ports 80, 443 | Port definitions |
 | `backend_address_pools` | map(object) | no | `{}` | Pools: fqdns, ip_addresses |
-| `backend_http_settings` | map(object) | no | `{}` | HTTP settings: port, protocol, probe, affinity, timeout |
+| `backend_http_settings` | map(object) | no | `{}` | HTTP settings: port, protocol, probe, affinity, timeout, trusted_root_certificate_names |
 | `http_listeners` | map(object) | no | `{}` | Listeners: protocol, port, hostname, ssl_certificate, use_private_frontend, firewall_policy_id |
 | `request_routing_rules` | map(object) | no | `{}` | Rules: priority, listener, pool, settings |
 | `probes` | map(object) | no | `{}` | Health probes: protocol, path, interval |
 | `ssl_certificates` | map(object) | no | `{}` | PFX data+password or Key Vault secret ID (sensitive) |
+| `trusted_root_certificates` | map(object) | no | `{}` | Trusted root CAs (.cer data or Key Vault secret ID) for backend HTTPS |
 | `redirect_configurations` | map(object) | no | `{}` | Redirects: type (Permanent/Found/SeeOther/Temporary) |
 | `url_path_maps` | map(object) | no | `{}` | Path-based routing |
 | `enable_http2` | bool | no | `false` | Enable HTTP/2 |

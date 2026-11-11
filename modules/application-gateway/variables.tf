@@ -151,6 +151,7 @@ variable "backend_http_settings" {
     host_name                                 = optional(string, null)
     pick_host_name_from_backend_http_settings = optional(bool, false)
     path                                      = optional(string, null)
+    trusted_root_certificate_names            = optional(list(string), [])
   }))
   default     = {}
   description = "Map of backend HTTP settings. Key is used as the setting name."
@@ -249,6 +250,23 @@ variable "ssl_certificates" {
   default     = {}
   sensitive   = true
   description = "Map of SSL certificates. Key is used as the certificate name. Provide either data+password (PFX) or key_vault_secret_id."
+}
+
+variable "trusted_root_certificates" {
+  type = map(object({
+    data                = optional(string, null)
+    key_vault_secret_id = optional(string, null)
+  }))
+  default     = {}
+  description = "Map of trusted root certificates (.cer) for backend HTTPS verification. Key is used as the certificate name. Provide either data (Base64 .cer) or key_vault_secret_id."
+
+  validation {
+    condition = alltrue([
+      for k, v in var.trusted_root_certificates :
+      (v.data != null) != (v.key_vault_secret_id != null)
+    ])
+    error_message = "Each trusted_root_certificates entry must set exactly one of data or key_vault_secret_id."
+  }
 }
 
 variable "redirect_configurations" {

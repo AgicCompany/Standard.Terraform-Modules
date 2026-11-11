@@ -121,6 +121,11 @@ resource "azurerm_application_gateway" "this" {
       host_name                           = backend_http_settings.value.pick_host_name_from_backend_http_settings ? null : backend_http_settings.value.host_name
       pick_host_name_from_backend_address = backend_http_settings.value.pick_host_name_from_backend_http_settings
       path                                = backend_http_settings.value.path
+      trusted_root_certificate_names = (
+        length(backend_http_settings.value.trusted_root_certificate_names) > 0
+        ? backend_http_settings.value.trusted_root_certificate_names
+        : null
+      )
     }
   }
 
@@ -186,6 +191,16 @@ resource "azurerm_application_gateway" "this" {
       data                = ssl_certificate.value.data
       password            = ssl_certificate.value.password
       key_vault_secret_id = ssl_certificate.value.key_vault_secret_id
+    }
+  }
+
+  dynamic "trusted_root_certificate" {
+    for_each = var.trusted_root_certificates
+
+    content {
+      name                = trusted_root_certificate.key
+      data                = trusted_root_certificate.value.data
+      key_vault_secret_id = trusted_root_certificate.value.key_vault_secret_id
     }
   }
 
@@ -279,6 +294,24 @@ resource "azurerm_application_gateway" "this" {
         : (var.firewall_policy_id != null ? true : var.waf_policy != null)
       )
       error_message = "WAF_v2 SKU requires either firewall_policy_id or waf_policy to be configured."
+    }
+
+    precondition {
+      condition = (
+        !anytrue([for c in values(var.trusted_root_certificates) : c.key_vault_secret_id != null]) ? true
+        : length(var.user_assigned_identity_ids) > 0
+      )
+      error_message = "user_assigned_identity_ids must include at least one identity when any trusted_root_certificates entry sets key_vault_secret_id."
+    }
+
+    precondition {
+      condition = alltrue(flatten([
+        for s in values(var.backend_http_settings) : [
+          for cert_name in coalesce(s.trusted_root_certificate_names, []) :
+          contains(keys(var.trusted_root_certificates), cert_name)
+        ]
+      ]))
+      error_message = "All backend_http_settings.trusted_root_certificate_names must reference keys defined in trusted_root_certificates."
     }
   }
 }
