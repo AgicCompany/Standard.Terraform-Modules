@@ -4,6 +4,8 @@ All notable changes to this module will be documented in this file.
 
 ## [Unreleased]
 
+## [2.2.0] - 2026-11-11
+
 ### Added
 
 - `private_frontend_ip_configuration` variable and `http_listeners[*].use_private_frontend` flag for dual public + private frontend IP configurations, plus `private_ip_address` output.

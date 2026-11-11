@@ -4,6 +4,8 @@ All notable changes to this module will be documented in this file.
 
 ## [Unreleased]
 
+## [4.1.0] - 2026-11-11
+
 ### Added
 
 - `enable_https_traffic_only` variable (default: `true`) allowing consumers to disable HTTPS-only enforcement when required for Azure Files NFSv4.1 shares.

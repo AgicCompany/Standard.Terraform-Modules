@@ -2,9 +2,9 @@ schema_version: "0.1"
 
 metadata:
   module_name: application-gateway
-  module_version: "2.1.1"
+  module_version: "2.2.0"
   schema_authored_by: AGIC Infrastructure Team
-  schema_last_updated: "2026-09-16"
+  schema_last_updated: "2026-11-11"
 
 catalogue:
   display_name: "Application Gateway"
@@ -146,6 +146,13 @@ variables:
         ssl_certificate_name:
           widget: text
           help: "Must match a key in ssl_certificates. Required for HTTPS."
+        use_private_frontend:
+          widget: toggle
+          help: "Bind listener to the private frontend IP instead of the public IP."
+        firewall_policy_id:
+          widget: resource_picker
+          widget_options: { resource_type: web_application_firewall_policy }
+          help: "Optional per-listener WAF policy override."
       add_label: "Add HTTP listener"
     group: core
     order: 50
@@ -260,6 +267,27 @@ variables:
     order: 10
     help: "Dedicated subnet for the Application Gateway. Minimum /24 recommended."
 
+  private_frontend_ip_configuration:
+    widget: object
+    widget_options:
+      fields:
+        private_ip_address:
+          widget: text
+          placeholder: "10.0.1.10"
+          help: "Static private IP address inside the Application Gateway subnet."
+        private_ip_address_allocation:
+          widget: select
+          widget_options:
+            options: ["Static"]
+        subnet_id:
+          widget: resource_picker
+          widget_options: { resource_type: subnet }
+          help: "Defaults to the gateway subnet_id when left empty."
+    group: networking
+    order: 15
+    advanced: true
+    help: "Optional private frontend IP configuration alongside the public frontend."
+
   frontend_ports:
     widget: repeater
     widget_options:
@@ -326,9 +354,50 @@ variables:
     widget_options: { resource_type: web_application_firewall_policy }
     group: security
     order: 20
-    help: "WAF policy to attach. Required for WAF_v2 SKU."
+    help: "External WAF policy to attach. Required for WAF_v2 SKU unless waf_policy is configured."
     show_when:
       sku_name: "WAF_v2"
+
+  waf_policy:
+    widget: object
+    widget_options:
+      fields:
+        name:
+          widget: text
+          placeholder: "wafpol-<appgw-name>"
+          help: "Defaults to wafpol-<name> when omitted."
+        mode:
+          widget: select
+          widget_options:
+            options: ["Detection", "Prevention"]
+        rule_set_type:
+          widget: text
+          placeholder: "OWASP"
+        rule_set_version:
+          widget: text
+          placeholder: "3.2"
+        file_upload_limit_in_mb:
+          widget: number
+          widget_options: { min: 1, max: 4000 }
+        max_request_body_size_in_kb:
+          widget: number
+          widget_options: { min: 8, max: 2000 }
+        request_body_check:
+          widget: toggle
+    group: security
+    order: 25
+    help: "Optional module-managed WAF policy created when firewall_policy_id is null."
+    show_when:
+      sku_name: "WAF_v2"
+
+  user_assigned_identity_ids:
+    widget: resource_picker
+    widget_options:
+      resource_type: user_assigned_identity
+      multiple: true
+    group: security
+    order: 35
+    help: "User-Assigned Managed Identities attached to the gateway (required for Key Vault SSL certificates)."
 
   ssl_certificates:
     widget: repeater
@@ -442,6 +511,20 @@ composition_contract:
       discovery_kind: azure-resource-id
     external_changes:
       allowed: false
+  - requirement_id: application-gateway.user_assigned_identity_ids
+    variable: user_assigned_identity_ids
+    role: resource_binding
+    necessity: optional
+    resource_type: user_assigned_identity
+    cardinality: many
+    compatible_providers:
+    - user-assigned-identity
+    recommended_provider: user-assigned-identity
+    existing_resource:
+      supported: true
+      discovery_kind: azure-resource-id
+    external_changes:
+      allowed: false
 
 dependencies:
   required_inputs_from_other_resources:
@@ -454,6 +537,11 @@ dependencies:
       resource_type: log_analytics_workspace
       cardinality: one
       notes: "Optional diagnostic sink."
+
+    - variable: user_assigned_identity_ids
+      resource_type: user_assigned_identity
+      cardinality: many
+      notes: "Required when ssl_certificates reference Key Vault secrets."
 
   produces_outputs_consumable_by:
     - output: id
@@ -488,6 +576,17 @@ outputs_display:
     display_name: "Backend pool IDs"
     show_in_summary: false
     copyable: true
+
+  private_ip_address:
+    display_name: "Private IP address"
+    show_in_summary: false
+    copyable: true
+
+  waf_policy_id:
+    display_name: "WAF policy ID"
+    show_in_summary: false
+    copyable: true
+    format: arm_id
 
   public_appgw_id:
     display_name: "Resource ID (public)"
