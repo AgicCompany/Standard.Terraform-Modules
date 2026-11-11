@@ -120,7 +120,48 @@ variable "network_rules" {
   description = "Network rules for the storage account. Only applies when enable_public_access = true."
 }
 
+variable "file_shares" {
+  type = map(object({
+    quota            = number
+    enabled_protocol = optional(string, "SMB")
+    access_tier      = optional(string, null)
+    metadata         = optional(map(string), {})
+  }))
+  default     = {}
+  description = "Map of Azure Files shares to create. Key is the share name. Note: NFS protocol requires account_kind = \"FileStorage\", account_tier = \"Premium\", enable_https_traffic_only = false, and quota >= 100."
+
+  validation {
+    condition = alltrue([
+      for k, v in var.file_shares :
+      contains(["SMB", "NFS"], v.enabled_protocol)
+    ])
+    error_message = "file_shares enabled_protocol must be \"SMB\" or \"NFS\"."
+  }
+
+  validation {
+    condition = alltrue([
+      for k, v in var.file_shares :
+      v.enabled_protocol != "NFS" ? true : v.quota >= 100
+    ])
+    error_message = "NFS file shares require quota >= 100 GiB."
+  }
+
+  validation {
+    condition = alltrue([
+      for k, v in var.file_shares :
+      v.access_tier == null ? true : contains(["Cool", "Hot", "Premium", "TransactionOptimized"], v.access_tier)
+    ])
+    error_message = "file_shares access_tier must be \"Cool\", \"Hot\", \"Premium\", or \"TransactionOptimized\" when set."
+  }
+}
+
 # === Optional: Feature Flags ===
+variable "enable_https_traffic_only" {
+  type        = bool
+  default     = true
+  description = "Enforce HTTPS-only traffic. Must be set to false when using Azure Files NFSv4.1 shares."
+}
+
 variable "enable_private_endpoint" {
   type        = bool
   default     = true

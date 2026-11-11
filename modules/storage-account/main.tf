@@ -18,7 +18,7 @@ resource "azurerm_storage_account" "this" {
 
   # Security settings
   min_tls_version                 = var.min_tls_version == "1.2" ? "TLS1_2" : var.min_tls_version
-  https_traffic_only_enabled      = true
+  https_traffic_only_enabled      = var.enable_https_traffic_only
   allow_nested_items_to_be_public = var.allow_nested_items_to_be_public
   shared_access_key_enabled       = var.shared_access_key_enabled
   public_network_access_enabled   = var.enable_public_access
@@ -138,7 +138,33 @@ resource "azurerm_storage_account" "this" {
       )
       error_message = "customer_managed_key requires account_kind = \"StorageV2\" (the module default) or account_tier = \"Premium\"."
     }
+
+    # Azure Files NFSv4.1 requires a Premium FileStorage account with HTTPS-only disabled.
+    precondition {
+      condition = (
+        !anytrue([for s in values(var.file_shares) : s.enabled_protocol == "NFS"]) ? true
+        : (
+          var.account_kind != "FileStorage" ? false
+          : (
+            var.account_tier != "Premium" ? false
+            : !var.enable_https_traffic_only
+          )
+        )
+      )
+      error_message = "NFS file shares require account_kind = \"FileStorage\", account_tier = \"Premium\", and enable_https_traffic_only = false."
+    }
   }
+}
+
+resource "azurerm_storage_share" "this" {
+  for_each = var.file_shares
+
+  name               = each.key
+  storage_account_id = azurerm_storage_account.this.id
+  quota              = each.value.quota
+  enabled_protocol   = each.value.enabled_protocol
+  access_tier        = each.value.access_tier
+  metadata           = each.value.metadata
 }
 
 resource "azurerm_private_endpoint" "this" {
