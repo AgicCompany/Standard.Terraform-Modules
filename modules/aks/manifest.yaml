@@ -2,7 +2,7 @@ schema_version: "0.1"
 
 metadata:
   module_name: aks
-  module_version: "4.2.0"
+  module_version: "4.2.1"
   schema_authored_by: AGIC Infrastructure Team
   schema_last_updated: "2026-11-11"
 
