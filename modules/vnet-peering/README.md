@@ -84,12 +84,15 @@ No modules.
 | <a name="input_allow_forwarded_traffic"></a> [allow\_forwarded\_traffic](#input\_allow\_forwarded\_traffic) | Allow forwarded traffic from remote VNet | `bool` | `false` | no |
 | <a name="input_allow_gateway_transit"></a> [allow\_gateway\_transit](#input\_allow\_gateway\_transit) | Allow gateway transit on the local VNet | `bool` | `false` | no |
 | <a name="input_allow_virtual_network_access"></a> [allow\_virtual\_network\_access](#input\_allow\_virtual\_network\_access) | Allow access between peered VNets | `bool` | `true` | no |
+| <a name="input_enable_remote_to_local"></a> [enable\_remote\_to\_local](#input\_enable\_remote\_to\_local) | Create the reverse peering (remote-to-local). Set to false when the remote VNet is managed separately. | `bool` | `true` | no |
+| <a name="input_local_use_remote_gateways"></a> [local\_use\_remote\_gateways](#input\_local\_use\_remote\_gateways) | Use remote VNet's gateway on the local-to-remote peering (used when local is the spoke). | `bool` | `false` | no |
 | <a name="input_name"></a> [name](#input\_name) | Peering name prefix. Creates two peerings: `{name}-local-to-remote` and `{name}-remote-to-local`. | `string` | n/a | yes |
+| <a name="input_remote_allow_gateway_transit"></a> [remote\_allow\_gateway\_transit](#input\_remote\_allow\_gateway\_transit) | Allow gateway transit on the remote-to-local peering (used when remote is the hub). | `bool` | `false` | no |
 | <a name="input_remote_virtual_network_id"></a> [remote\_virtual\_network\_id](#input\_remote\_virtual\_network\_id) | Resource ID of the remote virtual network | `string` | n/a | yes |
-| <a name="input_remote_virtual_network_name"></a> [remote\_virtual\_network\_name](#input\_remote\_virtual\_network\_name) | Name of the remote virtual network | `string` | n/a | yes |
-| <a name="input_remote_virtual_network_resource_group_name"></a> [remote\_virtual\_network\_resource\_group\_name](#input\_remote\_virtual\_network\_resource\_group\_name) | Resource group name of the remote virtual network | `string` | n/a | yes |
+| <a name="input_remote_virtual_network_name"></a> [remote\_virtual\_network\_name](#input\_remote\_virtual\_network\_name) | Name of the remote virtual network (required when enable\_remote\_to\_local = true) | `string` | `null` | no |
+| <a name="input_remote_virtual_network_resource_group_name"></a> [remote\_virtual\_network\_resource\_group\_name](#input\_remote\_virtual\_network\_resource\_group\_name) | Resource group name of the remote virtual network (required when enable\_remote\_to\_local = true) | `string` | `null` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | Tags to apply to resources. Included for interface consistency; VNet peering does not support tags. | `map(string)` | `{}` | no |
-| <a name="input_use_remote_gateways"></a> [use\_remote\_gateways](#input\_use\_remote\_gateways) | Use remote VNet's gateway | `bool` | `false` | no |
+| <a name="input_use_remote_gateways"></a> [use\_remote\_gateways](#input\_use\_remote\_gateways) | Use remote VNet's gateway on the remote-to-local peering | `bool` | `false` | no |
 | <a name="input_virtual_network_id"></a> [virtual\_network\_id](#input\_virtual\_network\_id) | Resource ID of the local virtual network | `string` | n/a | yes |
 | <a name="input_virtual_network_name"></a> [virtual\_network\_name](#input\_virtual\_network\_name) | Name of the local virtual network | `string` | n/a | yes |
 | <a name="input_virtual_network_resource_group_name"></a> [virtual\_network\_resource\_group\_name](#input\_virtual\_network\_resource\_group\_name) | Resource group name of the local virtual network | `string` | n/a | yes |
@@ -102,7 +105,7 @@ No modules.
 | <a name="output_local_to_remote_id"></a> [local\_to\_remote\_id](#output\_local\_to\_remote\_id) | Local-to-remote peering resource ID |
 | <a name="output_name"></a> [name](#output\_name) | Local-to-remote peering name |
 | <a name="output_public_peering_id"></a> [public\_peering\_id](#output\_public\_peering\_id) | Local-to-remote peering resource ID (for cross-project consumption) |
-| <a name="output_remote_to_local_id"></a> [remote\_to\_local\_id](#output\_remote\_to\_local\_id) | Remote-to-local peering resource ID |
+| <a name="output_remote_to_local_id"></a> [remote\_to\_local\_id](#output\_remote\_to\_local\_id) | Remote-to-local peering resource ID (null when enable\_remote\_to\_local = false) |
 <!-- END_TF_DOCS -->
 
 ## Notes

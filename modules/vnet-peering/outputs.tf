@@ -16,8 +16,8 @@ output "local_to_remote_id" {
 }
 
 output "remote_to_local_id" {
-  value       = azurerm_virtual_network_peering.remote_to_local.id
-  description = "Remote-to-local peering resource ID"
+  value       = try(azurerm_virtual_network_peering.remote_to_local[0].id, null)
+  description = "Remote-to-local peering resource ID (null when enable_remote_to_local = false)"
 }
 
 # === Public Outputs (Cross-Project Consumption) ===
