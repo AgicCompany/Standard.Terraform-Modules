@@ -2,9 +2,9 @@ schema_version: "0.1"
 
 metadata:
   module_name: vnet-peering
-  module_version: "1.0.0"
+  module_version: "1.1.0"
   schema_authored_by: AGIC Infrastructure Team
-  schema_last_updated: "2026-09-17"
+  schema_last_updated: "2026-11-11"
 
 catalogue:
   display_name: "VNet Peering"
@@ -75,6 +75,12 @@ variables:
     help: "Resource ID of the remote virtual network to peer with."
 
   # --- Features: traffic options ---
+  enable_remote_to_local:
+    widget: toggle
+    group: features
+    order: 5
+    help: "Create the reverse (remote-to-local) peering. Disable when the remote VNet is in a subscription managed separately."
+
   allow_virtual_network_access:
     widget: toggle
     group: features
@@ -91,13 +97,27 @@ variables:
     widget: toggle
     group: features
     order: 30
-    help: "Allow the local VNet's gateway to be used by the remote VNet. Cannot be enabled with use_remote_gateways simultaneously."
+    help: "Allow the local VNet's gateway to be used by the remote VNet. Cannot be enabled with local_use_remote_gateways simultaneously."
 
   use_remote_gateways:
     widget: toggle
     group: features
     order: 40
-    help: "Use the remote VNet's gateway for traffic from the local VNet. Requires allow_gateway_transit on the remote peering."
+    help: "Use the local VNet's gateway on the remote-to-local peering. Requires allow_gateway_transit on the local peering."
+
+  local_use_remote_gateways:
+    widget: toggle
+    group: features
+    order: 50
+    advanced: true
+    help: "Use the remote VNet's gateway on the local-to-remote peering (used when local is the spoke)."
+
+  remote_allow_gateway_transit:
+    widget: toggle
+    group: features
+    order: 60
+    advanced: true
+    help: "Allow gateway transit on the remote-to-local peering (used when remote is the hub)."
 
 composition_contract:
   version: v1

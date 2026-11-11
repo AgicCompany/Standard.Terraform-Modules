@@ -2,9 +2,9 @@ schema_version: "0.1"
 
 metadata:
   module_name: aks
-  module_version: "4.1.2"
+  module_version: "4.2.0"
   schema_authored_by: AGIC Infrastructure Team
-  schema_last_updated: "2026-09-17"
+  schema_last_updated: "2026-11-11"
 
 catalogue:
   display_name: "Azure Kubernetes Service"
@@ -91,6 +91,13 @@ variables:
               - { value: calico, label: "Calico" }
               - { value: cilium, label: "Cilium" }
               - { value: "", label: "None (no network policy)" }
+        network_data_plane:
+          widget: select
+          widget_options:
+            options:
+              - { value: azure, label: "Azure" }
+              - { value: cilium, label: "Cilium" }
+          help: "Must be 'cilium' when network_policy is 'cilium'."
         pod_cidr:
           widget: text
           placeholder: "10.244.0.0/16"
@@ -193,6 +200,9 @@ variables:
         max_pods:
           widget: number
           widget_options: { min: 10, max: 250 }
+        only_critical_addons_enabled:
+          widget: toggle
+          help: "Taint system nodes with CriticalAddonsOnly=true:NoSchedule so application workloads run on user node pools."
         temporary_name_for_rotation:
           widget: text
           placeholder: "tmpnodepool"
@@ -677,6 +687,11 @@ outputs_display:
     show_in_summary: false
     copyable: true
     # See findings: this output is a nested object, not a scalar.
+
+  key_vault_secrets_provider_identity:
+    display_name: "Key Vault Secrets Provider identity"
+    show_in_summary: false
+    copyable: true
 
   public_aks_id:
     display_name: "Resource ID (public)"

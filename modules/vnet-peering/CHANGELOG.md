@@ -4,6 +4,8 @@ All notable changes to this module will be documented in this file.
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-11-11
+
 ### Added
 
 - `enable_remote_to_local` variable (default: `true`) allowing one-sided peering creation when the remote VNet is managed separately (`remote_virtual_network_resource_group_name` and `remote_virtual_network_name` now default to `null` and are required only when `enable_remote_to_local = true`).

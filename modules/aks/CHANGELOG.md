@@ -4,6 +4,8 @@ All notable changes to this module will be documented in this file.
 
 ## [Unreleased]
 
+## [4.2.0] - 2026-11-11
+
 ### Added
 
 - `default_node_pool.only_critical_addons_enabled` field (default: `false`) to taint system nodes with `CriticalAddonsOnly=true:NoSchedule` so application pods schedule only onto user node pools.
